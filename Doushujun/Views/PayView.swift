@@ -1,22 +1,22 @@
 import SwiftUI
+import WebKit
 
-/// 支付页：内置 WebView 打开第三方支付链接 + 复制链接 / Safari 打开 + 支付结果轮询
+/// 支付页：内置 WebView 打开第三方支付链接 + 复制链接/Safari 打开 + 支付结果轮询
 struct PayView: View {
     let orderNo: String
     let payUrl: String
     let onFinished: (_ paid: Bool) -> Void
 
+    @EnvironmentObject private var store: UserStore
     @Environment(\.openURL) private var openURL
 
     @State private var isPolling = false
-    @State private var pollDone = false
     @State private var pollMessage = ""
     @State private var toast: String?
 
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // 提示条
                 VStack(spacing: 6) {
                     Text("请在新打开的页面完成支付")
                         .font(.system(size: 14, weight: .medium))
@@ -38,7 +38,6 @@ struct PayView: View {
                         .frame(maxHeight: .infinity)
                 }
 
-                // 底部操作栏
                 VStack(spacing: 10) {
                     HStack(spacing: 10) {
                         Button(action: copyLink) {
@@ -131,17 +130,16 @@ struct PayView: View {
         }
     }
 
-    /// 轮询订单支付状态（最多 15 次 × 3 秒）
+    /// 轮询订单支付状态（web 端 recharge/query 同款，最多 15 次 × 3 秒）
     private func checkPaid() async {
         isPolling = true
-        pollDone = false
         pollMessage = ""
         defer { isPolling = false }
 
         for i in 0..<15 {
             pollMessage = "正在查询支付结果(\(i + 1)/15)..."
             do {
-                let paid = try await API.queryOrderPaid(orderNo: orderNo)
+                let paid = try await API.queryOrderPaid(orderNo: orderNo, userEmail: store.email)
                 if paid {
                     onFinished(true)
                     return
@@ -152,8 +150,23 @@ struct PayView: View {
             try? await Task.sleep(nanoseconds: 3_000_000_000)
         }
 
-        // 轮询结束仍未支付
-        pollDone = true
-        showToast("未查询到支付结果。如已支付，会员将在几分钟内自动生效，可稍后在「会员中心」刷新查看")
+        showToast("未查询到支付结果。如已支付，VIP 将在几分钟内自动生效，可稍后在「会员充值」页查看")
     }
+}
+
+/// WKWebView 封装：加载第三方支付跳转页
+struct PayWebView: UIViewRepresentable {
+    let url: URL
+
+    func makeUIView(context: Context) -> WKWebView {
+        let cfg = WKWebViewConfiguration()
+        cfg.websiteDataStore = .default()
+        let web = WKWebView(frame: .zero, configuration: cfg)
+        web.allowsBackForwardNavigationGestures = true
+        let req = URLRequest(url: url)
+        web.load(req)
+        return web
+    }
+
+    func updateUIView(_ uiView: WKWebView, context: Context) {}
 }
