@@ -78,7 +78,8 @@ enum APIError: LocalizedError {
 
 enum API {
     /// 与微信小程序「doushujun_wx对接第三方支付」同源后端
-    static let baseURL = "https://duochacha.top"
+    /// （小程序代码里的 duochacha.top 已失效，当前生产域名经实测为 doushujun.me）
+    static let baseURL = "https://doushujun.me"
 
     static func toStr(_ v: Any?, fallback: String = "") -> String {
         if let s = v as? String { return s }

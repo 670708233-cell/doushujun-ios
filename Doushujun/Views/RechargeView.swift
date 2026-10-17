@@ -52,8 +52,8 @@ struct RechargeView: View {
                             }
                             .padding(.vertical, 60)
                         } else {
-                            packageGroup(title: "低请求版", desc: "每日限额 300 次", type: 1)
-                            packageGroup(title: "高请求版", desc: "每日限额 450 次", type: 2)
+                            packageGroup(title: "低请求版", desc: "满足日常查询需求", type: 1)
+                            packageGroup(title: "高请求版", desc: "更大每日额度", type: 2)
                         }
 
                         // 支付方式
