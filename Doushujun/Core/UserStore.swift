@@ -84,10 +84,9 @@ final class UserStore: ObservableObject {
 
 private extension Optional where Wrapped == Any {
     var isNilOrEmptyString: Bool {
-        switch self {
-        case nil, .some(NSNull()): return true
-        case .some(let v as String): return v.isEmpty
-        default: return false
-        }
+        guard let v = self else { return true }
+        if v is NSNull { return true }
+        if let s = v as? String { return s.isEmpty }
+        return false
     }
 }

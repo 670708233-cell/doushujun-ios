@@ -8,7 +8,7 @@ struct RegisterInfo {
     var allowedEmailDomains: [String]
 }
 
-struct VipPackage {
+struct VipPackage: Identifiable {
     var id: Int
     var name: String
     var price: String
@@ -128,7 +128,11 @@ enum API {
     static func toInt(_ v: Any?) -> Int? {
         if let i = v as? Int { return i }
         if let n = v as? NSNumber { return n.intValue }
-        if let s = v as? String { return Int(s) ?? Int(Double(s)) }
+        if let s = v as? String {
+            if let i = Int(s) { return i }
+            if let d = Double(s) { return Int(d) }
+            return nil
+        }
         return nil
     }
 

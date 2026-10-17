@@ -103,6 +103,7 @@ struct SliderCaptchaView: View {
     }
 
     /// 刷新滑块种子
+    @MainActor
     func refresh() async {
         verified = false
         verifying = false
@@ -116,24 +117,20 @@ struct SliderCaptchaView: View {
         }
     }
 
+    @MainActor
     private func submit(ratio: Double) async {
         guard let s = seed, !verifying else { return }
         verifying = true
         statusText = "正在验证..."
-        defer {
-            verifying = false
-            if !verified {
-                withAnimation { offset = 0 }
-            }
-        }
 
         let totalTime = Int(Date().timeIntervalSince(dragStart) * 1000)
+        let points = trajectory
         let track: [String: Any] = [
             "ratio": min(1.0, max(0.0, ratio)),
             "total_time": max(totalTime, 600),
-            "trajectory": trajectory,
+            "trajectory": points,
             "pause_count": 0,
-            "point_count": trajectory.count,
+            "point_count": points.count,
             "mouse_down_count": 1,
             "screen_width": Double(UIScreen.main.bounds.width),
             "screen_height": Double(UIScreen.main.bounds.height),
@@ -149,6 +146,10 @@ struct SliderCaptchaView: View {
             onVerified(token)
         } catch {
             statusText = "验证未通过，已刷新，请重试"
+        }
+        verifying = false
+        if !verified {
+            withAnimation { offset = 0 }
             await refresh()
         }
     }
