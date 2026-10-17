@@ -41,7 +41,13 @@ struct VipStatus {
 
     static func from(_ dict: [String: Any]) -> VipStatus {
         var s = VipStatus()
-        s.isVip = (dict["is_vip"] as? Bool) ?? ((dict["is_vip"] as? Int) ?? 0) == 1
+        if let b = dict["is_vip"] as? Bool {
+            s.isVip = b
+        } else if let i = API.toInt(dict["is_vip"]) {
+            s.isVip = i == 1
+        } else if let n = dict["is_vip"] as? NSNumber {
+            s.isVip = n.boolValue
+        }
         s.packageName = API.toStr(dict["package_name"], fallback: "普通用户")
         s.startTime = API.toStr(dict["start_time"], fallback: "")
         if let et = dict["end_time"] as? String { s.endTime = et }
@@ -91,7 +97,7 @@ enum API {
     static func toPriceText(_ v: Any?) -> String {
         if let s = v as? String { return s }
         if let n = v as? NSNumber {
-            let f = NSNumberFormatter()
+            let f = NumberFormatter()
             f.minimumFractionDigits = 0
             f.maximumFractionDigits = 2
             return f.string(from: n) ?? n.stringValue

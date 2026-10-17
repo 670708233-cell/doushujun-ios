@@ -20,7 +20,7 @@ struct HomeView: View {
                                 .foregroundColor(Color(red: 0.5, green: 0.58, blue: 0.75))
                         }
                         Spacer()
-                        Button(action: { Task { await store.refreshVip(showLoading: true) } }) {
+                        Button(action: { Task { _ = await store.refreshVip(showLoading: true) } }) {
                             Image(systemName: "arrow.clockwise")
                                 .font(.system(size: 16, weight: .semibold))
                                 .foregroundColor(.white)
