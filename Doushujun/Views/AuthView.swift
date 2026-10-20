@@ -472,6 +472,9 @@ struct GeeTestSheet: View {
             let id = d["captcha_id"].str ?? ""
             guard !id.isEmpty else { throw ApiError.business("获取验证配置失败") }
             await MainActor.run { captchaId = id }
+        } catch ApiError.notFound {
+            // 生产后端未部署极验接口（slider_token 本就可选）→ 跳过安全验证直接登录
+            await MainActor.run { onVerified("") }
         } catch {
             await MainActor.run { loadError = (error as? ApiError)?.errorDescription ?? "获取验证配置失败" }
         }

@@ -5,6 +5,7 @@ enum ApiError: LocalizedError {
     case business(String)      // 业务错误：展示后端 msg
     case sessionExpired        // code 401：会话过期，踢回登录
     case maintenance           // HTTP 503：维护中
+    case notFound              // HTTP 404：接口不存在（如生产后端未部署极验）
     case network(String)
 
     var errorDescription: String? {
@@ -12,6 +13,7 @@ enum ApiError: LocalizedError {
         case .business(let m): return m
         case .sessionExpired: return "登录已过期，请重新登录"
         case .maintenance: return "系统维护中，请稍后再试"
+        case .notFound: return "接口不存在(404)"
         case .network(let m): return m
         }
     }
@@ -92,6 +94,7 @@ final class Network {
         }
 
         if http.statusCode == 503 { throw ApiError.maintenance }
+        if http.statusCode == 404 { throw ApiError.notFound }
         guard let root = try? J(data: data) else {
             throw ApiError.network("服务返回异常(\(http.statusCode))")
         }
