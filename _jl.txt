@@ -1,0 +1,150 @@
+
+===== JOB: Build Unsigned IPA  conclusion=failure =====
+  [completed/success] Set up job
+  [completed/success] Run actions/checkout@v4
+  [completed/success] Verify Xcode
+  [completed/success] Generate Xcode project
+  [completed/failure] Validate project file
+  [completed/skipped] Clean and Build
+  [completed/skipped] Package IPA
+  [completed/skipped] Upload IPA
+  [completed/success] Upload Build Log
+  [completed/success] Post Run actions/checkout@v4
+  [completed/success] Complete job
+  ----- LOG TAIL -----
+  2026-10-20T16:12:09.1203630Z   Doushujun/Views/MonitorChartView.swift
+  2026-10-20T16:12:09.1203910Z   Doushujun/Views/MonitorView.swift
+  2026-10-20T16:12:09.1204160Z   Doushujun/Views/VipView.swift
+  2026-10-20T16:12:09.1204450Z   Doushujun/Views/WeightHistoryView.swift
+  2026-10-20T16:12:09.1204780Z   Doushujun/Views/WeightView.swift
+  2026-10-20T16:12:09.1205030Z   Doushujun/Views/WorkHistoryView.swift
+  2026-10-20T16:12:09.1205310Z   Doushujun/Views/WorkView.swift
+  2026-10-20T16:12:09.1205530Z   Doushujun/Info.plist
+  2026-10-20T16:12:09.1205810Z UI test files: ['DoushujunUITests/DoushujunUITests.swift']
+  2026-10-20T16:12:09.1207120Z Bundle resources: ['Resources/dengji_1.png', 'Resources/dengji_2.png', 'Resources/dengji_3.png', 'Resources/dengji_4.png', 'Resources/dengji_5.png', 'Resources/dengji_6.png', 'Resources/dengji_7.png', 'Resources/dengji_8.
+  2026-10-20T16:12:09.1208300Z Asset catalogs: ['Doushujun/Assets.xcassets']
+  2026-10-20T16:12:09.1208500Z 
+  2026-10-20T16:12:09.1208790Z Generated: /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun.xcodeproj/project.pbxproj
+  2026-10-20T16:12:09.1209210Z Total Swift files: 22
+  2026-10-20T16:12:09.1209430Z Total plist files: 1
+  2026-10-20T16:12:09.1209920Z Generated: /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun.xcodeproj/xcshareddata/xcschemes/Doushujun.xcscheme
+  2026-10-20T16:12:09.1254470Z ##[group]Run plutil -lint Doushujun.xcodeproj/project.pbxproj
+  2026-10-20T16:12:09.1254870Z [36;1mplutil -lint Doushujun.xcodeproj/project.pbxproj[0m
+  2026-10-20T16:12:09.1255210Z [36;1mxcodebuild -list -project Doushujun.xcodeproj[0m
+  2026-10-20T16:12:09.1301450Z shell: /bin/bash -e {0}
+  2026-10-20T16:12:09.1301730Z ##[endgroup]
+  2026-10-20T16:12:09.1703480Z Doushujun.xcodeproj/project.pbxproj: OK
+  2026-10-20T16:12:09.7632450Z Command line invocation:
+  2026-10-20T16:12:09.7633500Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/xcodebuild -list -project Doushujun.xcodeproj
+  2026-10-20T16:12:09.7633860Z 
+  2026-10-20T16:12:09.7633970Z User defaults from command line:
+  2026-10-20T16:12:09.7634250Z     IDEPackageSupportUseBuiltinSCM = YES
+  2026-10-20T16:12:09.7634520Z 
+  2026-10-20T16:12:10.8918620Z /Users/runner/work/_temp/59cb49f9-9cbf-4089-8a59-47fa9a8ba9e9.sh: line 2:  1085 Trace/BPT trap: 5       xcodebuild -list -project Doushujun.xcodeproj
+  2026-10-20T16:12:10.8928430Z ##[error]Process completed with exit code 133.
+  2026-10-20T16:12:10.9360960Z ##[group]Run actions/upload-artifact@v4
+  2026-10-20T16:12:10.9361210Z with:
+  2026-10-20T16:12:10.9361340Z   name: build-log
+  2026-10-20T16:12:10.9361480Z   path: build.log
+  2026-10-20T16:12:10.9361630Z   retention-days: 7
+  2026-10-20T16:12:10.9361880Z   if-no-files-found: warn
+  2026-10-20T16:12:10.9362090Z   compression-level: 6
+  2026-10-20T16:12:10.9362420Z   overwrite: false
+  2026-10-20T16:12:10.9362600Z   include-hidden-files: false
+  2026-10-20T16:12:10.9362780Z ##[endgroup]
+  2026-10-20T16:12:11.2189940Z (node:1150) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+  2026-10-20T16:12:11.2190580Z (Use `node --trace-deprecation ...` to show where the warning was created)
+  2026-10-20T16:12:11.2212310Z ##[warning]No files were found with the provided path: build.log. No artifacts will be uploaded.
+  2026-10-20T16:12:11.2347550Z Post job cleanup.
+  2026-10-20T16:12:11.3256640Z [command]/opt/homebrew/bin/git version
+  2026-10-20T16:12:11.3329490Z git version 2.55.0
+  2026-10-20T16:12:11.3367190Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/8da38ec4-f5b5-4a6e-ad1e-8f2418c23fe1/.gitconfig'
+  2026-10-20T16:12:11.3455490Z Temporarily overriding HOME='/Users/runner/work/_temp/8da38ec4-f5b5-4a6e-ad1e-8f2418c23fe1' before making global git config changes
+  2026-10-20T16:12:11.3456240Z Adding repository directory to the temporary git global config as a safe directory
+  2026-10-20T16:12:11.3458750Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/doushujun-ios/doushujun-ios
+  2026-10-20T16:12:11.3698240Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+  2026-10-20T16:12:11.3750000Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+  2026-10-20T16:12:11.4591680Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+  2026-10-20T16:12:11.4649120Z http.https://github.com/.extraheader
+  2026-10-20T16:12:11.4692610Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+  2026-10-20T16:12:11.4776140Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.ext
+  2026-10-20T16:12:11.5796010Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+  2026-10-20T16:12:11.5847430Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+  2026-10-20T16:12:11.6816850Z Cleaning up orphan processes
+  2026-10-20T16:12:11.9053950Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/upload-artifact@v4. For more information see: https://github.blog/change
+
+===== JOB: UI Test (Simulator + Local Backend)  conclusion=failure =====
+  [completed/success] Set up job
+  [completed/success] Run actions/checkout@v4
+  [completed/success] Checkout backend (private repo)
+  [completed/success] Verify Xcode & pick simulator
+  [completed/failure] Start MySQL (brew)
+  [completed/skipped] Start PHP backend
+  [completed/skipped] Generate Xcode project
+  [completed/skipped] Run UI tests on simulator
+  [completed/success] Upload UI test log
+  [completed/success] Upload backend log
+  [completed/success] Post Checkout backend (private repo)
+  [completed/success] Post Run actions/checkout@v4
+  [completed/success] Complete job
+  ----- LOG TAIL -----
+  2026-10-20T16:12:36.6562250Z ERROR 1064 (42000) at line 1: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'mysqldump: [Warning] Using a password on the command lin
+  2026-10-20T16:12:36.6629540Z ##[error]Process completed with exit code 1.
+  2026-10-20T16:12:36.6730260Z ##[group]Run actions/upload-artifact@v4
+  2026-10-20T16:12:36.6730560Z with:
+  2026-10-20T16:12:36.6730710Z   name: uitest-log
+  2026-10-20T16:12:36.6730870Z   path: uitest.log
+  2026-10-20T16:12:36.6731060Z   retention-days: 7
+  2026-10-20T16:12:36.6731240Z   if-no-files-found: warn
+  2026-10-20T16:12:36.6731420Z   compression-level: 6
+  2026-10-20T16:12:36.6731600Z   overwrite: false
+  2026-10-20T16:12:36.6731870Z   include-hidden-files: false
+  2026-10-20T16:12:36.6732070Z ##[endgroup]
+  2026-10-20T16:12:37.0389180Z (node:2527) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+  2026-10-20T16:12:37.0396330Z (Use `node --trace-deprecation ...` to show where the warning was created)
+  2026-10-20T16:12:37.0420960Z ##[warning]No files were found with the provided path: uitest.log. No artifacts will be uploaded.
+  2026-10-20T16:12:37.0574180Z ##[group]Run actions/upload-artifact@v4
+  2026-10-20T16:12:37.0574410Z with:
+  2026-10-20T16:12:37.0574540Z   name: backend-log
+  2026-10-20T16:12:37.0574700Z   path: backend/server.log
+  2026-10-20T16:12:37.0574950Z   retention-days: 7
+  2026-10-20T16:12:37.0575160Z   if-no-files-found: warn
+  2026-10-20T16:12:37.0575340Z   compression-level: 6
+  2026-10-20T16:12:37.0575530Z   overwrite: false
+  2026-10-20T16:12:37.0575710Z   include-hidden-files: false
+  2026-10-20T16:12:37.0575890Z ##[endgroup]
+  2026-10-20T16:12:37.1891430Z (node:2559) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+  2026-10-20T16:12:37.1965320Z (Use `node --trace-deprecation ...` to show where the warning was created)
+  2026-10-20T16:12:37.1976360Z ##[warning]No files were found with the provided path: backend/server.log. No artifacts will be uploaded.
+  2026-10-20T16:12:37.2089370Z Post job cleanup.
+  2026-10-20T16:12:37.3007100Z [command]/opt/homebrew/bin/git version
+  2026-10-20T16:12:37.3110170Z git version 2.55.0
+  2026-10-20T16:12:37.3214520Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/8e7fddd6-8429-4609-87f9-d04aea1b6747/.gitconfig'
+  2026-10-20T16:12:37.3215350Z Temporarily overriding HOME='/Users/runner/work/_temp/8e7fddd6-8429-4609-87f9-d04aea1b6747' before making global git config changes
+  2026-10-20T16:12:37.3219010Z Adding repository directory to the temporary git global config as a safe directory
+  2026-10-20T16:12:37.3220380Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/doushujun-ios/doushujun-ios/backend
+  2026-10-20T16:12:37.3298840Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+  2026-10-20T16:12:37.3360870Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+  2026-10-20T16:12:37.4626920Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+  2026-10-20T16:12:37.4667610Z http.https://github.com/.extraheader
+  2026-10-20T16:12:37.4790390Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+  2026-10-20T16:12:37.4800170Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.ext
+  2026-10-20T16:12:37.5374120Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+  2026-10-20T16:12:37.5420540Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+  2026-10-20T16:12:37.6092850Z Post job cleanup.
+  2026-10-20T16:12:37.6908560Z [command]/opt/homebrew/bin/git version
+  2026-10-20T16:12:37.6953850Z git version 2.55.0
+  2026-10-20T16:12:37.6974550Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/1ca44f56-4a3c-4e6c-85b5-7a688bd7f5b8/.gitconfig'
+  2026-10-20T16:12:37.6984550Z Temporarily overriding HOME='/Users/runner/work/_temp/1ca44f56-4a3c-4e6c-85b5-7a688bd7f5b8' before making global git config changes
+  2026-10-20T16:12:37.6986050Z Adding repository directory to the temporary git global config as a safe directory
+  2026-10-20T16:12:37.6986690Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/doushujun-ios/doushujun-ios
+  2026-10-20T16:12:37.7039710Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+  2026-10-20T16:12:37.7098390Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+  2026-10-20T16:12:37.7719040Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+  2026-10-20T16:12:37.7753750Z http.https://github.com/.extraheader
+  2026-10-20T16:12:37.7796370Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+  2026-10-20T16:12:37.7850960Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.ext
+  2026-10-20T16:12:37.8476190Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+  2026-10-20T16:12:37.8499870Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+  2026-10-20T16:12:37.9200780Z Cleaning up orphan processes
+  2026-10-20T16:12:38.4870060Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/upload-artifact@v4. For more information see: https://github.blog/change

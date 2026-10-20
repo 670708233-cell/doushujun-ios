@@ -11,6 +11,26 @@ for a, b in [("{", "}"), ("(", ")")]:
     ca, cb = s.count(a), s.count(b)
     print(f"{a}{b}: {ca} vs {cb}", "OK" if ca == cb else "<<< MISMATCH")
 
+# 1.5 重复 ID 定义（set 会掩盖碰撞）
+all_defs = re.findall(r"^\t\t([0-9A-F]{24}) ", s, re.M)
+if len(all_defs) != len(set(all_defs)):
+    from collections import Counter
+    print("<<< DUPLICATE DEFINITIONS:")
+    for k, v in Counter(all_defs).items():
+        if v > 1:
+            print("  ", k, "x", v)
+else:
+    print("no duplicate definitions:", len(all_defs))
+
+# 1.6 scheme XML 解析
+import xml.etree.ElementTree as ET
+try:
+    tree = ET.parse(r"d:\hubulider\dsj\doushujunfull\doushujun-ios\Doushujun.xcodeproj\xcshareddata\xcschemes\Doushujun.xcscheme")
+    root = tree.getroot()
+    print("scheme XML OK, root =", root.tag)
+except Exception as e:
+    print("<<< SCHEME XML ERROR:", e)
+
 # 2. ID 定义与引用
 defined = set(re.findall(r"^\t\t([0-9A-F]{24}) ", s, re.M))
 referenced = set(re.findall(r"\b([0-9A-F]{24})\b", s))

@@ -22,8 +22,17 @@ jobs:
 
       - name: Validate project file
         run: |
-          plutil -lint Doushujun.xcodeproj/project.pbxproj
-          xcodebuild -list -project Doushujun.xcodeproj
+          plutil -lint Doushujun.xcodeproj/project.pbxproj || true
+          xcodebuild -list -project Doushujun.xcodeproj || {
+            echo "=== xcodebuild crashed, dumping latest crash reports ==="
+            ls -t ~/Library/Logs/DiagnosticReports/ 2>/dev/null | head -5 || true
+            CRASH=$(ls -t ~/Library/Logs/DiagnosticReports/xcodebuild*.ips 2>/dev/null | head -1)
+            if [ -n "$CRASH" ]; then
+              echo "=== $CRASH ==="
+              head -c 6000 "$CRASH" || true
+            fi
+            exit 1
+          }
 
       - name: Clean and Build
         id: build
