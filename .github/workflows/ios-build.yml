@@ -20,6 +20,11 @@ jobs:
       - name: Generate Xcode project
         run: python3 generate_project.py
 
+      - name: Validate project file
+        run: |
+          plutil -lint Doushujun.xcodeproj/project.pbxproj
+          xcodebuild -list -project Doushujun.xcodeproj
+
       - name: Clean and Build
         id: build
         run: |
