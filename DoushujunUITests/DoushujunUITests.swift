@@ -17,14 +17,13 @@ final class DoushujunUITests: XCTestCase {
     /// tap 聚焦 → 等软键盘弹出 → 输入。
     /// 无头模拟器上若硬件键盘未禁用，tap 后软键盘不弹出 → "Neither element nor any descendant has keyboard focus"。
     /// yml 里已 defaults write ConnectHardwareKeyboard -bool false，此处双保险 + 二次 tap 兜底。
-    private func typeInto(_ app: XCUIApplication, _ field: XCUIElement, _ text: String,
-                          file: StaticString = #filePath, line: UInt = #line) {
+    private func typeInto(_ app: XCUIApplication, _ field: XCUIElement, _ text: String) {
         field.tap()
         if !app.keyboards.firstMatch.waitForExistence(timeout: 6) {
             field.tap()
             _ = app.keyboards.firstMatch.waitForExistence(timeout: 4)
         }
-        field.typeText(text, file: file, line: line)
+        field.typeText(text)
     }
 
     /// 正向链路：测试账号 + 自动读取的验证码 + 拖满滑块 → 登录成功进主页
