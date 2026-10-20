@@ -1,9 +1,10 @@
 import SwiftUI
+import WebKit
 
 // ============================================================================
-// AuthView.swift — 登录/注册/忘记密码 + 自研滑块验证
+// AuthView.swift — 登录/注册/忘记密码 + 滑块验证（极验优先，失败降级自研滑块）
 // 职责：三面板单页切换（login/register/forgot）+ 图形验证码 + 邮箱验证码
-//       + SliderCaptchaSheet（generate→AES 轨迹→verify 换 slider_token）
+//       + CaptchaSheet（探测极验 config → 可用走 GeeTestSheet，失败走 SliderCaptchaSheet）
 // ============================================================================
 
 /// 登录/注册/忘记密码（对齐安卓 AuthScreens.kt：mode 单页切换）
@@ -141,7 +142,7 @@ private struct LoginPanel: View {
             }
         }
         .sheet(isPresented: $showGeeTest) {
-            SliderCaptchaSheet { sliderToken in    // 滑块通过：拿 token 提交登录
+            CaptchaSheet { sliderToken in    // 滑块通过：拿 token 提交登录
                 showGeeTest = false
                 Task { await doLogin(sliderToken: sliderToken) }
             } onClosed: {
@@ -250,7 +251,7 @@ private struct RegisterPanel: View {
             }
         }
         .sheet(isPresented: $showGeeTest) {
-            SliderCaptchaSheet { sliderToken in    // 滑块通过：提交注册
+            CaptchaSheet { sliderToken in    // 滑块通过：提交注册
                 showGeeTest = false
                 Task { await doRegister(sliderToken: sliderToken) }
             } onClosed: {
@@ -520,8 +521,6 @@ struct SliderCaptchaSheet: View {
             }
             Spacer(minLength: 8)
         }
-        .presentationDetentsCompat()
-        .background(Color(hex: "0D1420"))
         .task { await refresh() }                                   // 出现即取验证会话
     }
 
@@ -598,14 +597,198 @@ struct SliderCaptchaSheet: View {
     }
 }
 
-/// iOS 15 兼容 sheet 高度
+/// iOS 15 兼容 sheet 高度（参数化：极验面板 420 / 自研滑块 300）
 extension View {
     @ViewBuilder
-    func presentationDetentsCompat() -> some View {
+    func presentationDetentsCompat(height: CGFloat) -> some View {
         if #available(iOS 16.0, *) {
-            self.presentationDetents([.height(300)])
+            self.presentationDetents([.height(height)])
         } else {
             self
+        }
+    }
+}
+
+// MARK: - 验证码统一入口：极验优先，不可用自动降级自研滑块
+
+/// 验证弹窗统一入口：先探测极验可用性（GET captcha/geetest/config）→
+/// 拿到 captcha_id 走极验 4.0；探测失败或极验页面加载失败 → 自动降级自研滑块
+/// （生产当前极验 404 → 实际运行即走自研滑块；后端部署极验后无需改码自动切换）
+struct CaptchaSheet: View {
+    var onVerified: (String) -> Void   // 验证通过回传 slider_token
+    var onClosed: () -> Void
+
+    private enum Mode { case checking, geetest, slider }  // 三态：探测中 / 极验 / 自研
+    @State private var mode: Mode = .checking
+    @State private var geeTestId = ""                     // 极验 captcha_id（探测成功时缓存）
+
+    var body: some View {
+        VStack(spacing: 0) {
+            switch mode {
+            case .checking:                               // 探测中：
+                VStack {
+                    ProgressView().tint(T.primary)
+                    Text("正在初始化安全验证…").font(.system(size: 12)).foregroundColor(T.textSub)
+                        .padding(.top, 8)
+                }
+                .frame(maxWidth: .infinity, minHeight: 260)
+            case .geetest:                                // 极验可用：
+                GeeTestSheet(captchaId: geeTestId,
+                             onVerified: onVerified,
+                             onClosed: onClosed,
+                             onFallback: { Task { @MainActor in mode = .slider } })
+            case .slider:                                 // 降级自研滑块：
+                SliderCaptchaSheet(onVerified: onVerified, onClosed: onClosed)
+            }
+        }
+        .background(Color(hex: "0D1420"))                              // 弹层底色（子面板共用）
+        .presentationDetentsCompat(height: mode == .slider ? 300 : 420) // 高度随方案切换
+        .task { await probe() }                           // 出现即探测极验可用性
+    }
+
+    /// 探测：GET captcha/geetest/config 拿 captcha_id；404/网络失败 → 降级自研滑块
+    private func probe() async {
+        do {
+            let d = try await Network.get("captcha/geetest/config")
+            let id = d["captcha_id"].str ?? ""
+            guard !id.isEmpty else { throw ApiError.business("获取验证配置失败") }
+            await MainActor.run {
+                geeTestId = id
+                mode = .geetest
+            }
+        } catch {
+            await MainActor.run { mode = .slider }        // 生产 404 / 异常 → 自研滑块兜底
+        }
+    }
+}
+
+/// 极验 4.0 验证面板（WKWebView 本地 geetest.html）：验证成功回传 token；
+/// 页面加载/初始化失败、二次校验失败均走 onFallback 降级自研滑块
+struct GeeTestSheet: View {
+    let captchaId: String                // CaptchaSheet 探测好的验证 ID（免二次请求）
+    var onVerified: (String) -> Void
+    var onClosed: () -> Void
+    var onFallback: () -> Void           // 极验链路任一环失败 → 降级
+
+    @State private var verifying = false // 服务端二次校验进行中
+    @State private var reloadKey = 0     // 变化时重建 WebView（重新验证）
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // 标题栏
+            HStack {
+                Text("安全验证").font(.system(size: 16, weight: .semibold)).foregroundColor(T.textMain)
+                Spacer()
+                Button("关闭") {
+                    if !verifying { onClosed() }
+                }
+                .font(.system(size: 13)).foregroundColor(T.textSub)
+            }
+            .padding(16)
+
+            GeeTestWebView(captchaId: captchaId, reloadKey: reloadKey,
+                           onSuccess: { json in Task { await verify(json) } },
+                           onClose: { onClosed() },
+                           onError: { _ in onFallback() })      // 加载/初始化失败：自动降级
+                .frame(height: 320)
+
+            if verifying {                                    // 二次校验中：
+                HStack(spacing: 8) {
+                    ProgressView().tint(T.primary)
+                    Text("正在校验…").font(.system(size: 12)).foregroundColor(T.textSub)
+                }
+                .padding(.bottom, 14)
+            }
+            Spacer(minLength: 8)
+        }
+    }
+
+    /// POST captcha/geetest/verify：极验四元组 → 服务端向极验服务器核验 → slider_token
+    private func verify(_ json: String) async {
+        verifying = true
+        defer { verifying = false }
+        guard let data = json.data(using: .utf8),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            onFallback()                                      // 结果解析异常：降级兜底
+            return
+        }
+        do {
+            let d = try await Network.post("captcha/geetest/verify", body: obj)
+            let token = d["slider_token"].str ?? ""
+            guard !token.isEmpty else { throw ApiError.business("验证失败，请重试") }
+            onVerified(token)                                 // 成功：回传 token
+        } catch {
+            onFallback()                                      // 二次校验失败：降级自研滑块
+        }
+    }
+}
+
+/// WKWebView 容器：loadFileURL 本地 html（替换 captcha_id），JS 桥转发验证结果
+struct GeeTestWebView: UIViewRepresentable {
+    let captchaId: String
+    let reloadKey: Int
+    let onSuccess: (String) -> Void
+    let onClose: () -> Void
+    let onError: (String) -> Void
+
+    func makeUIView(context: Context) -> WKWebView {
+        let cfg = WKWebViewConfiguration()
+        cfg.userContentController.add(context.coordinator, name: "dsj")  // JS 桥通道 "dsj"
+        let wv = WKWebView(frame: .zero, configuration: cfg)
+        wv.isOpaque = false
+        wv.backgroundColor = .clear
+        wv.scrollView.isScrollEnabled = false                 // 验证面板本身不滚动
+        wv.navigationDelegate = context.coordinator
+        context.coordinator.webView = wv
+        return wv
+    }
+
+    func updateUIView(_ wv: WKWebView, context: Context) {
+        if context.coordinator.loadedKey != reloadKey {       // reloadKey 变化 → 重新加载
+            context.coordinator.loadedKey = reloadKey
+            load(wv)
+        }
+    }
+
+    private func load(_ wv: WKWebView) {
+        // 读 bundle 里的 geetest.html → 替换 captcha_id → 写沙盒 → loadFileURL
+        guard let url = Bundle.main.url(forResource: "geetest", withExtension: "html"),
+              var html = try? String(contentsOf: url, encoding: .utf8) else {
+            onError("验证组件缺失")
+            return
+        }
+        html = html.replacingOccurrences(of: "__CAPTCHA_ID__", with: captchaId)
+        let tmp = FileManager.default.temporaryDirectory.appendingPathComponent("geetest_run.html")
+        try? html.write(to: tmp, atomically: true, encoding: .utf8)
+        wv.loadFileURL(tmp, allowingReadAccessTo: FileManager.default.temporaryDirectory)
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
+    class Coordinator: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
+        var parent: GeeTestWebView
+        var webView: WKWebView?
+        var loadedKey = -1
+
+        init(_ p: GeeTestWebView) { parent = p }
+
+        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+            guard let body = message.body as? [String: Any], let event = body["event"] as? String else { return }
+            DispatchQueue.main.async {
+                switch event {
+                case "onCaptchaSuccess":                      // 前端验证成功：四元组 JSON
+                    if let data = body["data"] as? String { self.parent.onSuccess(data) }
+                case "onClose":
+                    self.parent.onClose()
+                case "onError":                               // gt4.js 加载失败/初始化异常
+                    self.parent.onError(body["data"] as? String ?? "验证出错，请重试")
+                default: break
+                }
+            }
+        }
+
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            parent.onError("页面加载失败：\(error.localizedDescription)")
         }
     }
 }
