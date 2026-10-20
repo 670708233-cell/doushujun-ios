@@ -14,6 +14,19 @@ final class DoushujunUITests: XCTestCase {
         continueAfterFailure = false
     }
 
+    /// tap 聚焦 → 等软键盘弹出 → 输入。
+    /// 无头模拟器上若硬件键盘未禁用，tap 后软键盘不弹出 → "Neither element nor any descendant has keyboard focus"。
+    /// yml 里已 defaults write ConnectHardwareKeyboard -bool false，此处双保险 + 二次 tap 兜底。
+    private func typeInto(_ app: XCUIApplication, _ field: XCUIElement, _ text: String,
+                          file: StaticString = #filePath, line: UInt = #line) {
+        field.tap()
+        if !app.keyboards.firstMatch.waitForExistence(timeout: 6) {
+            field.tap()
+            _ = app.keyboards.firstMatch.waitForExistence(timeout: 4)
+        }
+        field.typeText(text, file: file, line: line)
+    }
+
     /// 正向链路：测试账号 + 自动读取的验证码 + 拖满滑块 → 登录成功进主页
     func testLoginFullFlow() throws {
         let app = XCUIApplication()
@@ -23,13 +36,11 @@ final class DoushujunUITests: XCTestCase {
         // —— 登录面板出现 ——
         let userField = app.textFields["用户名或邮箱"]
         XCTAssertTrue(userField.waitForExistence(timeout: 15), "登录面板未出现")
-        userField.tap()
-        userField.typeText("uitester")
+        typeInto(app, userField, "uitester")
 
         let pwField = app.secureTextFields["密码"]
         XCTAssertTrue(pwField.waitForExistence(timeout: 5))
-        pwField.tap()
-        pwField.typeText("Uitest#2026")
+        typeInto(app, pwField, "Uitest#2026")
 
         // —— 图形验证码：等图加载出答案（accessibility label 暴露）——
         let captcha = app.otherElements["captcha_answer"]
@@ -51,8 +62,7 @@ final class DoushujunUITests: XCTestCase {
         XCTAssertEqual(answer.count, 4, "验证码应为 4 字符，实际: \(answer)")
 
         let codeField = app.textFields["图形验证码"]
-        codeField.tap()
-        codeField.typeText(answer)
+        typeInto(app, codeField, answer)
 
         // —— 点登录 → 探测极验失败 → 自动降级自研滑块 ——
         let loginBtn = app.buttons["登  录"]
@@ -91,12 +101,11 @@ final class DoushujunUITests: XCTestCase {
 
         let userField = app.textFields["用户名或邮箱"]
         XCTAssertTrue(userField.waitForExistence(timeout: 15))
-        userField.tap()
-        userField.typeText("uitester")
+        typeInto(app, userField, "uitester")
 
         let pwField = app.secureTextFields["密码"]
-        pwField.tap()
-        pwField.typeText("WrongPass#999")
+        XCTAssertTrue(pwField.waitForExistence(timeout: 5))
+        typeInto(app, pwField, "WrongPass#999")
 
         let captcha = app.otherElements["captcha_answer"]
         XCTAssertTrue(captcha.waitForExistence(timeout: 15))
@@ -111,8 +120,7 @@ final class DoushujunUITests: XCTestCase {
         }
         XCTAssertFalse(answer.isEmpty)
         let codeField = app.textFields["图形验证码"]
-        codeField.tap()
-        codeField.typeText(answer)
+        typeInto(app, codeField, answer)
 
         app.buttons["登  录"].tap()
 

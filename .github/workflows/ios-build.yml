@@ -235,6 +235,8 @@ jobs:
         id: test
         run: |
           set -o pipefail
+          # 无头模拟器必须禁硬件键盘，否则 tap 文本框后软键盘不弹出，typeText 报 keyboard focus 失败
+          defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool false
           xcodebuild test \
             -project Doushujun.xcodeproj \
             -scheme Doushujun \

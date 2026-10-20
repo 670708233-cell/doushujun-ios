@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-"""拉 UI Test job 步骤状态与失败步骤日志尾部"""
-import io, json, urllib.request, urllib.error, sys
+"""拉指定 run 的 uitest-log artifact"""
+import io, json, urllib.request, urllib.error, zipfile, os, sys
 
 OWNER, REPO = "670708233-cell", "doushujun-ios"
-RUN_ID = sys.argv[1] if len(sys.argv) > 1 else "39472955259"
+RUN_ID = sys.argv[1] if len(sys.argv) > 1 else "39473773234"
+BASE = os.path.dirname(os.path.abspath(__file__))
 
 cred = io.open(r"d:\hubulider\dsj\doushujunfull\_cred_out.txt", encoding="utf-8").read()
 TOKEN = [l.strip()[9:] for l in cred.splitlines() if l.strip().startswith("password=")][0]
@@ -16,32 +17,37 @@ class NR(urllib.request.HTTPRedirectHandler):
         return None
 
 
-def get_log(job_id):
-    r3 = urllib.request.Request(API + f"/actions/jobs/{job_id}/logs", headers=H)
+def dl(url, out):
     opener = urllib.request.build_opener(NR)
+    r = urllib.request.Request(url, headers=H)
+    data = None
     try:
-        resp = opener.open(r3, timeout=60)
+        resp = opener.open(r, timeout=60)
         loc = resp.headers.get("Location")
-        data = resp.read() if not loc else None
+        if not loc:
+            data = resp.read()
     except urllib.error.HTTPError as e:
         loc = e.headers.get("Location")
-        data = None
     if data is None and loc:
         data = urllib.request.urlopen(urllib.request.Request(loc, headers={"User-Agent": "dsj"}), timeout=300).read()
-    return data.decode("utf-8", "ignore")
+    with open(out, "wb") as f:
+        f.write(data)
+    return data
 
 
-r = urllib.request.Request(API + f"/actions/runs/{RUN_ID}/jobs", headers=H)
-jobs = json.loads(urllib.request.urlopen(r, timeout=30).read())["jobs"]
-for j in jobs:
-    if "UI Test" not in j["name"]:
-        continue
-    print("JOB:", j["name"], "conclusion=", j["conclusion"])
-    for s in j["steps"]:
-        print("   %-44s %s" % (s["name"], s["conclusion"]))
-    full = get_log(j["id"])
-    lines = full.splitlines()
-    print("--- last 60 lines ---")
-    for ln in lines[-60:]:
-        body = ln.split("Z ", 1)[1] if "Z " in ln[:30] else ln
-        print(body[:250])
+r = urllib.request.Request(API + f"/actions/runs/{RUN_ID}/artifacts", headers=H)
+arts = json.loads(urllib.request.urlopen(r, timeout=30).read())["artifacts"]
+print("artifacts:", [(a["name"], a["size_in_bytes"]) for a in arts])
+uit = [a for a in arts if a["name"] == "uitest-log"]
+if not uit:
+    print("NO uitest-log artifact!")
+    sys.exit(0)
+dl(f"{API}/actions/artifacts/{uit[0]['id']}/zip", os.path.join(BASE, "_uit.zip"))
+zf = zipfile.ZipFile(os.path.join(BASE, "_uit.zip"))
+log = zf.read(zf.namelist()[0]).decode("utf-8", "ignore")
+out = os.path.join(BASE, "_uit_latest.log")
+with open(out, "w", encoding="utf-8") as f:
+    f.write(log)
+print("saved %d bytes -> %s" % (len(log), out))
+print("===== tail 5000 =====")
+print(log[-5000:])
