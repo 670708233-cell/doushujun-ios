@@ -216,7 +216,7 @@ struct VipView: View {
             }
             // 点数档位 Map {金额: 点数}
             if let d = try? await Network.get("recharge/packages") {
-                var tiers: [(Double, Double)] = []
+                var tiers: [(amount: Double, points: Double)] = []
                 for (k, v) in d.dict {
                     if let amount = Double(k), let pts = v.dbl { tiers.append((amount, pts)) }
                 }

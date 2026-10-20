@@ -126,7 +126,8 @@ struct MonitorChartView: View {
                           let v = e["value"].dbl else { continue }
                     m[type, default: []].append((ts, v))
                 }
-                await MainActor.run { metrics = m }
+                let snapshot = m
+                await MainActor.run { metrics = snapshot }
             } catch {
                 await MainActor.run { self.error = (error as? ApiError)?.errorDescription ?? "加载失败" }
             }

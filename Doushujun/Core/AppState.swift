@@ -74,7 +74,7 @@ final class SessionBus: ObservableObject {
         Task {
             let result = await withTaskGroup(of: J?.self) { g -> J? in
                 g.addTask { try? await Network.get("announcement/current") }
-                g.addTask { _ -> J? in
+                g.addTask { () -> J? in
                     try? await Task.sleep(nanoseconds: 2_500_000_000)
                     return nil
                 }

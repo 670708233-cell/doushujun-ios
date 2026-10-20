@@ -24,7 +24,7 @@ struct LineChartView: View {
             let t0 = allDates.first ?? Date()
             let t1 = max(allDates.last ?? Date().addingTimeInterval(1), t0.addingTimeInterval(1))
 
-            func pos(_ p: (t: Date, v: Double)) -> CGPoint {
+            let pos: ((t: Date, v: Double)) -> CGPoint = { p in
                 let fx = p.t.timeIntervalSince(t0) / t1.timeIntervalSince(t0)
                 let fy = (p.v - minV) / span
                 return CGPoint(x: left + fx * w, y: top + (1 - fy) * h)
@@ -55,7 +55,7 @@ struct LineChartView: View {
                 }
                 // 各序列折线
                 ForEach(Array(series.enumerated()), id: \.offset) { _, s in
-                    let pts = s.points.sorted { $0.t < $1.t }.map(pos)
+                    let pts = s.points.sorted { $0.t < $1.t }.map { pos($0) }
                     if pts.count >= 2 {
                         Path { p in
                             p.move(to: pts[0])

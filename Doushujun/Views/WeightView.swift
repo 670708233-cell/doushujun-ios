@@ -575,8 +575,9 @@ struct CoverGridRow: View {
                     Text(d).font(.system(size: 11)).foregroundColor(T.textSub)
                 }
             }
-            let items = row["rowValueDetail"].arr
-            ForEach(Array(items.enumerated().chunked(2)), id: \.0.offset) { chunk in
+            let items = Array(row["rowValueDetail"].arr.enumerated())
+            let chunks = stride(from: 0, to: items.count, by: 2).map { Array(items[$0..<Swift.min($0 + 2, items.count)]) }
+            ForEach(chunks, id: \.first?.offset) { chunk in
                 HStack(spacing: 10) {
                     ForEach(chunk, id: \.offset) { _, it in
                         CoverCell(item: it, onWork: onWork)
@@ -629,8 +630,8 @@ private struct CoverCell: View {
     private var stats: [String: Double] {
         guard let raw = item["tips"].str,
               let data = raw.data(using: .utf8),
-              let obj = try? JSONSerialization.jsonObject(with: data),
-              let vs = J(obj)["video_stats"][0]["statistics"].dict else { return [:] }
+              let obj = try? JSONSerialization.jsonObject(with: data) else { return [:] }
+        let vs = J(obj)["video_stats"][0]["statistics"].dict
         var out: [String: Double] = [:]
         for (k, v) in vs { out[k] = v.dbl ?? 0 }
         return out
@@ -642,15 +643,6 @@ private struct CoverCell: View {
         if a >= 1e8 { return String(format: "%.1f亿", v / 1e8) }
         if a >= 1e4 { return String(format: "%.1f万", v / 1e4) }
         return String(Int64(v))
-    }
-}
-
-extension Array {
-    /// 元组序列按 size 分块
-    func chunked(_ size: Int) -> [[(offset: Int, element: Element)]] {
-        stride(from: 0, to: count, by: size).map {
-            Array(self[$0..<Swift.min($0 + size, count)])
-        }
     }
 }
 

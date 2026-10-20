@@ -7,17 +7,16 @@ enum Crypto {
     // MARK: - 摘要
 
     static func sha256Hex(_ s: String) -> String {
-        digest(s, algo: CC_SHA256, len: CC_SHA256_DIGEST_LENGTH)
+        let bytes = Array(s.utf8)
+        var buf = [UInt8](repeating: 0, count: CC_SHA256_DIGEST_LENGTH)
+        _ = CC_SHA256(bytes, CC_LONG(bytes.count), &buf)
+        return buf.map { String(format: "%02x", $0) }.joined()
     }
 
     static func md5Hex(_ s: String) -> String {
-        digest(s, algo: CC_MD5, len: CC_MD5_DIGEST_LENGTH)
-    }
-
-    private static func digest(_ s: String, algo: (_ data: UnsafeRawPointer?, _ len: CC_LONG, _ md: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer?, len: Int32) -> String {
         let bytes = Array(s.utf8)
-        var buf = [UInt8](repeating: 0, count: Int(len))
-        algo(bytes, CC_LONG(bytes.count), &buf)
+        var buf = [UInt8](repeating: 0, count: CC_MD5_DIGEST_LENGTH)
+        _ = CC_MD5(bytes, CC_LONG(bytes.count), &buf)
         return buf.map { String(format: "%02x", $0) }.joined()
     }
 
@@ -147,7 +146,7 @@ struct J {
     }
     var int: Int? {
         if let n = raw as? NSNumber, CFGetTypeID(n) == CFNumberGetTypeID() { return n.intValue }
-        if let s = raw as? String { return Int(s) ?? Int(Double(s).map { Int($0) } ?? nil) }
+        if let s = raw as? String { return Int(s) ?? Double(s).flatMap { Int($0) } }
         return nil
     }
     var dbl: Double? {

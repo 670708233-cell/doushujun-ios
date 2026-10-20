@@ -64,7 +64,7 @@ final class Network {
 
         // 签名材料 = 全部 GET+POST 参数（后端 request->param() 全量比对）
         let ts = Int(Date().timeIntervalSince1970)
-        if signedPaths.contains(where: { path.hasSuffix($0) }) {
+        if Self.signedPaths.contains(where: { path.hasSuffix($0) }) {
             var sigParams: [String: Any] = body ?? [:]
             for (k, v) in query { sigParams[k] = v }
             req.setValue(String(ts), forHTTPHeaderField: "X-Timestamp")
