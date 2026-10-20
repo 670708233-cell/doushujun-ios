@@ -132,7 +132,7 @@ private struct LoginPanel: View {
             }
         }
         .sheet(isPresented: $showGeeTest) {
-            GeeTestSheet { sliderToken in
+            SliderCaptchaSheet { sliderToken in
                 showGeeTest = false
                 Task { await doLogin(sliderToken: sliderToken) }
             } onClosed: {
@@ -239,7 +239,7 @@ private struct RegisterPanel: View {
             }
         }
         .sheet(isPresented: $showGeeTest) {
-            GeeTestSheet { sliderToken in
+            SliderCaptchaSheet { sliderToken in
                 showGeeTest = false
                 Task { await doRegister(sliderToken: sliderToken) }
             } onClosed: {
@@ -401,16 +401,25 @@ private struct ForgotPanel: View {
     }
 }
 
-// MARK: - 极验 4.0 弹窗（WKWebView 本地 geetest.html）
+// MARK: - 自研滑块验证弹窗（对齐 web SliderCaptcha.vue：generate 发 AES 密钥 → 拖动采轨迹 → AES-CBC 加密上送 verify 换 slider_token）
 
-struct GeeTestSheet: View {
-    var onVerified: (String) -> Void   // 拿到 slider_token
+struct SliderCaptchaSheet: View {
+    var onVerified: (String) -> Void   // 验证通过回传 slider_token
     var onClosed: () -> Void
 
-    @State private var captchaId: String? = nil
-    @State private var loadError: String? = nil
-    @State private var verifying = false
-    @State private var reloadKey = 0   // 重建 WebView（重新验证）
+    // ---- 验证会话（captcha/slider/generate 返回）----
+    @State private var captchaKey = ""   // 验证 key（一次一用，verify 即销毁）
+    @State private var aesKey = ""       // 轨迹加密密钥（16 字符）
+    @State private var aesIv = ""        // 轨迹加密 IV（16 字符）
+    @State private var loading = true    // generate 进行中
+    @State private var verifying = false // verify 进行中
+    @State private var msg = ""          // 失败提示文案（后端 msg 直显）
+
+    // ---- 拖动状态 ----
+    @State private var dragX: CGFloat = 0            // 滑块当前位移
+    @State private var trajectory: [[Double]] = []   // 轨迹点 [ [x,y,t]... ]（与 web 端同构）
+    @State private var dragStart = Date()            // 拖动起始时刻（算 total_time）
+    @State private var yBase: CGFloat = 0            // 手势基准 y（上报加噪声防"Y 恒定=脚本"误判）
 
     var body: some View {
         VStack(spacing: 0) {
@@ -425,147 +434,146 @@ struct GeeTestSheet: View {
             }
             .padding(16)
 
-            if let err = loadError {
-                VStack(spacing: 12) {
-                    Text(err).font(.system(size: 13)).foregroundColor(T.danger)
-                        .multilineTextAlignment(.center)
-                    Button("重新验证") {
-                        loadError = nil
-                        captchaId = nil
-                        reloadKey += 1
-                        Task { await loadConfig() }
-                    }
-                    .font(.system(size: 14, weight: .medium)).foregroundColor(T.primary)
-                }
-                .frame(height: 220)
-            } else if captchaId == nil {
-                VStack {
+            VStack(spacing: 14) {
+                if loading {                                        // generate 中：
                     ProgressView().tint(T.primary)
                     Text("正在加载验证组件…").font(.system(size: 12)).foregroundColor(T.textSub).padding(.top, 8)
+                } else {                                            // 就绪：
+                    Text("拖动滑块到最右侧完成验证")                 // 交互提示
+                        .font(.system(size: 13)).foregroundColor(T.textSub)
+                    // 轨道
+                    GeometryReader { g in
+                        let maxMove = max(g.size.width - 48, 1)     // 最大位移 = 轨道宽 - 滑块宽
+                        ZStack(alignment: .leading) {
+                            // 轨道底
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.white.opacity(0.06))
+                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(T.stroke, lineWidth: 1))
+                            // 已拖过区域（渐变，宽度随拖动）
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(T.grad.opacity(0.35))
+                                .frame(width: dragX + 48)
+                            // 提示文案（未拖动时居中显示）
+                            if dragX < 4 {
+                                Text("向右拖动滑块").font(.system(size: 12)).foregroundColor(T.textSub)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            // 滑块把手
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(T.grad)
+                                .frame(width: 48, height: 48)
+                                .overlay(Image(systemName: "chevron.right.2").font(.system(size: 15, weight: .bold)).foregroundColor(T.bg))
+                                .offset(x: dragX)
+                                .gesture(
+                                    DragGesture(minimumDistance: 0)
+                                        .onChanged { v in          // 拖动中：更新位移+采轨迹
+                                            if trajectory.isEmpty {             // 首点：记录起点
+                                                dragStart = Date()
+                                                yBase = v.location.y
+                                            }
+                                            dragX = min(max(0, v.translation.width), maxMove)  // 钳位位移
+                                            let t = Date().timeIntervalSince(dragStart) * 1000  // 相对时间 ms
+                                            // x/y 加微噪声上报：真手指不会完美水平（后端"Y 恒定/X 增量恒定"判脚本）
+                                            let xn = Double(dragX) + Double.random(in: -1.0...1.0)
+                                            let yn = Double(yBase) + Double.random(in: -3.0...3.0)
+                                            trajectory.append([xn, yn, t])
+                                        }
+                                        .onEnded { _ in            // 松手：本地预判后上送验证
+                                            Task { await verify(maxMove: maxMove) }
+                                        }
+                                )
+                        }
+                    }
+                    .frame(height: 48)
+                    if !msg.isEmpty {                               // 失败提示
+                        Text(msg).font(.system(size: 12)).foregroundColor(T.danger)
+                            .multilineTextAlignment(.center)
+                    }
                 }
-                .frame(height: 300)
-            } else {
-                GeeTestWebView(captchaId: captchaId!, reloadKey: reloadKey,
-                               onSuccess: { json in Task { await verify(json) } },
-                               onClose: { onClosed() },
-                               onError: { msg in loadError = msg })
-                    .frame(height: 320)
             }
+            .padding(.horizontal, 20)
 
-            if verifying {
+            if verifying {                                          // 校验中：
                 HStack(spacing: 8) {
                     ProgressView().tint(T.primary)
                     Text("正在校验…").font(.system(size: 12)).foregroundColor(T.textSub)
                 }
-                .padding(.bottom, 14)
+                .padding(.top, 10)
             }
             Spacer(minLength: 8)
         }
         .presentationDetentsCompat()
         .background(Color(hex: "0D1420"))
-        .task { await loadConfig() }
+        .task { await refresh() }                                   // 出现即取验证会话
     }
 
-    private func loadConfig() async {
-        do {
-            let d = try await Network.get("captcha/geetest/config")
-            let id = d["captcha_id"].str ?? ""
-            guard !id.isEmpty else { throw ApiError.business("获取验证配置失败") }
-            await MainActor.run { captchaId = id }
-        } catch ApiError.notFound {
-            // 生产后端未部署极验接口（slider_token 本就可选）→ 跳过安全验证直接登录
-            await MainActor.run { onVerified("") }
-        } catch {
-            await MainActor.run { loadError = (error as? ApiError)?.errorDescription ?? "获取验证配置失败" }
-        }
-    }
-
-    /// POST captcha/geetest/verify：四元组 → slider_token
-    private func verify(_ json: String) async {
-        verifying = true
-        defer { verifying = false }
-        guard let data = json.data(using: .utf8),
-              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            loadError = "验证结果解析失败"
-            return
+    /// 拉取新验证会话：GET captcha/slider/generate → captcha_key + AES 密钥/IV
+    private func refresh() async {
+        await MainActor.run {
+            loading = true; msg = ""
+            dragX = 0; trajectory = []
         }
         do {
-            let d = try await Network.post("captcha/geetest/verify", body: obj)
-            let token = d["slider_token"].str ?? ""
-            guard !token.isEmpty else { throw ApiError.business("验证失败，请重试") }
-            onVerified(token)
+            let d = try await Network.get("captcha/slider/generate")
+            let k = d["captcha_key"].str ?? ""
+            guard !k.isEmpty else { throw ApiError.business("获取验证码失败") }
+            await MainActor.run {
+                captchaKey = k
+                aesKey = d["aes_key"].str ?? ""
+                aesIv = d["aes_iv"].str ?? ""
+                loading = false
+            }
         } catch {
-            loadError = (error as? ApiError)?.errorDescription ?? "验证失败，请重试"
-        }
-    }
-}
-
-/// WKWebView 容器：loadFileURL 本地 html（替换 captcha_id），桥转发
-struct GeeTestWebView: UIViewRepresentable {
-    let captchaId: String
-    let reloadKey: Int
-    let onSuccess: (String) -> Void
-    let onClose: () -> Void
-    let onError: (String) -> Void
-
-    func makeUIView(context: Context) -> WKWebView {
-        let cfg = WKWebViewConfiguration()
-        cfg.userContentController.add(context.coordinator, name: "dsj")
-        let wv = WKWebView(frame: .zero, configuration: cfg)
-        wv.isOpaque = false
-        wv.backgroundColor = .clear
-        wv.scrollView.isScrollEnabled = false
-        wv.navigationDelegate = context.coordinator
-        context.coordinator.webView = wv
-        return wv
-    }
-
-    func updateUIView(_ wv: WKWebView, context: Context) {
-        if context.coordinator.loadedKey != reloadKey {
-            context.coordinator.loadedKey = reloadKey
-            load(wv)
-        }
-    }
-
-    private func load(_ wv: WKWebView) {
-        // 读 bundle 里的 geetest.html → 替换 captcha_id → 写沙盒 → loadFileURL
-        guard let url = Bundle.main.url(forResource: "geetest", withExtension: "html"),
-              var html = try? String(contentsOf: url, encoding: .utf8) else {
-            onError("验证组件缺失")
-            return
-        }
-        html = html.replacingOccurrences(of: "__CAPTCHA_ID__", with: captchaId)
-        let tmp = FileManager.default.temporaryDirectory.appendingPathComponent("geetest_run.html")
-        try? html.write(to: tmp, atomically: true, encoding: .utf8)
-        wv.loadFileURL(tmp, allowingReadAccessTo: FileManager.default.temporaryDirectory)
-    }
-
-    func makeCoordinator() -> Coordinator { Coordinator(self) }
-
-    class Coordinator: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
-        var parent: GeeTestWebView
-        var webView: WKWebView?
-        var loadedKey = -1
-
-        init(_ p: GeeTestWebView) { parent = p }
-
-        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-            guard let body = message.body as? [String: Any], let event = body["event"] as? String else { return }
-            DispatchQueue.main.async {
-                switch event {
-                case "onCaptchaSuccess":
-                    if let data = body["data"] as? String { self.parent.onSuccess(data) }
-                case "onClose":
-                    self.parent.onClose()
-                case "onError":
-                    self.parent.onError(body["data"] as? String ?? "验证出错，请重试")
-                default: break
-                }
+            await MainActor.run {
+                loading = false
+                msg = (error as? ApiError)?.errorDescription ?? "获取验证码失败"
             }
         }
+    }
 
-        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            parent.onError("页面加载失败：\(error.localizedDescription)")
+    /// 松手上送：ratio 预判 → 构造轨迹载荷 → AES-CBC 加密 → POST captcha/slider/verify
+    private func verify(maxMove: CGFloat) async {
+        guard !verifying, !captchaKey.isEmpty else { return }
+        let ratio = maxMove > 0 ? Double(dragX / maxMove) : 0       // 归一化比例（拖满=1.0）
+        guard ratio >= 0.80 else {                                  // 服务端目标 0.88~0.98 容差 0.08：
+            await MainActor.run {
+                msg = "请将滑块拖动到最右侧"                          // 不足 0.80 必拒，省一次接口
+                trajectory = []; dragX = 0
+            }
+            return
+        }
+        await MainActor.run { verifying = true }
+        defer { Task { await MainActor.run { verifying = false } } }
+        // 载荷（与 web 端同构）：ratio/total_time/trajectory/pause_count/point_count/mouse_down_count
+        let realMs = Int(Date().timeIntervalSince(dragStart) * 1000)
+        let totalTime = max(realMs, 600)                            // 快甩 <500ms 会被"操作过快"拒，补足下限
+        let payload: [String: Any] = [
+            "ratio": (ratio * 10000).rounded() / 10000,             // 四位小数（对齐 web）
+            "total_time": totalTime,
+            "trajectory": trajectory,
+            "pause_count": 0,
+            "point_count": trajectory.count,
+            "mouse_down_count": 1,
+        ]
+        guard let jd = try? JSONSerialization.data(withJSONObject: payload),
+              let jsonStr = String(data: jd, encoding: .utf8),
+              let cipher = Crypto.aesCBCEncryptBase64(jsonStr, key: aesKey, iv: aesIv) else {
+            await MainActor.run { msg = "轨迹加密失败，请重试" }
+            return
+        }
+        do {
+            let d = try await Network.post("captcha/slider/verify", body: [
+                "captcha_key": captchaKey,
+                "payload": cipher,
+            ])
+            let token = d["slider_token"].str ?? ""
+            guard !token.isEmpty else { throw ApiError.business("验证失败，请重试") }
+            onVerified(token)                                       // 成功：回传 token
+        } catch {                                                   // 失败：提示 + 0.8s 后自动换新会话重试
+            let m = (error as? ApiError)?.errorDescription ?? "验证失败，请重试"
+            await MainActor.run { msg = m }
+            try? await Task.sleep(nanoseconds: 800_000_000)
+            await refresh()
         }
     }
 }
@@ -575,7 +583,7 @@ extension View {
     @ViewBuilder
     func presentationDetentsCompat() -> some View {
         if #available(iOS 16.0, *) {
-            self.presentationDetents([.height(420)])
+            self.presentationDetents([.height(300)])
         } else {
             self
         }
