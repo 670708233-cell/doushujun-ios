@@ -200,17 +200,28 @@ jobs:
           nohup php think run --host 127.0.0.1 --port 8000 > server.log 2>&1 &
           BACKEND_UP=0
           for i in $(seq 1 30); do
-            curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8000/api/captcha/slider/generate | grep -q 200 && { echo "backend UP"; BACKEND_UP=1; break; }
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8000/api/captcha/slider/generate)
+            if [ "$CODE" != "000" ]; then
+              echo "backend UP (http $CODE)"
+              BACKEND_UP=1
+              break
+            fi
             sleep 2
           done
           if [ "$BACKEND_UP" != "1" ]; then
-            echo "::error::backend failed to start"
+            echo "::error::backend did not respond"
             tail -30 server.log || true
             exit 1
           fi
-          curl -s http://127.0.0.1:8000/api/captcha/slider/generate | head -c 200
-          echo ""
-          # 验证 debug 模式回传明文验证码（缺失直接 fail，避免 UI 测试空跑 7 分钟）
+          # 硬校验 1：slider/generate 必须 200；失败时打印异常详情页（APP_DEBUG 下含堆栈）
+          GEN_CODE=$(curl -s -o gen_body.txt -w "%{http_code}" http://127.0.0.1:8000/api/captcha/slider/generate)
+          if [ "$GEN_CODE" != "200" ]; then
+            echo "::error::slider/generate http $GEN_CODE, response body:"
+            head -c 3000 gen_body.txt || true
+            exit 1
+          fi
+          echo "slider/generate OK: $(head -c 200 gen_body.txt)"
+          # 硬校验 2：debug 模式回传明文验证码（缺失直接 fail，避免 UI 测试空跑 7 分钟）
           curl -s "http://127.0.0.1:8000/api/captcha/image" | grep -o "captcha_code" || { echo "::error::captcha_code missing - APP_DEBUG not effective"; exit 1; }
 
       - name: Generate Xcode project
