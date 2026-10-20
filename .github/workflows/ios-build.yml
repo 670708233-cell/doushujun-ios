@@ -196,7 +196,7 @@ jobs:
           mkdir -p runtime/cache runtime/log
           # macos runner 不预装 composer（php 依赖 brew composer 自动带）
           brew install composer 2>&1 | tail -2
-          composer install --no-interaction --prefer-dist --no-progress 2>&1 | tail -3
+          composer install --no-scripts --no-interaction --prefer-dist --no-progress 2>&1 | tail -3
           nohup php think run --host 127.0.0.1 --port 8000 > server.log 2>&1 &
           BACKEND_UP=0
           for i in $(seq 1 30); do

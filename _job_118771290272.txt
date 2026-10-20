@@ -1,0 +1,432 @@
+﻿2026-10-20T17:13:56.9312430Z Current runner version: '2.337.0'
+2026-10-20T17:13:56.9331430Z ##[group]Runner Image Provisioner
+2026-10-20T17:13:56.9332000Z Hosted Compute Agent
+2026-10-20T17:13:56.9332470Z Version: 20260828.587
+2026-10-20T17:13:56.9332890Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+2026-10-20T17:13:56.9333370Z Build Date: 2026-08-28T16:44:25Z
+2026-10-20T17:13:56.9333860Z Worker ID: {140b11ac-d78d-42d1-9f41-a6e3392517d1}
+2026-10-20T17:13:56.9334380Z Azure Region: westus
+2026-10-20T17:13:56.9334760Z ##[endgroup]
+2026-10-20T17:13:56.9335750Z ##[group]Operating System
+2026-10-20T17:13:56.9336150Z macOS
+2026-10-20T17:13:56.9336490Z 14.8.9
+2026-10-20T17:13:56.9336820Z 23J631
+2026-10-20T17:13:56.9337160Z ##[endgroup]
+2026-10-20T17:13:56.9337590Z ##[group]Runner Image
+2026-10-20T17:13:56.9338000Z Image: macos-14-arm64
+2026-10-20T17:13:56.9338390Z Version: 20260831.0302.1
+2026-10-20T17:13:56.9339300Z Included Software: https://github.com/actions/runner-images/blob/macos-14-arm64/20260831.0302/images/macos/macos-14-arm64-Readme.md
+2026-10-20T17:13:56.9340390Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-14-arm64%2F20260831.0302
+2026-10-20T17:13:56.9341150Z ##[endgroup]
+2026-10-20T17:13:56.9341960Z ##[group]GITHUB_TOKEN Permissions
+2026-10-20T17:13:56.9343630Z Contents: read
+2026-10-20T17:13:56.9344090Z Metadata: read
+2026-10-20T17:13:56.9344450Z Packages: read
+2026-10-20T17:13:56.9344820Z ##[endgroup]
+2026-10-20T17:13:56.9346480Z Secret source: Actions
+2026-10-20T17:13:56.9347040Z Cache mode: write
+2026-10-20T17:13:56.9347510Z Prepare workflow directory
+2026-10-20T17:13:56.9586080Z Prepare all required actions
+2026-10-20T17:13:56.9620050Z Getting action download info
+2026-10-20T17:13:57.3882430Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-20T17:13:57.7297510Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-20T17:13:57.9612180Z Complete job name: UI Test (Simulator + Local Backend)
+2026-10-20T17:13:58.0256790Z ##[group]Run actions/checkout@v4
+2026-10-20T17:13:58.0257590Z with:
+2026-10-20T17:13:58.0258000Z   repository: 670708233-cell/doushujun-ios
+2026-10-20T17:13:58.0262080Z   token: ***
+2026-10-20T17:13:58.0262590Z   ssh-strict: true
+2026-10-20T17:13:58.0262970Z   ssh-user: git
+2026-10-20T17:13:58.0263360Z   persist-credentials: true
+2026-10-20T17:13:58.0263770Z   clean: true
+2026-10-20T17:13:58.0264140Z   sparse-checkout-cone-mode: true
+2026-10-20T17:13:58.0264580Z   fetch-depth: 1
+2026-10-20T17:13:58.0264940Z   fetch-tags: false
+2026-10-20T17:13:58.0265330Z   show-progress: true
+2026-10-20T17:13:58.0265720Z   lfs: false
+2026-10-20T17:13:58.0266090Z   submodules: false
+2026-10-20T17:13:58.0266470Z   set-safe-directory: true
+2026-10-20T17:13:58.0268710Z   allow-unsafe-pr-checkout: false
+2026-10-20T17:13:58.0269710Z ##[endgroup]
+2026-10-20T17:13:58.1818400Z Syncing repository: 670708233-cell/doushujun-ios
+2026-10-20T17:13:58.1820240Z ##[group]Getting Git version info
+2026-10-20T17:13:58.1821070Z Working directory is '/Users/runner/work/doushujun-ios/doushujun-ios'
+2026-10-20T17:13:58.1822010Z [command]/opt/homebrew/bin/git version
+2026-10-20T17:13:58.2175880Z git version 2.55.0
+2026-10-20T17:13:58.2189630Z ##[endgroup]
+2026-10-20T17:13:58.2196520Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/3600516e-ba26-44c3-9c35-eef4d8638f04/.gitconfig'
+2026-10-20T17:13:58.2211130Z Temporarily overriding HOME='/Users/runner/work/_temp/3600516e-ba26-44c3-9c35-eef4d8638f04' before making global git config changes
+2026-10-20T17:13:58.2212380Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-20T17:13:58.2219550Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T17:13:58.2333310Z Deleting the contents of '/Users/runner/work/doushujun-ios/doushujun-ios'
+2026-10-20T17:13:58.2341930Z ##[group]Initializing the repository
+2026-10-20T17:13:58.2346890Z [command]/opt/homebrew/bin/git init /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T17:13:58.2601990Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-20T17:13:58.2603790Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-20T17:13:58.2604720Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-20T17:13:58.2605460Z hint: call:
+2026-10-20T17:13:58.2606020Z hint:
+2026-10-20T17:13:58.2608120Z hint: 	git config --global init.defaultBranch <name>
+2026-10-20T17:13:58.2610130Z hint:
+2026-10-20T17:13:58.2610780Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-20T17:13:58.2611790Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-20T17:13:58.2612510Z hint:
+2026-10-20T17:13:58.2612900Z hint: 	git branch -m <name>
+2026-10-20T17:13:58.2613650Z hint:
+2026-10-20T17:13:58.2614250Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-20T17:13:58.2615380Z Initialized empty Git repository in /Users/runner/work/doushujun-ios/doushujun-ios/.git/
+2026-10-20T17:13:58.2626070Z [command]/opt/homebrew/bin/git remote add origin https://github.com/670708233-cell/doushujun-ios
+2026-10-20T17:13:58.2694680Z ##[endgroup]
+2026-10-20T17:13:58.2695410Z ##[group]Disabling automatic garbage collection
+2026-10-20T17:13:58.2698060Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-10-20T17:13:58.2761900Z ##[endgroup]
+2026-10-20T17:13:58.2762740Z ##[group]Setting up auth
+2026-10-20T17:13:58.2770200Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-20T17:13:58.2829880Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-20T17:13:58.3808630Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-20T17:13:58.3868330Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-20T17:13:58.4603790Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-20T17:13:58.4661850Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-20T17:13:58.5514110Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-20T17:13:58.5645810Z ##[endgroup]
+2026-10-20T17:13:58.5646990Z ##[group]Fetching the repository
+2026-10-20T17:13:58.5650520Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +ad5b7f4e3101b82429fc59acc97ef056e8b3d978:refs/remotes/origin/main
+2026-10-20T17:13:59.2218830Z From https://github.com/670708233-cell/doushujun-ios
+2026-10-20T17:13:59.2224980Z  * [new ref]         ad5b7f4e3101b82429fc59acc97ef056e8b3d978 -> origin/main
+2026-10-20T17:13:59.2234360Z ##[endgroup]
+2026-10-20T17:13:59.2237730Z ##[group]Determining the checkout info
+2026-10-20T17:13:59.2241360Z ##[endgroup]
+2026-10-20T17:13:59.2243760Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-10-20T17:13:59.2316750Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-20T17:13:59.2416140Z ##[group]Checking out the ref
+2026-10-20T17:13:59.2423860Z [command]/opt/homebrew/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-10-20T17:13:59.2669070Z Switched to a new branch 'main'
+2026-10-20T17:13:59.2679320Z branch 'main' set up to track 'origin/main'.
+2026-10-20T17:13:59.2682100Z ##[endgroup]
+2026-10-20T17:13:59.2752700Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-10-20T17:13:59.2816150Z ad5b7f4e3101b82429fc59acc97ef056e8b3d978
+2026-10-20T17:13:59.3309680Z ##[group]Run actions/checkout@v4
+2026-10-20T17:13:59.3310530Z with:
+2026-10-20T17:13:59.3311300Z   repository: 670708233-cell/doushujun-php
+2026-10-20T17:13:59.3312130Z   ref: main
+2026-10-20T17:13:59.3313190Z   token: ***
+2026-10-20T17:13:59.3315010Z   path: backend
+2026-10-20T17:13:59.3315680Z   ssh-strict: true
+2026-10-20T17:13:59.3316380Z   ssh-user: git
+2026-10-20T17:13:59.3317120Z   persist-credentials: true
+2026-10-20T17:13:59.3317900Z   clean: true
+2026-10-20T17:13:59.3318580Z   sparse-checkout-cone-mode: true
+2026-10-20T17:13:59.3319440Z   fetch-depth: 1
+2026-10-20T17:13:59.3320110Z   fetch-tags: false
+2026-10-20T17:13:59.3321560Z   show-progress: true
+2026-10-20T17:13:59.3322980Z   lfs: false
+2026-10-20T17:13:59.3323720Z   submodules: false
+2026-10-20T17:13:59.3324660Z   set-safe-directory: true
+2026-10-20T17:13:59.3325530Z   allow-unsafe-pr-checkout: false
+2026-10-20T17:13:59.3326940Z ##[endgroup]
+2026-10-20T17:13:59.4336230Z Syncing repository: 670708233-cell/doushujun-php
+2026-10-20T17:13:59.4346540Z ##[group]Getting Git version info
+2026-10-20T17:13:59.4347800Z Working directory is '/Users/runner/work/doushujun-ios/doushujun-ios/backend'
+2026-10-20T17:13:59.4392620Z [command]/opt/homebrew/bin/git version
+2026-10-20T17:13:59.4477900Z git version 2.55.0
+2026-10-20T17:13:59.4514880Z ##[endgroup]
+2026-10-20T17:13:59.4522730Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/06e2b691-4dd8-4049-9ce5-7e8f25de0b86/.gitconfig'
+2026-10-20T17:13:59.4535090Z Temporarily overriding HOME='/Users/runner/work/_temp/06e2b691-4dd8-4049-9ce5-7e8f25de0b86' before making global git config changes
+2026-10-20T17:13:59.4541090Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-20T17:13:59.4546260Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/doushujun-ios/doushujun-ios/backend
+2026-10-20T17:13:59.4594740Z ##[group]Initializing the repository
+2026-10-20T17:13:59.4604250Z [command]/opt/homebrew/bin/git init /Users/runner/work/doushujun-ios/doushujun-ios/backend
+2026-10-20T17:13:59.4702200Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-20T17:13:59.4704360Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-20T17:13:59.4705910Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-20T17:13:59.4708920Z hint: call:
+2026-10-20T17:13:59.4710450Z hint:
+2026-10-20T17:13:59.4712290Z hint: 	git config --global init.defaultBranch <name>
+2026-10-20T17:13:59.4714580Z hint:
+2026-10-20T17:13:59.4716730Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-20T17:13:59.4720280Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-20T17:13:59.4723060Z hint:
+2026-10-20T17:13:59.4724610Z hint: 	git branch -m <name>
+2026-10-20T17:13:59.4726400Z hint:
+2026-10-20T17:13:59.4728820Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-20T17:13:59.4733280Z Initialized empty Git repository in /Users/runner/work/doushujun-ios/doushujun-ios/backend/.git/
+2026-10-20T17:13:59.4740600Z [command]/opt/homebrew/bin/git remote add origin https://github.com/670708233-cell/doushujun-php
+2026-10-20T17:13:59.4773030Z ##[endgroup]
+2026-10-20T17:13:59.4775960Z ##[group]Disabling automatic garbage collection
+2026-10-20T17:13:59.4779080Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-10-20T17:13:59.4834330Z ##[endgroup]
+2026-10-20T17:13:59.4837210Z ##[group]Setting up auth
+2026-10-20T17:13:59.4840240Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-20T17:13:59.4895160Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-20T17:13:59.5592780Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-20T17:13:59.5643800Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-20T17:13:59.6441710Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-20T17:13:59.6474890Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-20T17:13:59.7803500Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-20T17:13:59.7862130Z ##[endgroup]
+2026-10-20T17:13:59.7864940Z ##[group]Fetching the repository
+2026-10-20T17:13:59.7875540Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +refs/heads/main*:refs/remotes/origin/main* +refs/tags/main*:refs/tags/main*
+2026-10-20T17:14:01.8180470Z From https://github.com/670708233-cell/doushujun-php
+2026-10-20T17:14:01.8182840Z  * [new branch]      main       -> origin/main
+2026-10-20T17:14:01.8203740Z ##[endgroup]
+2026-10-20T17:14:01.8205210Z ##[group]Determining the checkout info
+2026-10-20T17:14:01.8229930Z [command]/opt/homebrew/bin/git branch --list --remote origin/main
+2026-10-20T17:14:01.8357670Z   origin/main
+2026-10-20T17:14:01.8374170Z ##[endgroup]
+2026-10-20T17:14:01.8395210Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-10-20T17:14:01.8521900Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-20T17:14:01.8621310Z ##[group]Checking out the ref
+2026-10-20T17:14:01.8629260Z [command]/opt/homebrew/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-10-20T17:14:01.9927390Z Switched to a new branch 'main'
+2026-10-20T17:14:01.9937420Z branch 'main' set up to track 'origin/main'.
+2026-10-20T17:14:01.9946000Z ##[endgroup]
+2026-10-20T17:14:02.0033710Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-10-20T17:14:02.0092200Z d6a1e5f28e7f9ad669416cd681aacc90d64819fa
+2026-10-20T17:14:02.0249210Z ##[group]Run xcodebuild -version
+2026-10-20T17:14:02.0249560Z [36;1mxcodebuild -version[0m
+2026-10-20T17:14:02.0249840Z [36;1mxcrun simctl list devices available | grep -E "iPhone" || true[0m
+2026-10-20T17:14:02.0251170Z [36;1mSIM=$(xcrun simctl list devices available | grep -oE "iPhone [0-9]+( Pro Max| Plus)?" | head -1)[0m
+2026-10-20T17:14:02.0251640Z [36;1mecho "Using simulator: $SIM"[0m
+2026-10-20T17:14:02.0252090Z [36;1mecho "name=$SIM" >> "$GITHUB_OUTPUT"[0m
+2026-10-20T17:14:02.0368330Z shell: /bin/bash -e {0}
+2026-10-20T17:14:02.0368590Z ##[endgroup]
+2026-10-20T17:14:02.3681890Z Xcode 15.4
+2026-10-20T17:14:02.3687940Z Build version 15F31d
+2026-10-20T17:14:13.2943300Z     iPhone 15 Pro (E3BBCD6B-A52D-45EF-B6E0-96D3151F472D) (Shutdown) 
+2026-10-20T17:14:13.2949320Z     iPhone 15 Pro Max (78A14695-FEEB-4A7C-A0FA-91541B02259E) (Shutdown) 
+2026-10-20T17:14:13.2951410Z     iPhone 15 (85C23E01-9DF2-4DCC-B85A-E0BBB7758E48) (Shutdown) 
+2026-10-20T17:14:13.2960400Z     iPhone 15 Plus (17A8C012-E83F-467F-888A-25C2977491AB) (Shutdown) 
+2026-10-20T17:14:13.2962590Z     iPhone SE (3rd generation) (3E23127D-2EE4-4591-89A5-FD2CEE2A05CE) (Shutdown) 
+2026-10-20T17:14:13.2992840Z     iPhone 15 Pro (0C511E31-82CB-4CE3-AF79-548A755737AE) (Shutdown) 
+2026-10-20T17:14:13.3070750Z     iPhone 15 Pro Max (753632A6-2C76-413F-80EA-EA5B7C90310B) (Shutdown) 
+2026-10-20T17:14:13.3184740Z     iPhone 15 (B85A6126-D430-4125-9250-E65CD7DF14B7) (Shutdown) 
+2026-10-20T17:14:13.3257190Z     iPhone 15 Plus (D4463870-0237-4022-B154-00CCA82A0636) (Shutdown) 
+2026-10-20T17:14:13.3258480Z     iPhone SE (3rd generation) (1EEC7A8C-5A8B-4FBE-B86E-AE7A34D4A64A) (Shutdown) 
+2026-10-20T17:14:13.3262450Z     iPhone 15 Pro (E63A4C69-8ADF-4037-A5EE-AE47A98E069B) (Shutdown) 
+2026-10-20T17:14:13.3263430Z     iPhone 15 Pro Max (F2188A35-1A84-46E5-AD89-58890B04C591) (Shutdown) 
+2026-10-20T17:14:13.3268610Z     iPhone 15 (30F33610-4843-4C04-99B0-734F24ADAB6B) (Shutdown) 
+2026-10-20T17:14:13.3269050Z     iPhone 15 Plus (9E6981FD-68F6-499B-9715-54D0AC6B324E) (Shutdown) 
+2026-10-20T17:14:13.3269610Z     iPhone SE (3rd generation) (1A195176-A999-41D7-A7D6-84FCB41A26EF) (Shutdown) 
+2026-10-20T17:14:13.3270070Z     iPhone 15 Pro (B15C98D2-D2CB-4366-B470-4881BB76708E) (Shutdown) 
+2026-10-20T17:14:13.3270540Z     iPhone 15 Pro Max (B67BB802-8F6F-4830-A0C0-81D202D4AE98) (Shutdown) 
+2026-10-20T17:14:13.3271040Z     iPhone 15 (CC86AE0C-952D-43BA-B4CA-7A9A56FB3E00) (Shutdown) 
+2026-10-20T17:14:13.3271500Z     iPhone 15 Plus (4AA0BA9A-F857-4E14-B7E2-0886D349E70F) (Shutdown) 
+2026-10-20T17:14:13.3272130Z     iPhone SE (3rd generation) (52978592-8BD6-4A5C-8913-43711812C97D) (Shutdown) 
+2026-10-20T17:14:13.3272750Z     iPhone 16 Pro (E6F7DFB4-78AF-4B8D-A285-B24000457240) (Shutdown) 
+2026-10-20T17:14:13.3273220Z     iPhone 16 Pro Max (D93350B9-61EE-4432-BD8E-E25978972F13) (Shutdown) 
+2026-10-20T17:14:13.3273750Z     iPhone 16 (A5B144E6-A071-4106-B457-76AA34C952DD) (Shutdown) 
+2026-10-20T17:14:13.3274240Z     iPhone 16 Plus (CDBA815E-750D-4478-84CE-3B56660EA7E2) (Shutdown) 
+2026-10-20T17:14:13.3274830Z     iPhone SE (3rd generation) (55BC56C5-67CD-46A7-BB04-A0B19A8F0AAC) (Shutdown) 
+2026-10-20T17:14:13.3275420Z     iPhone 16 Pro (154781AA-E525-424F-9768-390D4DED6241) (Shutdown) 
+2026-10-20T17:14:13.3275910Z     iPhone 16 Pro Max (F4C49282-5F1D-44F0-B0C6-178B582DB734) (Shutdown) 
+2026-10-20T17:14:13.3276400Z     iPhone 16 (EDC4F281-97FB-4004-B8FA-3ED2BD36749C) (Shutdown) 
+2026-10-20T17:14:13.3276930Z     iPhone 16 Plus (21915B6B-125F-4295-A2C0-EC803AABBF05) (Shutdown) 
+2026-10-20T17:14:13.3277450Z     iPhone SE (3rd generation) (A9044B95-7ADA-4C87-9EE0-0393C5CC6805) (Shutdown) 
+2026-10-20T17:14:14.5855770Z Using simulator: iPhone 15
+2026-10-20T17:14:14.6036910Z ##[group]Run brew install mysql
+2026-10-20T17:14:14.6037230Z [36;1mbrew install mysql[0m
+2026-10-20T17:14:14.6037540Z [36;1mbrew services start mysql[0m
+2026-10-20T17:14:14.6037910Z [36;1mfor i in $(seq 1 30); do[0m
+2026-10-20T17:14:14.6038190Z [36;1m  mysqladmin ping 2>/dev/null && break[0m
+2026-10-20T17:14:14.6038570Z [36;1m  sleep 2[0m
+2026-10-20T17:14:14.6038840Z [36;1mdone[0m
+2026-10-20T17:14:14.6039240Z [36;1mmysql -e "CREATE DATABASE IF NOT EXISTS dcc CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"[0m
+2026-10-20T17:14:14.6039760Z [36;1mmysql dcc < backend/database/schema.sql[0m
+2026-10-20T17:14:14.6040300Z [36;1mmysql dcc -e "SELECT COUNT(*) AS tables_count FROM information_schema.tables WHERE table_schema='dcc';"[0m
+2026-10-20T17:14:14.6040910Z [36;1m# 测试账号（密码 Uitest#2026 的 bcrypt hash）[0m
+2026-10-20T17:14:14.6041910Z [36;1mmysql dcc -e "INSERT INTO users (username, email, password, balance, invite_code, nickname) VALUES ('uitester', 'uitest@doushujun.local', '\$2y\$10\$aDv.o2d7NGaFE5BGjD3wG.dKyqlvVxSDufWEBHffxjJHRnYjoZO/O', 100, 'UITEST01', 'UI自动化测试账号');"[0m
+2026-10-20T17:14:14.6481190Z shell: /bin/bash -e {0}
+2026-10-20T17:14:14.6481600Z ##[endgroup]
+2026-10-20T17:14:17.9163380Z [32m==>[0m [1mDownloading bottle manifests[0m
+2026-10-20T17:14:17.9346200Z ✔︎ Bottle Manifest mysql (26.7.0)
+2026-10-20T17:14:17.9347460Z [34m==>[0m [1mWould install 1 formula:[0m
+2026-10-20T17:14:17.9348160Z mysql
+2026-10-20T17:14:18.0529620Z [34m==>[0m [1mWould install 3 dependencies for mysql:[0m
+2026-10-20T17:14:18.0530190Z abseil
+2026-10-20T17:14:18.0530520Z protobuf
+2026-10-20T17:14:18.0530830Z zlib-ng-compat
+2026-10-20T17:14:18.1040620Z [32m==>[0m [1mFetching downloads for: [32mmysql[39m[0m
+2026-10-20T17:14:18.3295660Z ✔︎ Bottle Manifest protobuf (36.0)
+2026-10-20T17:14:18.3299390Z ✔︎ Bottle Manifest zlib-ng-compat (2.3.3_1)
+2026-10-20T17:14:18.3684670Z ✔︎ Bottle Manifest abseil (20260817.0)
+2026-10-20T17:14:18.5401350Z ✔︎ Bottle abseil (20260817.0)
+2026-10-20T17:14:18.6178090Z ✔︎ Bottle protobuf (36.0)
+2026-10-20T17:14:18.6310030Z ✔︎ Bottle zlib-ng-compat (2.3.3_1)
+2026-10-20T17:14:21.5171820Z ✔︎ Bottle mysql (26.7.0)
+2026-10-20T17:14:21.5905220Z [32m==>[0m [1mInstalling dependencies for mysql:[0m [32mabseil[39m, [32mprotobuf[39m and [32mzlib-ng-compat[39m[0m
+2026-10-20T17:14:21.5921340Z [32m==>[0m [1mInstalling mysql dependency: [32mabseil[39m[0m
+2026-10-20T17:14:21.6097750Z [34m==>[0m [1mPouring abseil--20260817.0.arm64_sonoma.bottle.1.tar.gz[0m
+2026-10-20T17:14:23.0887250Z 🍺  /opt/homebrew/Cellar/abseil/20260817.0: 832 files, 11.8MB
+2026-10-20T17:14:23.0977480Z [32m==>[0m [1mInstalling mysql dependency: [32mprotobuf[39m[0m
+2026-10-20T17:14:23.1090110Z [34m==>[0m [1mPouring protobuf--36.0.arm64_sonoma.bottle.tar.gz[0m
+2026-10-20T17:14:24.3690220Z 🍺  /opt/homebrew/Cellar/protobuf/36.0: 387 files, 18.1MB
+2026-10-20T17:14:24.3696280Z [32m==>[0m [1mInstalling mysql dependency: [32mzlib-ng-compat[39m[0m
+2026-10-20T17:14:24.3792980Z [34m==>[0m [1mPouring zlib-ng-compat--2.3.3_1.arm64_sonoma.bottle.tar.gz[0m
+2026-10-20T17:14:24.4218600Z 🍺  /opt/homebrew/Cellar/zlib-ng-compat/2.3.3_1: 17 files, 427.0KB
+2026-10-20T17:14:24.4255580Z [32m==>[0m [1mInstalling [32mmysql[39m[0m
+2026-10-20T17:14:24.4312480Z [34m==>[0m [1mPouring mysql--26.7.0.arm64_sonoma.bottle.tar.gz[0m
+2026-10-20T17:14:33.8225250Z 2026-10-20T17:14:33.712744Z 0 [System] [MY-015017] [Server] MySQL Server Initialization - start.
+2026-10-20T17:14:33.8338780Z 2026-10-20T17:14:33.804144Z 0 [System] [MY-013169] [Server] /opt/homebrew/Cellar/mysql/26.7.0/bin/mysqld (mysqld 26.7.0) initializing of server in progress as process 2624
+2026-10-20T17:14:33.8435880Z 2026-10-20T17:14:33.810372Z 0 [Warning] [MY-010159] [Server] Setting lower_case_table_names=2 because file system for /opt/homebrew/var/mysql/ is case insensitive
+2026-10-20T17:14:33.8485310Z 2026-10-20T17:14:33.822882Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-10-20T17:14:34.0465630Z 2026-10-20T17:14:34.043794Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-10-20T17:14:35.2296390Z 2026-10-20T17:14:35.228657Z 6 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+2026-10-20T17:14:35.9131570Z 2026-10-20T17:14:35.907225Z 0 [System] [MY-013172] [Server] Received SHUTDOWN from user <via user signal>. Shutting down mysqld (Version: 26.7.0).
+2026-10-20T17:14:36.4258890Z 2026-10-20T17:14:36.425240Z 0 [System] [MY-015018] [Server] MySQL Server Initialization - end.
+2026-10-20T17:14:37.4310640Z 🍺  /opt/homebrew/Cellar/mysql/26.7.0: 344 files, 308.7MB
+2026-10-20T17:14:37.4413430Z [32m==>[0m [1mCaveats[0m
+2026-10-20T17:14:37.4527660Z [34m==>[0m [1mmysql[0m
+2026-10-20T17:14:37.4540590Z A "/etc/my.cnf" or "/etc/mysql/my.cnf" from another install may interfere
+2026-10-20T17:14:37.4554580Z with a Homebrew-built server starting up correctly.
+2026-10-20T17:14:37.4561370Z 
+2026-10-20T17:14:37.4562420Z Upgrading from MySQL <8.4 to MySQL >9.0 requires running MySQL 8.4 first:
+2026-10-20T17:14:37.4599340Z  - brew services stop mysql
+2026-10-20T17:14:37.4632220Z  - brew install mysql@8.4
+2026-10-20T17:14:37.4715840Z  - brew services start mysql@8.4
+2026-10-20T17:14:37.4740130Z  - brew services stop mysql@8.4
+2026-10-20T17:14:37.4785900Z  - brew services start mysql
+2026-10-20T17:14:37.4887190Z 
+2026-10-20T17:14:37.4958350Z We've installed your MySQL database without a root password. To secure it run:
+2026-10-20T17:14:37.4990730Z     mysql_secure_installation
+2026-10-20T17:14:37.5046680Z 
+2026-10-20T17:14:37.5057970Z MySQL is configured to only allow connections from localhost by default
+2026-10-20T17:14:37.5074840Z 
+2026-10-20T17:14:37.5076250Z To connect run:
+2026-10-20T17:14:37.5078050Z     mysql -u root
+2026-10-20T17:14:37.5130620Z 
+2026-10-20T17:14:37.5191070Z To start mysql now and restart at login:
+2026-10-20T17:14:37.5191810Z   brew services start mysql
+2026-10-20T17:14:37.5205480Z Or, if you don't want/need a background service you can just run:
+2026-10-20T17:14:37.5218980Z   /opt/homebrew/opt/mysql/bin/mysqld_safe --datadir\=/opt/homebrew/var/mysql
+2026-10-20T17:14:38.3784230Z [34m==>[0m [1mSuccessfully started `mysql` (label: homebrew.mxcl.mysql)[0m
+2026-10-20T17:14:40.5049400Z mysqld is alive
+2026-10-20T17:14:41.1238520Z tables_count
+2026-10-20T17:14:41.1239270Z 62
+2026-10-20T17:14:41.1510870Z ##[group]Run cd backend
+2026-10-20T17:14:41.1511490Z [36;1mcd backend[0m
+2026-10-20T17:14:41.1511780Z [36;1mcp env.ci .env[0m
+2026-10-20T17:14:41.1512190Z [36;1mmkdir -p runtime/cache runtime/log[0m
+2026-10-20T17:14:41.1513230Z [36;1m# macos runner 不预装 composer（php 依赖 brew composer 自动带）[0m
+2026-10-20T17:14:41.1513600Z [36;1mbrew install composer 2>&1 | tail -2[0m
+2026-10-20T17:14:41.1514140Z [36;1mcomposer install --no-interaction --prefer-dist --no-progress 2>&1 | tail -3[0m
+2026-10-20T17:14:41.1514810Z [36;1mnohup php think run --host 127.0.0.1 --port 8000 > server.log 2>&1 &[0m
+2026-10-20T17:14:41.1515640Z [36;1mBACKEND_UP=0[0m
+2026-10-20T17:14:41.1516000Z [36;1mfor i in $(seq 1 30); do[0m
+2026-10-20T17:14:41.1516680Z [36;1m  curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8000/api/captcha/slider/generate | grep -q 200 && { echo "backend UP"; BACKEND_UP=1; break; }[0m
+2026-10-20T17:14:41.1517400Z [36;1m  sleep 2[0m
+2026-10-20T17:14:41.1517790Z [36;1mdone[0m
+2026-10-20T17:14:41.1518050Z [36;1mif [ "$BACKEND_UP" != "1" ]; then[0m
+2026-10-20T17:14:41.1518430Z [36;1m  echo "::error::backend failed to start"[0m
+2026-10-20T17:14:41.1518770Z [36;1m  tail -30 server.log || true[0m
+2026-10-20T17:14:41.1519100Z [36;1m  exit 1[0m
+2026-10-20T17:14:41.1519350Z [36;1mfi[0m
+2026-10-20T17:14:41.1519660Z [36;1mcurl -s http://127.0.0.1:8000/api/captcha/slider/generate | head -c 200[0m
+2026-10-20T17:14:41.1520070Z [36;1mecho ""[0m
+2026-10-20T17:14:41.1520440Z [36;1m# 验证 debug 模式回传明文验证码（缺失直接 fail，避免 UI 测试空跑 7 分钟）[0m
+2026-10-20T17:14:41.1521330Z [36;1mcurl -s "http://127.0.0.1:8000/api/captcha/image" | grep -o "captcha_code" || { echo "::error::captcha_code missing - APP_DEBUG not effective"; exit 1; }[0m
+2026-10-20T17:14:41.1794460Z shell: /bin/bash -e {0}
+2026-10-20T17:14:41.1794770Z ##[endgroup]
+2026-10-20T17:14:57.2167010Z [34m==>[0m [1mPouring composer--2.10.3.arm64_sonoma.bottle.tar.gz[0m
+2026-10-20T17:14:57.2168330Z 🍺  /opt/homebrew/Cellar/composer/2.10.3: 4 files, 3.7MB
+2026-10-20T17:15:02.5474900Z 
+2026-10-20T17:15:02.5477450Z Read <https://getcomposer.org/doc/articles/troubleshooting.md> for further common problems.
+2026-10-20T17:15:02.5561720Z ##[error]Your requirements could not be resolved to an installable set of packages.
+
+  Problem 1
+    - Root composer.json requires alipay/easysdk, it could not be found in any version, there may be a typo in the package name.
+  Problem 2
+    - Root composer.json requires topthink/think-filesystem ^2.0 -> satisfiable by topthink/think-filesystem[v2.0.0, v2.0.1, v2.0.2, v2.0.3].
+    - topthink/think-filesystem[v2.0.0, ..., v2.0.1] require topthink/framework ^6.1 -> found topthink/framework[v6.1.0, ..., v6.1.5] but it conflicts with your root composer.json require (^8.0).
+    - topthink/think-filesystem v2.0.2 requires league/flysystem ^2.0 -> found league/flysystem[2.0.0, ..., 2.5.0] but these were not loaded, because they are affected by security advisories ("PKSA-w9tt-7782-78jx", "PKSA-pwh8-d4fr-nywn"). Go to https://packagist.org/security-advisories/ to find advisory details. To ignore the advisories, add their IDs to the "policy.advisories.ignore-id" config or add the package to "policy.advisories.ignore". To turn the feature off entirely, you can set "policy.advisories.block" to false.
+    - topthink/think-filesystem v2.0.3 requires league/flysystem ^1.1.4 -> found league/flysystem[1.1.4, ..., 1.1.10] but these were not loaded, because they are affected by security advisories ("PKSA-w9tt-7782-78jx"). Go to https://packagist.org/security-advisories/ to find advisory details. To ignore the advisories, add their IDs to the "policy.advisories.ignore-id" config or add the package to "policy.advisories.ignore". To turn the feature off entirely, you can set "policy.advisories.block" to false.
+
+Potential causes:
+ - A typo in the package name
+ - The package is not available in a stable-enough version according to your minimum-stability setting
+   see <https://getcomposer.org/doc/04-schema.md#minimum-stability> for more details.
+ - It's a private package and you forgot to add a custom repository to find it
+
+Read <https://getcomposer.org/doc/articles/troubleshooting.md> for further common problems.
+2026-10-20T17:16:04.5830510Z ##[error]backend failed to start
+2026-10-20T17:16:04.6244970Z PHP Warning:  require(/Users/runner/work/doushujun-ios/doushujun-ios/backend/vendor/autoload.php): Failed to open stream: No such file or directory in /Users/runner/work/doushujun-ios/doushujun-ios/backend/think on line 8
+2026-10-20T17:16:04.6245950Z 
+2026-10-20T17:16:04.6246680Z Warning: require(/Users/runner/work/doushujun-ios/doushujun-ios/backend/vendor/autoload.php): Failed to open stream: No such file or directory in /Users/runner/work/doushujun-ios/doushujun-ios/backend/think on line 8
+2026-10-20T17:16:04.6248600Z PHP Fatal error:  Uncaught Error: Failed opening required '/Users/runner/work/doushujun-ios/doushujun-ios/backend/vendor/autoload.php' (include_path='.:/opt/homebrew/Cellar/php/8.5.10/share/php/pear') in /Users/runner/work/doushujun-ios/doushujun-ios/backend/think:8
+2026-10-20T17:16:04.6254630Z Stack trace:
+2026-10-20T17:16:04.6255720Z #0 {main}
+2026-10-20T17:16:04.6257280Z   thrown in /Users/runner/work/doushujun-ios/doushujun-ios/backend/think on line 8
+2026-10-20T17:16:04.6258200Z 
+2026-10-20T17:16:04.6260380Z Fatal error: Uncaught Error: Failed opening required '/Users/runner/work/doushujun-ios/doushujun-ios/backend/vendor/autoload.php' (include_path='.:/opt/homebrew/Cellar/php/8.5.10/share/php/pear') in /Users/runner/work/doushujun-ios/doushujun-ios/backend/think:8
+2026-10-20T17:16:04.6263320Z Stack trace:
+2026-10-20T17:16:04.6263980Z #0 {main}
+2026-10-20T17:16:04.6264810Z   thrown in /Users/runner/work/doushujun-ios/doushujun-ios/backend/think on line 8
+2026-10-20T17:16:04.6294580Z ##[error]Process completed with exit code 1.
+2026-10-20T17:16:04.7033790Z ##[group]Run actions/upload-artifact@v4
+2026-10-20T17:16:04.7034270Z with:
+2026-10-20T17:16:04.7034540Z   name: uitest-log
+2026-10-20T17:16:04.7035080Z   path: uitest.log
+2026-10-20T17:16:04.7035590Z   retention-days: 7
+2026-10-20T17:16:04.7035960Z   if-no-files-found: warn
+2026-10-20T17:16:04.7036800Z   compression-level: 6
+2026-10-20T17:16:04.7037060Z   overwrite: false
+2026-10-20T17:16:04.7037570Z   include-hidden-files: false
+2026-10-20T17:16:04.7037930Z ##[endgroup]
+2026-10-20T17:16:05.4988830Z (node:6388) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-20T17:16:05.4989450Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-20T17:16:05.5011440Z ##[warning]No files were found with the provided path: uitest.log. No artifacts will be uploaded.
+2026-10-20T17:16:05.5211710Z ##[group]Run actions/upload-artifact@v4
+2026-10-20T17:16:05.5212180Z with:
+2026-10-20T17:16:05.5212540Z   name: backend-log
+2026-10-20T17:16:05.5213870Z   path: backend/server.log
+2026-10-20T17:16:05.5214120Z   retention-days: 7
+2026-10-20T17:16:05.5214310Z   if-no-files-found: warn
+2026-10-20T17:16:05.5214510Z   compression-level: 6
+2026-10-20T17:16:05.5214820Z   overwrite: false
+2026-10-20T17:16:05.5215060Z   include-hidden-files: false
+2026-10-20T17:16:05.5215360Z ##[endgroup]
+2026-10-20T17:16:05.7619400Z (node:6395) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-20T17:16:05.7621190Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-20T17:16:05.7663570Z With the provided path, there will be 1 file uploaded
+2026-10-20T17:16:05.7664570Z Artifact name is valid!
+2026-10-20T17:16:05.7665170Z Root directory input is valid!
+2026-10-20T17:16:06.2249350Z Beginning upload of artifact content to blob storage
+2026-10-20T17:16:06.2399770Z (node:6395) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-20T17:16:06.5373260Z Uploaded bytes 401
+2026-10-20T17:16:06.6171650Z Finished uploading artifact content to blob storage!
+2026-10-20T17:16:06.6173550Z SHA256 digest of uploaded artifact zip is f51cbd97242e2a6a47334dae6292754ffdebbb92157822c7b95fb2fd20aac9bd
+2026-10-20T17:16:06.6175350Z Finalizing artifact upload
+2026-10-20T17:16:06.9957830Z Artifact backend-log.zip successfully finalized. Artifact ID 12284171945
+2026-10-20T17:16:06.9958600Z Artifact backend-log has been successfully uploaded! Final size is 401 bytes. Artifact ID is 12284171945
+2026-10-20T17:16:06.9965610Z Artifact download URL: https://github.com/670708233-cell/doushujun-ios/actions/runs/39464230419/artifacts/12284171945
+2026-10-20T17:16:07.0134030Z Post job cleanup.
+2026-10-20T17:16:07.1571770Z [command]/opt/homebrew/bin/git version
+2026-10-20T17:16:07.2088310Z git version 2.55.0
+2026-10-20T17:16:07.2113800Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/1f9e7e97-002d-4c37-b74b-130342b3fc59/.gitconfig'
+2026-10-20T17:16:07.2124490Z Temporarily overriding HOME='/Users/runner/work/_temp/1f9e7e97-002d-4c37-b74b-130342b3fc59' before making global git config changes
+2026-10-20T17:16:07.2125420Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-20T17:16:07.2126240Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/doushujun-ios/doushujun-ios/backend
+2026-10-20T17:16:07.2325540Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-20T17:16:07.2474560Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-20T17:16:07.4436600Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-20T17:16:07.4523740Z http.https://github.com/.extraheader
+2026-10-20T17:16:07.4535610Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-20T17:16:07.4870640Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-20T17:16:07.6175300Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-20T17:16:07.6297880Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-20T17:16:07.7796720Z Post job cleanup.
+2026-10-20T17:16:07.9055160Z [command]/opt/homebrew/bin/git version
+2026-10-20T17:16:07.9116020Z git version 2.55.0
+2026-10-20T17:16:07.9134340Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/c4af4d05-8b19-45ff-aa90-7a753733b719/.gitconfig'
+2026-10-20T17:16:07.9142530Z Temporarily overriding HOME='/Users/runner/work/_temp/c4af4d05-8b19-45ff-aa90-7a753733b719' before making global git config changes
+2026-10-20T17:16:07.9144680Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-20T17:16:07.9147600Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T17:16:07.9218550Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-20T17:16:07.9326760Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-20T17:16:08.0371750Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-20T17:16:08.0443670Z http.https://github.com/.extraheader
+2026-10-20T17:16:08.0463010Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-20T17:16:08.0605430Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-20T17:16:08.1816160Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-20T17:16:08.1881120Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-20T17:16:08.2876900Z Cleaning up orphan processes
+2026-10-20T17:16:09.0955260Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
