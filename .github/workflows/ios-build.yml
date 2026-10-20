@@ -154,7 +154,7 @@ jobs:
           mysql dcc < backend/database/schema.sql
           mysql dcc -e "SELECT COUNT(*) AS tables_count FROM information_schema.tables WHERE table_schema='dcc';"
           # 测试账号（密码 Uitest#2026 的 bcrypt hash）
-          mysql dcc -e "INSERT INTO users (username, email, password, balance, invite_code, nickname, status, create_time) VALUES ('uitester', 'uitest@doushujun.local', '\$2y\$10\$aDv.o2d7NGaFE5BGjD3wG.dKyqlvVxSDufWEBHffxjJHRnYjoZO/O', 100, 'UITEST01', 'UI自动化测试账号', 1, NOW());"
+          mysql dcc -e "INSERT INTO users (username, email, password, balance, invite_code, nickname) VALUES ('uitester', 'uitest@doushujun.local', '\$2y\$10\$aDv.o2d7NGaFE5BGjD3wG.dKyqlvVxSDufWEBHffxjJHRnYjoZO/O', 100, 'UITEST01', 'UI自动化测试账号');"
 
       - name: Start PHP backend
         run: |
