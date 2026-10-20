@@ -1,26 +1,32 @@
 import SwiftUI
-import WebKit
+
+// ============================================================================
+// AuthView.swift — 登录/注册/忘记密码 + 自研滑块验证
+// 职责：三面板单页切换（login/register/forgot）+ 图形验证码 + 邮箱验证码
+//       + SliderCaptchaSheet（generate→AES 轨迹→verify 换 slider_token）
+// ============================================================================
 
 /// 登录/注册/忘记密码（对齐安卓 AuthScreens.kt：mode 单页切换）
 struct AuthView: View {
-    var onLoginSuccess: () -> Void
-    @State private var mode = "login"
+    var onLoginSuccess: () -> Void             // 登录成功回调（根容器切主页+拉账户）
+    @State private var mode = "login"          // 当前面板：login / register / forgot
     @ObservedObject private var bus = SessionBus.shared
 
     var body: some View {
         ZStack {
-            TechBackground()
+            TechBackground()                   // 科技感背景层
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 18) {
-                    Spacer().frame(height: 34)
-                    // Logo 区
+                    Spacer().frame(height: 34) // 顶部留白
+                    // Logo 区：渐变圆角方块 + 品牌名
                     RoundedRectangle(cornerRadius: 22)
                         .fill(T.grad)
                         .frame(width: 84, height: 84)
                         .overlay(Text("抖数君").font(.system(size: 22, weight: .heavy)).foregroundColor(T.bg))
-                    Text("AI作品分析建议优化平台")
+                    Text("AI作品分析建议优化平台")    // slogan（字间距拉开）
                         .font(.system(size: 15)).tracking(2).foregroundColor(T.textSub)
 
+                    // 按模式装配面板（switch 三态）
                     switch mode {
                     case "login": LoginPanel(onSuccess: onLoginSuccess, goRegister: { mode = "register" }, goForgot: { mode = "forgot" })
                     case "register": RegisterPanel(onSuccess: onLoginSuccess, goLogin: { mode = "login" })
@@ -31,27 +37,28 @@ struct AuthView: View {
                 .padding(.bottom, 40)
             }
         }
-        .onAppear { bus.loadAnnouncement() }
+        .onAppear { bus.loadAnnouncement() }       // 进页拉公告（登录页也展示公告）
     }
 }
 
 // MARK: - 图形验证码（GET captcha/generate → base64 PNG dataURI）
 
+/// 图形验证码组件：输入框 + 可点刷新的验证码图（双绑定 key 与用户输入）
 struct CaptchaImage: View {
-    @Binding var captchaKey: String
-    @Binding var code: String
-    @State private var img: UIImage?
+    @Binding var captchaKey: String                // 服务端发的验证码 key（提交时随表单回传）
+    @Binding var code: String                      // 用户输入的验证码
+    @State private var img: UIImage?               // 解码后的验证码图
 
     var body: some View {
         HStack(spacing: 10) {
-            DSJField(placeholder: "图形验证码", text: $code)
+            DSJField(placeholder: "图形验证码", text: $code)   // 用户输入
             Button {
-                refresh()
+                refresh()                          // 点图刷新
             } label: {
                 Group {
-                    if let img = img {
+                    if let img = img {             // 已加载：显示图
                         Image(uiImage: img).resizable().scaledToFill()
-                    } else {
+                    } else {                       // 加载失败占位
                         Text("点击刷新").font(.system(size: 11)).foregroundColor(T.textSub)
                     }
                 }
@@ -60,24 +67,25 @@ struct CaptchaImage: View {
                 .overlay(RoundedRectangle(cornerRadius: 10).stroke(T.stroke, lineWidth: 1))
             }
         }
-        .onAppear { refresh() }
+        .onAppear { refresh() }                    // 出现即拉首张
     }
 
+    /// 拉取验证码：剥 dataURI 前缀 → base64 解码 → 回填 key
     func refresh() {
-        code = ""
+        code = ""                                  // 换码必清输入
         Task {
             do {
                 let d = try await Network.get("captcha/generate")
                 let uri = d["captcha_image"].str ?? ""
-                let b64 = uri.replacingOccurrences(of: "^data:image/\\w+;base64,", with: "", options: .regularExpression)
-                    .replacingOccurrences(of: "\n", with: "")
+                let b64 = uri.replacingOccurrences(of: "^data:image/\\w+;base64,", with: "", options: .regularExpression)  // 正则剥 dataURI 头
+                    .replacingOccurrences(of: "\n", with: "")   // 清换行（base64 容错）
                     .replacingOccurrences(of: "\r", with: "")
                 await MainActor.run {
-                    img = Data(base64Encoded: b64).flatMap(UIImage.init)
+                    img = Data(base64Encoded: b64).flatMap(UIImage.init)   // 解码失败得 nil 显示占位
                     captchaKey = d["captcha_key"].str ?? ""
                 }
             } catch {
-                await MainActor.run { img = nil; captchaKey = "" }
+                await MainActor.run { img = nil; captchaKey = "" }   // 失败清空待重试
             }
         }
     }
@@ -85,34 +93,35 @@ struct CaptchaImage: View {
 
 // MARK: - 登录面板
 
+/// 登录面板：账号密码 + 图形验证码 → 滑块验证 → user/login
 private struct LoginPanel: View {
-    var onSuccess: () -> Void
-    var goRegister: () -> Void
-    var goForgot: () -> Void
+    var onSuccess: () -> Void                      // 登录成功回调
+    var goRegister: () -> Void                     // 切注册
+    var goForgot: () -> Void                       // 切忘记密码
 
     @State private var username = ""
     @State private var password = ""
-    @State private var captchaCode = ""
-    @State private var captchaKey = ""
-    @State private var loading = false
-    @State private var error = ""
-    @State private var showGeeTest = false
-    @State private var showWechatTip = false
+    @State private var captchaCode = ""            // 图形验证码输入
+    @State private var captchaKey = ""             // 图形验证码 key
+    @State private var loading = false             // 登录请求中
+    @State private var error = ""                  // 错误文案
+    @State private var showGeeTest = false         // 滑块弹窗显隐（先验证后提交）
+    @State private var showWechatTip = false       // 微信登录提示弹窗
     @ObservedObject private var bus = SessionBus.shared
 
     var body: some View {
         VStack(spacing: 14) {
-            GlassCard {
+            GlassCard {                            // 主卡：表单
                 VStack(alignment: .leading, spacing: 14) {
                     SectionTitle(text: "登录")
                     DSJField(placeholder: "用户名或邮箱", text: $username)
                     DSJField(placeholder: "密码", text: $password, secure: true)
-                    CaptchaImage(captchaKey: $captchaKey, code: $captchaCode)
+                    CaptchaImage(captchaKey: $captchaKey, code: $captchaCode)   // 图形验证码行
                     ErrorText(text: error)
-                    PrimaryButton(title: "登  录", loading: loading) { showGeeTest = true }
+                    PrimaryButton(title: "登  录", loading: loading) { showGeeTest = true }   // 点登录→先滑块
                 }
             }
-            HStack {
+            HStack {                               // 注册/忘记密码切换行
                 Button("注册新账号", action: goRegister).foregroundColor(T.primary)
                 Spacer()
                 Button("忘记密码？", action: goForgot).foregroundColor(T.textSub)
@@ -128,11 +137,11 @@ private struct LoginPanel: View {
                 .font(.system(size: 15, weight: .medium))
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity).frame(height: 46)
-                .background(RoundedRectangle(cornerRadius: 14).fill(Color(hex: "07C160")).opacity(0.85))
+                .background(RoundedRectangle(cornerRadius: 14).fill(Color(hex: "07C160")).opacity(0.85))  // 微信绿
             }
         }
         .sheet(isPresented: $showGeeTest) {
-            SliderCaptchaSheet { sliderToken in
+            SliderCaptchaSheet { sliderToken in    // 滑块通过：拿 token 提交登录
                 showGeeTest = false
                 Task { await doLogin(sliderToken: sliderToken) }
             } onClosed: {
@@ -146,11 +155,12 @@ private struct LoginPanel: View {
         }
     }
 
+    /// 登录提交：校验 → 拼表单（可选带 slider_token）→ 存会话 → 总线同步 → 回调
     private func doLogin(sliderToken: String) async {
         let un = username.trimmingCharacters(in: .whitespaces)
         let pw = password
-        guard !un.isEmpty, !pw.isEmpty else { error = "请输入账号和密码"; return }
-        if captchaKey.isEmpty && !captchaCode.isEmpty { error = "请输入图形验证码"; return }
+        guard !un.isEmpty, !pw.isEmpty else { error = "请输入账号和密码"; return }               // 前置校验
+        if captchaKey.isEmpty && !captchaCode.isEmpty { error = "请输入图形验证码"; return }     // 无 key 却有输入=没拉到码
         loading = true
         error = ""
         defer { loading = false }
@@ -161,44 +171,45 @@ private struct LoginPanel: View {
                 "captcha_key": captchaKey,
                 "captcha_code": captchaCode.trimmingCharacters(in: .whitespaces),
             ]
-            if !sliderToken.isEmpty { body["slider_token"] = sliderToken }
+            if !sliderToken.isEmpty { body["slider_token"] = sliderToken }   // 生产后端强校验，滑块必过才有值
             let d = try await Network.post("user/login", body: body)
             let token = d["token"].str ?? ""
             guard !token.isEmpty else { throw ApiError.business("登录失败，请稍后重试") }
-            SessionStore.saveLogin(token: token,
+            SessionStore.saveLogin(token: token,               // 持久化会话
                                    username: d["username"].str,
                                    email: d["email"].str,
                                    balance: d["balance"].dbl)
-            bus.syncLogin(username: d["username"].str, email: d["email"].str, balance: d["balance"].dbl)
-            bus.refreshAccount()
-            onSuccess()
+            bus.syncLogin(username: d["username"].str, email: d["email"].str, balance: d["balance"].dbl)   // 总线同步登录态
+            bus.refreshAccount()                               // 补拉账户（余额/用量/VIP）
+            onSuccess()                                        // 根容器切主页
         } catch {
             self.error = (error as? ApiError)?.errorDescription ?? "登录失败，请稍后重试"
-            captchaCode = ""
+            captchaCode = ""                                   // 失败清验证码输入防重放
         }
     }
 }
 
 // MARK: - 注册面板
 
+/// 注册面板：表单 + 图形码发邮箱码 → 滑块 → user/register
 private struct RegisterPanel: View {
-    var onSuccess: () -> Void
-    var goLogin: () -> Void
+    var onSuccess: () -> Void                      // 注册成功（后端直接发 token 自动登录）
+    var goLogin: () -> Void                        // 返回登录
 
     @State private var username = ""
     @State private var email = ""
     @State private var password = ""
-    @State private var confirm = ""
-    @State private var inviteCode = ""
-    @State private var captchaCode = ""
+    @State private var confirm = ""                // 确认密码
+    @State private var inviteCode = ""             // 邀请码（好友邀请必填）
+    @State private var captchaCode = ""            // 图形验证码输入
     @State private var captchaKey = ""
-    @State private var emailCode = ""
-    @State private var loading = false
-    @State private var sending = false
-    @State private var countdown = 0
+    @State private var emailCode = ""              // 邮箱验证码
+    @State private var loading = false             // 注册请求中
+    @State private var sending = false             // 发码请求中
+    @State private var countdown = 0               // 发码冷却倒计时（s）
     @State private var error = ""
-    @State private var showGeeTest = false
-    private let emailRe = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
+    @State private var showGeeTest = false         // 滑块弹窗显隐
+    private let emailRe = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"   // 邮箱格式正则
 
     var body: some View {
         VStack(spacing: 14) {
@@ -210,36 +221,36 @@ private struct RegisterPanel: View {
                     DSJField(placeholder: "密码（至少6位）", text: $password, secure: true)
                     DSJField(placeholder: "确认密码", text: $confirm, secure: true)
                     DSJField(placeholder: "邀请码（选填，好友邀请必填）", text: $inviteCode)
-                    CaptchaImage(captchaKey: $captchaKey, code: $captchaCode)
-                    // 邮箱验证码行
+                    CaptchaImage(captchaKey: $captchaKey, code: $captchaCode)   // 图形码（发邮箱码前置）
+                    // 邮箱验证码行：输入 + 发码按钮（冷却期禁用）
                     HStack(spacing: 10) {
                         DSJField(placeholder: "邮箱验证码", text: $emailCode, keyboard: .numberPad)
                         Button {
                             Task { await sendCode() }
                         } label: {
-                            Text(sending ? "发送中" : (countdown > 0 ? "\(countdown)s" : "获取验证码"))
+                            Text(sending ? "发送中" : (countdown > 0 ? "\(countdown)s" : "获取验证码"))   // 三态文案
                                 .font(.system(size: 13, weight: .medium)).foregroundColor(T.primary)
                                 .frame(width: 92, height: 46)
                                 .background(RoundedRectangle(cornerRadius: 12).fill(T.primary.opacity(0.12)))
                         }
-                        .disabled(sending || countdown > 0)
+                        .disabled(sending || countdown > 0)   // 发送中/冷却中禁点
                     }
                     ErrorText(text: error)
-                    PrimaryButton(title: "注  册", loading: loading) { showGeeTest = true }
+                    PrimaryButton(title: "注  册", loading: loading) { showGeeTest = true }   // 注册前滑块
                 }
             }
             Button("已有账号？返回登录", action: goLogin)
                 .font(.system(size: 13)).foregroundColor(T.textSub)
         }
         .task {
-            // 倒计时驱动
+            // 倒计时驱动：每秒 -1 直到归零（视图存活期运行）
             while countdown > 0 {
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
                 countdown -= 1
             }
         }
         .sheet(isPresented: $showGeeTest) {
-            SliderCaptchaSheet { sliderToken in
+            SliderCaptchaSheet { sliderToken in    // 滑块通过：提交注册
                 showGeeTest = false
                 Task { await doRegister(sliderToken: sliderToken) }
             } onClosed: {
@@ -248,6 +259,7 @@ private struct RegisterPanel: View {
         }
     }
 
+    /// 发送邮箱验证码：邮箱格式+图形码前置校验 → 成功起 60s 冷却
     private func sendCode() async {
         let em = email.trimmingCharacters(in: .whitespaces)
         guard em.range(of: emailRe, options: .regularExpression) != nil else { error = "邮箱格式不正确"; return }
@@ -261,18 +273,19 @@ private struct RegisterPanel: View {
                 "captcha_key": captchaKey,
                 "captcha_code": captchaCode.trimmingCharacters(in: .whitespaces),
             ])
-            countdown = 60
+            countdown = 60                         // 成功起 60s 冷却
         } catch {
             self.error = (error as? ApiError)?.errorDescription ?? "发送失败"
-            captchaCode = ""
+            captchaCode = ""                       // 失败清码防重放
         }
     }
 
+    /// 注册提交：本地校验 → user/register（自动登录）→ 回调
     private func doRegister(sliderToken: String) async {
         let un = username.trimmingCharacters(in: .whitespaces)
         let em = email.trimmingCharacters(in: .whitespaces)
         let ec = emailCode.trimmingCharacters(in: .whitespaces)
-        guard un.count >= 3 else { error = "用户名至少3个字符"; return }
+        guard un.count >= 3 else { error = "用户名至少3个字符"; return }      // 逐项前置校验
         guard password.count >= 6 else { error = "密码至少6位"; return }
         guard password == confirm else { error = "两次密码不一致"; return }
         guard !ec.isEmpty else { error = "请输入邮箱验证码"; return }
@@ -287,10 +300,10 @@ private struct RegisterPanel: View {
                 "email_code": ec,
                 "captcha_key": captchaKey,
                 "captcha_code": captchaCode.trimmingCharacters(in: .whitespaces),
-                "slider_token": sliderToken,
+                "slider_token": sliderToken,       // 生产后端注册同样强校验
                 "invite_code": inviteCode.trimmingCharacters(in: .whitespaces),
             ])
-            onSuccess()
+            onSuccess()                            // 注册即登录成功
         } catch {
             self.error = (error as? ApiError)?.errorDescription ?? "注册失败"
             captchaCode = ""
@@ -300,17 +313,18 @@ private struct RegisterPanel: View {
 
 // MARK: - 忘记密码（两阶段三步）
 
+/// 找回密码：先验邮箱存在 → 发码+新密码重置
 private struct ForgotPanel: View {
-    var onDone: () -> Void
-    var goLogin: () -> Void
+    var onDone: () -> Void                         // 重置成功回调（回登录）
+    var goLogin: () -> Void                        // 直接返回登录
 
     @State private var email = ""
-    @State private var checked = false
-    @State private var emailCode = ""
-    @State private var newPassword = ""
-    @State private var sending = false
-    @State private var countdown = 0
-    @State private var loading = false
+    @State private var checked = false             // false=阶段1验邮箱 true=阶段2重置
+    @State private var emailCode = ""              // 邮箱验证码
+    @State private var newPassword = ""            // 新密码
+    @State private var sending = false             // 发码中
+    @State private var countdown = 0               // 发码冷却
+    @State private var loading = false             // 请求中
     @State private var error = ""
 
     var body: some View {
@@ -318,21 +332,21 @@ private struct ForgotPanel: View {
             GlassCard {
                 VStack(alignment: .leading, spacing: 14) {
                     SectionTitle(text: "找回密码")
-                    if !checked {
+                    if !checked {                  // 阶段 1：验邮箱
                         DSJField(placeholder: "注册邮箱", text: $email, keyboard: .emailAddress)
                         ErrorText(text: error)
                         PrimaryButton(title: "下一步", loading: loading) {
                             Task { await checkEmail() }
                         }
-                    } else {
-                        Text("验证码已发送至 \(email)")
+                    } else {                       // 阶段 2：码+新密码
+                        Text("验证码已发送至 \(email)")   // 已发送提示
                             .font(.system(size: 13)).foregroundColor(T.textSub)
                         HStack(spacing: 10) {
                             DSJField(placeholder: "邮箱验证码", text: $emailCode, keyboard: .numberPad)
                             Button {
                                 Task { await sendResetCode() }
                             } label: {
-                                Text(sending ? "发送中" : (countdown > 0 ? "\(countdown)s" : "重发"))
+                                Text(sending ? "发送中" : (countdown > 0 ? "\(countdown)s" : "重发"))   // 三态
                                     .font(.system(size: 13, weight: .medium)).foregroundColor(T.primary)
                                     .frame(width: 70, height: 46)
                                     .background(RoundedRectangle(cornerRadius: 12).fill(T.primary.opacity(0.12)))
@@ -350,6 +364,7 @@ private struct ForgotPanel: View {
             Button("返回登录", action: goLogin).font(.system(size: 13)).foregroundColor(T.textSub)
         }
         .task {
+            // 冷却倒计时驱动
             while countdown > 0 {
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
                 countdown -= 1
@@ -357,6 +372,7 @@ private struct ForgotPanel: View {
         }
     }
 
+    /// 阶段 1：验证邮箱已注册 → 进阶段 2
     private func checkEmail() async {
         let em = email.trimmingCharacters(in: .whitespaces)
         guard !em.isEmpty else { error = "请输入邮箱"; return }
@@ -365,23 +381,25 @@ private struct ForgotPanel: View {
         defer { loading = false }
         do {
             _ = try await Network.post("reset_password/checkEmailForReset", body: ["email": em])
-            checked = true
+            checked = true                         // 通过 → 显示阶段 2 表单
         } catch {
             self.error = (error as? ApiError)?.errorDescription ?? "邮箱验证失败"
         }
     }
 
+    /// 重发验证码（阶段 2 内）
     private func sendResetCode() async {
         sending = true
         defer { sending = false }
         do {
             _ = try await Network.post("reset_password/sendResetCode", body: ["email": email.trimmingCharacters(in: .whitespaces)])
-            countdown = 60
+            countdown = 60                         // 60s 冷却
         } catch {
             self.error = (error as? ApiError)?.errorDescription ?? "发送失败"
         }
     }
 
+    /// 阶段 2：码+新密码提交重置 → 回调回登录
     private func reset() async {
         guard newPassword.count >= 6 else { error = "新密码至少6位"; return }
         guard !emailCode.trimmingCharacters(in: .whitespaces).isEmpty else { error = "请输入邮箱验证码"; return }
@@ -394,7 +412,7 @@ private struct ForgotPanel: View {
                 "email_code": emailCode.trimmingCharacters(in: .whitespaces),
                 "new_password": newPassword,
             ])
-            onDone()
+            onDone()                               // 成功回调（切回登录面板）
         } catch {
             self.error = (error as? ApiError)?.errorDescription ?? "重置失败"
         }
