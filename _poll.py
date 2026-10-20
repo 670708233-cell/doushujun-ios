@@ -14,7 +14,7 @@ import zipfile
 
 OWNER = "670708233-cell"
 REPO = "doushujun-ios"
-HEAD_SHA = "41a9b8e76c30d225aa4a0d50ac2b6b115d4664ba"
+HEAD_SHA = "3facf1d0fc0a002e6e41563857be62483ee0e556"
 POLL_INTERVAL = 30          # 秒
 MAX_WAIT_SEC = 30 * 60      # 最长等 30 分钟
 
