@@ -28,9 +28,10 @@ for pf in plist_files:
     print(f"  {pf}")
 
 # Collect UI test sources (DoushujunUITests/) — XCUITest 自动化用例
+# DSJ_NO_UITEST=1 → 整个 UITest target 不进工程（CI 二分定位用）
 UITEST_DIR = os.path.join(BASE_DIR, "DoushujunUITests")
 uitest_files = []
-if os.path.isdir(UITEST_DIR):
+if os.path.isdir(UITEST_DIR) and not os.environ.get("DSJ_NO_UITEST"):
     for f in sorted(os.listdir(UITEST_DIR)):
         if f.endswith(".swift"):
             uitest_files.append(os.path.join("DoushujunUITests", f).replace("\\", "/"))
@@ -159,8 +160,10 @@ lines.append("")
 lines.append("/* Begin PBXFileReference section */")
 app_fid = gen_id("file:Doushujun.app")
 lines.append(f"\t\t{app_fid} /* Doushujun.app */ = {{isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Doushujun.app; sourceTree = BUILT_PRODUCTS_DIR; }};")
-xctest_fid = gen_id("file:DoushujunUITests.xctest")
-lines.append(f"\t\t{xctest_fid} /* DoushujunUITests.xctest */ = {{isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DoushujunUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; }};")
+xctest_fid = None
+if uitest_files:
+    xctest_fid = gen_id("file:DoushujunUITests.xctest")
+    lines.append(f"\t\t{xctest_fid} /* DoushujunUITests.xctest */ = {{isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DoushujunUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; }};")
 for f, fid in sorted(file_refs.items()):
     basename = os.path.basename(f)
     if f.endswith(".swift"):
@@ -190,7 +193,7 @@ lines.append("")
 
 # PBXFrameworksBuildPhase section（app 与 uitest 各一个空 phase）
 fw_bid = gen_id("fw:phase")
-uitest_fw_bid = gen_id("fw:phase:uitest")
+uitest_fw_bid = gen_id("fw:phase:uitest") if uitest_files else None
 lines.append("/* Begin PBXFrameworksBuildPhase section */")
 lines.append(f"\t\t{fw_bid} /* Frameworks */ = {{")
 lines.append("\t\t\tisa = PBXFrameworksBuildPhase;")
@@ -199,13 +202,14 @@ lines.append("\t\t\tfiles = (")
 lines.append("\t\t\t);")
 lines.append("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
 lines.append("\t\t};")
-lines.append(f"\t\t{uitest_fw_bid} /* Frameworks */ = {{")
-lines.append("\t\t\tisa = PBXFrameworksBuildPhase;")
-lines.append("\t\t\tbuildActionMask = 2147483647;")
-lines.append("\t\t\tfiles = (")
-lines.append("\t\t\t);")
-lines.append("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
-lines.append("\t\t};")
+if uitest_fw_bid:
+    lines.append(f"\t\t{uitest_fw_bid} /* Frameworks */ = {{")
+    lines.append("\t\t\tisa = PBXFrameworksBuildPhase;")
+    lines.append("\t\t\tbuildActionMask = 2147483647;")
+    lines.append("\t\t\tfiles = (")
+    lines.append("\t\t\t);")
+    lines.append("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
+    lines.append("\t\t};")
 lines.append("/* End PBXFrameworksBuildPhase section */")
 lines.append("")
 
@@ -225,7 +229,8 @@ def render_child(child):
 for child in groups[""][1]:
     lines.append(render_child(child))
 lines.append(f"\t\t\t\t{app_fid} /* Doushujun.app */,")
-lines.append(f"\t\t\t\t{xctest_fid} /* DoushujunUITests.xctest */,")
+if xctest_fid:
+    lines.append(f"\t\t\t\t{xctest_fid} /* DoushujunUITests.xctest */,")
 lines.append("\t\t\t);")
 lines.append("\t\t\tsourceTree = \"<group>\";")
 lines.append("\t\t};")
@@ -270,46 +275,49 @@ lines.append(f"\t\t\tproductReference = {app_fid} /* Doushujun.app */;")
 lines.append("\t\t\tproductType = \"com.apple.product-type.application\";")
 lines.append("\t\t};")
 # UITest target（依赖 app target：依赖 + PBXContainerItemProxy + PBXTargetDependency）
-uitest_target_id = gen_id("target:DoushujunUITests")
-uitest_src_phase_id = gen_id("src:phase:uitest")
-proxy_id = gen_id("proxy:uitest")
-dep_id = gen_id("dep:uitest")
-lines.append(f"\t\t{uitest_target_id} /* DoushujunUITests */ = {{")
-lines.append("\t\t\tisa = PBXNativeTarget;")
-lines.append(f"\t\t\tbuildConfigurationList = {gen_id('bcl:uitest')} /* Build configuration list for PBXNativeTarget \"DoushujunUITests\" */;")
-lines.append("\t\t\tbuildPhases = (")
-lines.append(f"\t\t\t\t{uitest_src_phase_id} /* Sources */,")
-lines.append(f"\t\t\t\t{uitest_fw_bid} /* Frameworks */,")
-lines.append("\t\t\t);")
-lines.append("\t\t\tbuildRules = (")
-lines.append("\t\t\t);")
-lines.append("\t\t\tdependencies = (")
-lines.append(f"\t\t\t\t{dep_id} /* PBXTargetDependency */,")
-lines.append("\t\t\t);")
-lines.append("\t\t\tname = DoushujunUITests;")
-lines.append("\t\t\tproductName = DoushujunUITests;")
-lines.append(f"\t\t\tproductReference = {xctest_fid} /* DoushujunUITests.xctest */;")
-lines.append("\t\t\tproductType = \"com.apple.product-type.bundle.ui-testing\";")
-lines.append("\t\t};")
+uitest_target_id = gen_id("target:DoushujunUITests") if uitest_files else None
+uitest_src_phase_id = gen_id("src:phase:uitest") if uitest_files else None
+proxy_id = gen_id("proxy:uitest") if uitest_files else None
+dep_id = gen_id("dep:uitest") if uitest_files else None
+if uitest_files:
+    lines.append(f"\t\t{uitest_target_id} /* DoushujunUITests */ = {{")
+    lines.append("\t\t\tisa = PBXNativeTarget;")
+    lines.append(f"\t\t\tbuildConfigurationList = {gen_id('bcl:uitest')} /* Build configuration list for PBXNativeTarget \"DoushujunUITests\" */;")
+    lines.append("\t\t\tbuildPhases = (")
+    lines.append(f"\t\t\t\t{uitest_src_phase_id} /* Sources */,")
+    lines.append(f"\t\t\t\t{uitest_fw_bid} /* Frameworks */,")
+    lines.append("\t\t\t);")
+    lines.append("\t\t\tbuildRules = (")
+    lines.append("\t\t\t);")
+    lines.append("\t\t\tdependencies = (")
+    lines.append(f"\t\t\t\t{dep_id} /* PBXTargetDependency */,")
+    lines.append("\t\t\t);")
+    lines.append("\t\t\tname = DoushujunUITests;")
+    lines.append("\t\t\tproductName = DoushujunUITests;")
+    lines.append(f"\t\t\tproductReference = {xctest_fid} /* DoushujunUITests.xctest */;")
+    lines.append("\t\t\tproductType = \"com.apple.product-type.bundle.ui-testing\";")
+    lines.append("\t\t};")
 lines.append("/* End PBXNativeTarget section */")
 lines.append("")
-lines.append("/* Begin PBXContainerItemProxy section */")
-lines.append(f"\t\t{proxy_id} /* PBXContainerItemProxy */ = {{")
-lines.append("\t\t\tisa = PBXContainerItemProxy;")
-lines.append("\t\t\tcontainerPortal = " + proj_id + " /* Project object */;")
-lines.append("\t\t\tproxyType = 1;")
-lines.append("\t\t\tremoteGlobalIDString = " + target_id + ";")
-lines.append("\t\t\tremoteInfo = Doushujun;")
-lines.append("\t\t};")
-lines.append("/* End PBXContainerItemProxy section */")
-lines.append("")
-lines.append("/* Begin PBXTargetDependency section */")
-lines.append(f"\t\t{dep_id} /* PBXTargetDependency */ = {{")
-lines.append("\t\t\tisa = PBXTargetDependency;")
-lines.append(f"\t\t\ttarget = {target_id} /* Doushujun */;")
-lines.append(f"\t\t\ttargetProxy = {proxy_id} /* PBXContainerItemProxy */;")
-lines.append("\t\t};")
-lines.append("/* End PBXTargetDependency section */")
+if uitest_files:
+    lines.append("/* Begin PBXContainerItemProxy section */")
+    lines.append(f"\t\t{proxy_id} /* PBXContainerItemProxy */ = {{")
+    lines.append("\t\t\tisa = PBXContainerItemProxy;")
+    lines.append("\t\t\tcontainerPortal = " + proj_id + " /* Project object */;")
+    lines.append("\t\t\tproxyType = 1;")
+    lines.append("\t\t\tremoteGlobalIDString = " + target_id + ";")
+    lines.append("\t\t\tremoteInfo = Doushujun;")
+    lines.append("\t\t};")
+    lines.append("/* End PBXContainerItemProxy section */")
+    lines.append("")
+    lines.append("/* Begin PBXTargetDependency section */")
+    lines.append(f"\t\t{dep_id} /* PBXTargetDependency */ = {{")
+    lines.append("\t\t\tisa = PBXTargetDependency;")
+    lines.append(f"\t\t\ttarget = {target_id} /* Doushujun */;")
+    lines.append(f"\t\t\ttargetProxy = {proxy_id} /* PBXContainerItemProxy */;")
+    lines.append("\t\t};")
+    lines.append("/* End PBXTargetDependency section */")
+    lines.append("")
 lines.append("")
 
 # PBXProject section
@@ -325,10 +333,11 @@ lines.append("\t\t\t\tTargetAttributes = {")
 lines.append(f"\t\t\t\t\t{target_id} = {{")
 lines.append("\t\t\t\t\t\tCreatedOnToolsVersion = 15.0;")
 lines.append("\t\t\t\t\t};")
-lines.append(f"\t\t\t\t\t{uitest_target_id} = {{")
-lines.append("\t\t\t\t\t\tCreatedOnToolsVersion = 15.0;")
-lines.append("\t\t\t\t\t\tTestTargetID = " + target_id + ";")
-lines.append("\t\t\t\t\t};")
+if uitest_files:
+    lines.append(f"\t\t\t\t\t{uitest_target_id} = {{")
+    lines.append("\t\t\t\t\t\tCreatedOnToolsVersion = 15.0;")
+    lines.append("\t\t\t\t\t\tTestTargetID = " + target_id + ";")
+    lines.append("\t\t\t\t\t};")
 lines.append("\t\t\t\t};")
 lines.append("\t\t\t};")
 lines.append(f"\t\t\tbuildConfigurationList = {gen_id('bcl:project')} /* Build configuration list for PBXProject \"Doushujun\" */;")
@@ -345,7 +354,8 @@ lines.append("\t\t\tprojectDirPath = \"\";")
 lines.append("\t\t\tprojectRoot = \"\";")
 lines.append("\t\t\ttargets = (")
 lines.append(f"\t\t\t\t{target_id} /* Doushujun */,")
-lines.append(f"\t\t\t\t{uitest_target_id} /* DoushujunUITests */,")
+if uitest_files:
+    lines.append(f"\t\t\t\t{uitest_target_id} /* DoushujunUITests */,")
 lines.append("\t\t\t);")
 lines.append("\t\t};")
 lines.append("/* End PBXProject section */")
@@ -381,15 +391,16 @@ for sf, bid in sorted(build_files.items()):
 lines.append("\t\t\t);")
 lines.append("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
 lines.append("\t\t};")
-lines.append(f"\t\t{uitest_src_phase_id} /* Sources */ = {{")
-lines.append("\t\t\tisa = PBXSourcesBuildPhase;")
-lines.append("\t\t\tbuildActionMask = 2147483647;")
-lines.append("\t\t\tfiles = (")
-for sf, bid in sorted(uitest_build_files.items()):
-    lines.append(f"\t\t\t\t{bid} /* {os.path.basename(sf)} in Sources */,")
-lines.append("\t\t\t);")
-lines.append("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
-lines.append("\t\t};")
+if uitest_files:
+    lines.append(f"\t\t{uitest_src_phase_id} /* Sources */ = {{")
+    lines.append("\t\t\tisa = PBXSourcesBuildPhase;")
+    lines.append("\t\t\tbuildActionMask = 2147483647;")
+    lines.append("\t\t\tfiles = (")
+    for sf, bid in sorted(uitest_build_files.items()):
+        lines.append(f"\t\t\t\t{bid} /* {os.path.basename(sf)} in Sources */,")
+    lines.append("\t\t\t);")
+    lines.append("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
+    lines.append("\t\t};")
 lines.append("/* End PBXSourcesBuildPhase section */")
 lines.append("")
 
@@ -451,8 +462,8 @@ build_config(gen_id("tcfg:debug"), "Debug", True, True)
 build_config(gen_id("tcfg:release"), "Release", True, False)
 
 # UITest bundle 配置：TEST_HOST 指向 app 产物，TEST_TARGET_NAME 关联宿主
-uitest_tcfg_debug = gen_id("uitestcfg:debug")
-uitest_tcfg_release = gen_id("uitestcfg:release")
+uitest_tcfg_debug = gen_id("uitestcfg:debug") if uitest_files else None
+uitest_tcfg_release = gen_id("uitestcfg:release") if uitest_files else None
 def build_uitest_config(config_id, name):
     lines.append(f"\t\t{config_id} /* {name} */ = {{")
     lines.append("\t\t\tisa = XCBuildConfiguration;")
@@ -475,8 +486,9 @@ def build_uitest_config(config_id, name):
     lines.append(f"\t\t\tname = {name};")
     lines.append("\t\t};")
 
-build_uitest_config(uitest_tcfg_debug, "Debug")
-build_uitest_config(uitest_tcfg_release, "Release")
+if uitest_files:
+    build_uitest_config(uitest_tcfg_debug, "Debug")
+    build_uitest_config(uitest_tcfg_release, "Release")
 lines.append("")
 
 # XCConfigurationList sections
@@ -492,16 +504,17 @@ lines.append("\t\t\t);")
 lines.append("\t\t\tdefaultConfigurationIsVisible = 0;")
 lines.append("\t\t\tdefaultConfigurationName = Release;")
 lines.append("\t\t};")
-bcl_uitest = gen_id("bcl:uitest")
-lines.append(f"\t\t{bcl_uitest} /* Build configuration list for PBXNativeTarget \"DoushujunUITests\" */ = {{")
-lines.append("\t\t\tisa = XCConfigurationList;")
-lines.append("\t\t\tbuildConfigurations = (")
-lines.append(f"\t\t\t\t{uitest_tcfg_debug} /* Debug */,")
-lines.append(f"\t\t\t\t{uitest_tcfg_release} /* Release */,")
-lines.append("\t\t\t);")
-lines.append("\t\t\tdefaultConfigurationIsVisible = 0;")
-lines.append("\t\t\tdefaultConfigurationName = Release;")
-lines.append("\t\t};")
+if uitest_files:
+    bcl_uitest = gen_id("bcl:uitest")
+    lines.append(f"\t\t{bcl_uitest} /* Build configuration list for PBXNativeTarget \"DoushujunUITests\" */ = {{")
+    lines.append("\t\t\tisa = XCConfigurationList;")
+    lines.append("\t\t\tbuildConfigurations = (")
+    lines.append(f"\t\t\t\t{uitest_tcfg_debug} /* Debug */,")
+    lines.append(f"\t\t\t\t{uitest_tcfg_release} /* Release */,")
+    lines.append("\t\t\t);")
+    lines.append("\t\t\tdefaultConfigurationIsVisible = 0;")
+    lines.append("\t\t\tdefaultConfigurationName = Release;")
+    lines.append("\t\t};")
 lines.append(f"\t\t{bcl_project} /* Build configuration list for PBXProject \"Doushujun\" */ = {{")
 lines.append("\t\t\tisa = XCConfigurationList;")
 lines.append("\t\t\tbuildConfigurations = (")
@@ -528,7 +541,8 @@ print(f"Total Swift files: {len(swift_files)}")
 print(f"Total plist files: {len(plist_files)}")
 
 # Shared scheme：TestAction 显式包含 UITest target（保证 xcodebuild test 直接可跑）
-if uitest_files:
+# DSJ_NO_SCHEME=1 → 跳过 scheme 生成（CI 二分定位用）
+if uitest_files and not os.environ.get("DSJ_NO_SCHEME"):
     scheme_dir = os.path.join(xcodeproj_dir, "xcshareddata", "xcschemes")
     os.makedirs(scheme_dir, exist_ok=True)
     scheme = f'''<?xml version="1.0" encoding="UTF-8"?>
