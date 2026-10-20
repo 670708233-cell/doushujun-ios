@@ -560,6 +560,7 @@ if uitest_files and not os.environ.get("DSJ_NO_SCHEME"):
             buildForArchiving = "YES"
             buildForAnalyzing = "YES">
             <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "{target_id}"
                BuildableName = "Doushujun.app"
                BlueprintName = "Doushujun"
@@ -568,11 +569,12 @@ if uitest_files and not os.environ.get("DSJ_NO_SCHEME"):
          </BuildActionEntry>
          <BuildActionEntry
             buildForTesting = "YES"
-            buildForRunning = "NO"
+            buildForRunning = "YES"
             buildForProfiling = "NO"
             buildForArchiving = "NO"
             buildForAnalyzing = "YES">
             <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "{uitest_target_id}"
                BuildableName = "DoushujunUITests.xctest"
                BlueprintName = "DoushujunUITests"
@@ -591,6 +593,7 @@ if uitest_files and not os.environ.get("DSJ_NO_SCHEME"):
          <TestableReference
             skipped = "NO">
             <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "{uitest_target_id}"
                BuildableName = "DoushujunUITests.xctest"
                BlueprintName = "DoushujunUITests"
@@ -612,6 +615,7 @@ if uitest_files and not os.environ.get("DSJ_NO_SCHEME"):
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
+            BuildableIdentifier = "primary"
             BlueprintIdentifier = "{target_id}"
             BuildableName = "Doushujun.app"
             BlueprintName = "Doushujun"
@@ -620,6 +624,7 @@ if uitest_files and not os.environ.get("DSJ_NO_SCHEME"):
       </BuildableProductRunnable>
       <MacroExpansion>
          <BuildableReference
+            BuildableIdentifier = "primary"
             BlueprintIdentifier = "{target_id}"
             BuildableName = "Doushujun.app"
             BlueprintName = "Doushujun"
@@ -636,6 +641,7 @@ if uitest_files and not os.environ.get("DSJ_NO_SCHEME"):
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
+            BuildableIdentifier = "primary"
             BlueprintIdentifier = "{target_id}"
             BuildableName = "Doushujun.app"
             BlueprintName = "Doushujun"
@@ -644,6 +650,7 @@ if uitest_files and not os.environ.get("DSJ_NO_SCHEME"):
       </BuildableProductRunnable>
       <MacroExpansion>
          <BuildableReference
+            BuildableIdentifier = "primary"
             BlueprintIdentifier = "{target_id}"
             BuildableName = "Doushujun.app"
             BlueprintName = "Doushujun"
