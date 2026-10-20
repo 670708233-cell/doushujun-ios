@@ -200,7 +200,7 @@ jobs:
           nohup php think run --host 127.0.0.1 --port 8000 > server.log 2>&1 &
           BACKEND_UP=0
           for i in $(seq 1 30); do
-            CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8000/api/captcha/slider/generate)
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8000/api/captcha/slider/generate || true)
             if [ "$CODE" != "000" ]; then
               echo "backend UP (http $CODE)"
               BACKEND_UP=1
