@@ -22,20 +22,13 @@ jobs:
 
       - name: Validate project file (3-way bisect)
         run: |
-          dump_crash() {
-            echo "=== latest crash reports ==="
-            ls -t ~/Library/Logs/DiagnosticReports/ 2>/dev/null | head -5 || true
-            CRASH=$(ls -t ~/Library/Logs/DiagnosticReports/xcodebuild*.ips 2>/dev/null | head -1)
-            if [ -n "$CRASH" ]; then
-              echo "=== $CRASH ==="
-              head -c 4000 "$CRASH" || true
-            fi
-          }
-          try_list() {
-            LABEL="$1"
-            echo ""
-            echo "############ [$LABEL] ############"
+          run_list() {
+            # 用法: run_list <label> [ENV=1 ...]  —— 先清理再生成再 list
+            LABEL="$1"; shift
             rm -rf Doushujun.xcodeproj
+            env "$@" python3 generate_project.py > /dev/null || exit 1
+            echo ""
+            echo "############ [$LABEL] ($*) ############"
             xcodebuild -list -project Doushujun.xcodeproj > list_out.txt 2>&1
             RC=$?
             if [ $RC -eq 0 ]; then
@@ -43,35 +36,33 @@ jobs:
               tail -12 list_out.txt
               return 0
             fi
-            echo "[$LABEL] xcodebuild -list CRASHED (exit $RC)"
-            tail -5 list_out.txt || true
-            dump_crash
+            echo "[$LABEL] xcodebuild -list FAILED (exit $RC)"
+            tail -8 list_out.txt || true
             return 1
           }
 
           BISECT=0
-          echo "=== [1/3] full: uitest target + shared scheme ==="
-          python3 generate_project.py > /dev/null || exit 1
-          try_list "full" || BISECT=1
-
-          echo ""
-          echo "=== [2/3] DSJ_NO_SCHEME: uitest target, no shared scheme ==="
-          DSJ_NO_SCHEME=1 python3 generate_project.py > /dev/null || exit 1
-          try_list "no-scheme" || BISECT=2
-
-          echo ""
-          echo "=== [3/3] DSJ_NO_UITEST: app target only ==="
-          DSJ_NO_UITEST=1 python3 generate_project.py > /dev/null || exit 1
-          try_list "no-uitest" || BISECT=3
-
-          echo ""
-          echo "=== restoring full project ==="
-          python3 generate_project.py > /dev/null || exit 1
-          plutil -lint Doushujun.xcodeproj/project.pbxproj || true
+          run_list full || BISECT=1
+          run_list no-scheme DSJ_NO_SCHEME=1 || BISECT=2
+          run_list no-uitest DSJ_NO_UITEST=1 || BISECT=3
 
           if [ "$BISECT" != "0" ]; then
             echo ""
-            echo ">>> BISECT RESULT: crashed mode = $BISECT (1=full, 2=no-scheme, 3=no-uitest)"
+            echo ">>> BISECT RESULT: failed mode = $BISECT (1=full, 2=no-scheme, 3=no-uitest)"
+            echo ""
+            echo "=== lldb backtrace on full mode ==="
+            rm -rf Doushujun.xcodeproj
+            python3 generate_project.py > /dev/null
+            lldb -b -o run -o 'thread backtrace' -o 'quit' -- xcodebuild -list -project Doushujun.xcodeproj 2>&1 | tail -60
+            echo ""
+            echo "=== crash reports (after 15s wait) ==="
+            sleep 15
+            ls -t ~/Library/Logs/DiagnosticReports/ 2>/dev/null | head -8 || true
+            CRASH=$(ls -t ~/Library/Logs/DiagnosticReports/xcodebuild*.ips 2>/dev/null | head -1)
+            if [ -n "$CRASH" ]; then
+              echo "=== $CRASH ==="
+              head -c 6000 "$CRASH" || true
+            fi
             exit 1
           fi
           echo ">>> ALL 3 MODES OK - project file healthy"

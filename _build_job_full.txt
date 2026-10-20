@@ -1,0 +1,278 @@
+﻿16:37:35.1952140Z Current runner version: '2.337.0'
+16:37:35.1966930Z ##[group]Runner Image Provisioner
+16:37:35.1967540Z Hosted Compute Agent
+16:37:35.1967900Z Version: 20260828.587
+16:37:35.1968380Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+16:37:35.1968860Z Build Date: 2026-08-28T16:44:25Z
+16:37:35.1969390Z Worker ID: {ee4bc31e-4083-45ec-a2a6-3f419e8c5846}
+16:37:35.1969850Z Azure Region: westus
+16:37:35.1970280Z ##[endgroup]
+16:37:35.1971170Z ##[group]Operating System
+16:37:35.1971630Z macOS
+16:37:35.1972110Z 14.8.9
+16:37:35.1972510Z 23J631
+16:37:35.1972850Z ##[endgroup]
+16:37:35.1973270Z ##[group]Runner Image
+16:37:35.1973680Z Image: macos-14-arm64
+16:37:35.1974040Z Version: 20260831.0302.1
+16:37:35.1974970Z Included Software: https://github.com/actions/runner-images/blob/macos-14-arm64/20260831.0302/images/macos/macos-14-arm64-Readme.md
+16:37:35.1976100Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-14-arm64%2F20260831.0302
+16:37:35.1976810Z ##[endgroup]
+16:37:35.1977670Z ##[group]GITHUB_TOKEN Permissions
+16:37:35.1978890Z Contents: read
+16:37:35.1979320Z Metadata: read
+16:37:35.1979700Z Packages: read
+16:37:35.1980140Z ##[endgroup]
+16:37:35.1981630Z Secret source: Actions
+16:37:35.1982220Z Cache mode: write
+16:37:35.1982720Z Prepare workflow directory
+16:37:35.2220860Z Prepare all required actions
+16:37:35.2262990Z Getting action download info
+16:37:35.5169270Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+16:37:35.8674860Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+16:37:36.1007000Z Complete job name: Build Unsigned IPA
+16:37:36.1507230Z ##[group]Run actions/checkout@v4
+16:37:36.1507780Z with:
+16:37:36.1508120Z   repository: 670708233-cell/doushujun-ios
+16:37:36.1510870Z   token: ***
+16:37:36.1511190Z   ssh-strict: true
+16:37:36.1511520Z   ssh-user: git
+16:37:36.1511850Z   persist-credentials: true
+16:37:36.1512210Z   clean: true
+16:37:36.1512540Z   sparse-checkout-cone-mode: true
+16:37:36.1512920Z   fetch-depth: 1
+16:37:36.1513240Z   fetch-tags: false
+16:37:36.1513580Z   show-progress: true
+16:37:36.1513910Z   lfs: false
+16:37:36.1514210Z   submodules: false
+16:37:36.1514550Z   set-safe-directory: true
+16:37:36.1514920Z   allow-unsafe-pr-checkout: false
+16:37:36.1515400Z ##[endgroup]
+16:37:36.6852720Z Syncing repository: 670708233-cell/doushujun-ios
+16:37:36.6854820Z ##[group]Getting Git version info
+16:37:36.6855760Z Working directory is '/Users/runner/work/doushujun-ios/doushujun-ios'
+16:37:36.7030440Z [command]/opt/homebrew/bin/git version
+16:37:36.7071350Z git version 2.55.0
+16:37:36.7075540Z ##[endgroup]
+16:37:36.7079550Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/fd3baa57-c7e2-486f-b0f5-8d616df17a04/.gitconfig'
+16:37:36.7080640Z Temporarily overriding HOME='/Users/runner/work/_temp/fd3baa57-c7e2-486f-b0f5-8d616df17a04' before making global git config changes
+16:37:36.7081570Z Adding repository directory to the temporary git global config as a safe directory
+16:37:36.7082670Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/doushujun-ios/doushujun-ios
+16:37:36.7331960Z Deleting the contents of '/Users/runner/work/doushujun-ios/doushujun-ios'
+16:37:36.7335020Z ##[group]Initializing the repository
+16:37:36.7339440Z [command]/opt/homebrew/bin/git init /Users/runner/work/doushujun-ios/doushujun-ios
+16:37:36.7634220Z hint: Using 'master' as the name for the initial branch. This default branch name
+16:37:36.7635390Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+16:37:36.7637450Z hint: to use in all of your new repositories, which will suppress this warning,
+16:37:36.7638170Z hint: call:
+16:37:36.7640410Z hint:
+16:37:36.7640900Z hint: 	git config --global init.defaultBranch <name>
+16:37:36.7641430Z hint:
+16:37:36.7641940Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+16:37:36.7643160Z hint: 'development'. The just-created branch can be renamed via this command:
+16:37:36.7643710Z hint:
+16:37:36.7644110Z hint: 	git branch -m <name>
+16:37:36.7644520Z hint:
+16:37:36.7645350Z hint: Disable this message with "git config set advice.defaultBranchName false"
+16:37:36.7655210Z Initialized empty Git repository in /Users/runner/work/doushujun-ios/doushujun-ios/.git/
+16:37:36.7660060Z [command]/opt/homebrew/bin/git remote add origin https://github.com/670708233-cell/doushujun-ios
+16:37:36.7744630Z ##[endgroup]
+16:37:36.7746040Z ##[group]Disabling automatic garbage collection
+16:37:36.7753050Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+16:37:36.7838530Z ##[endgroup]
+16:37:36.7839250Z ##[group]Setting up auth
+16:37:36.7842180Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+16:37:36.7894280Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+16:37:36.9027990Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+16:37:36.9101800Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+16:37:37.0414050Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+16:37:37.0726380Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+16:37:37.2033630Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+16:37:37.2040590Z ##[endgroup]
+16:37:37.2041320Z ##[group]Fetching the repository
+16:37:37.2042990Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +45920816964f35d94ac368f3b9d9b20443cccd6f:refs/remotes/origin/main
+16:37:37.6930150Z From https://github.com/670708233-cell/doushujun-ios
+16:37:37.6933090Z  * [new ref]         45920816964f35d94ac368f3b9d9b20443cccd6f -> origin/main
+16:37:37.6938900Z ##[endgroup]
+16:37:37.6940930Z ##[group]Determining the checkout info
+16:37:37.6946650Z ##[endgroup]
+16:37:37.6948770Z [command]/opt/homebrew/bin/git sparse-checkout disable
+16:37:37.7055140Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+16:37:37.7143070Z ##[group]Checking out the ref
+16:37:37.7147280Z [command]/opt/homebrew/bin/git checkout --progress --force -B main refs/remotes/origin/main
+16:37:37.7411530Z Switched to a new branch 'main'
+16:37:37.7412700Z branch 'main' set up to track 'origin/main'.
+16:37:37.7421830Z ##[endgroup]
+16:37:37.7495210Z [command]/opt/homebrew/bin/git log -1 --format=%H
+16:37:37.7556520Z 45920816964f35d94ac368f3b9d9b20443cccd6f
+16:37:37.7822610Z ##[group]Run xcodebuild -version
+16:37:37.7823590Z [36;1mxcodebuild -version[0m
+16:37:37.7824380Z [36;1mxcodebuild -showsdks | grep iphoneos[0m
+16:37:37.7900520Z shell: /bin/bash -e {0}
+16:37:37.7901790Z ##[endgroup]
+16:37:37.9927080Z Xcode 15.4
+16:37:37.9934460Z Build version 15F31d
+16:37:39.2604080Z 	iOS 17.5                      	-sdk iphoneos17.5
+16:37:39.2696850Z ##[group]Run python3 generate_project.py
+16:37:39.2697240Z [36;1mpython3 generate_project.py[0m
+16:37:39.2776870Z shell: /bin/bash -e {0}
+16:37:39.2777700Z ##[endgroup]
+16:37:39.5321480Z Found 22 Swift files and 1 plist files:
+16:37:39.5322700Z   Doushujun/DoushujunApp.swift
+16:37:39.5323920Z   Doushujun/Core/AppState.swift
+16:37:39.5324850Z   Doushujun/Core/AppUpdater.swift
+16:37:39.5325640Z   Doushujun/Core/Charts.swift
+16:37:39.5326490Z   Doushujun/Core/Components.swift
+16:37:39.5327630Z   Doushujun/Core/Crypto.swift
+16:37:39.5328500Z   Doushujun/Core/LinkParser.swift
+16:37:39.5329400Z   Doushujun/Core/Network.swift
+16:37:39.5330210Z   Doushujun/Core/SessionStore.swift
+16:37:39.5331140Z   Doushujun/Core/Theme.swift
+16:37:39.5331920Z   Doushujun/Views/AuthView.swift
+16:37:39.5332920Z   Doushujun/Views/FeedbackView.swift
+16:37:39.5333770Z   Doushujun/Views/InviteView.swift
+16:37:39.5334620Z   Doushujun/Views/MaterialView.swift
+16:37:39.5335410Z   Doushujun/Views/MineView.swift
+16:37:39.5336260Z   Doushujun/Views/MonitorChartView.swift
+16:37:39.5337170Z   Doushujun/Views/MonitorView.swift
+16:37:39.5338050Z   Doushujun/Views/VipView.swift
+16:37:39.5339980Z   Doushujun/Views/WeightHistoryView.swift
+16:37:39.5341090Z   Doushujun/Views/WeightView.swift
+16:37:39.5342310Z   Doushujun/Views/WorkHistoryView.swift
+16:37:39.5342940Z   Doushujun/Views/WorkView.swift
+16:37:39.5343270Z   Doushujun/Info.plist
+16:37:39.5343600Z UI test files: ['DoushujunUITests/DoushujunUITests.swift']
+16:37:39.5345190Z Bundle resources: ['Resources/dengji_1.png', 'Resources/dengji_2.png', 'Resources/dengji_3.png', 'Resources/dengji_4.png', 'Resources/dengji_5.png', 'Resources/dengji_6.png', 'Resources/dengji_7.png', 'Resources/dengji_8.png', 'Resources/dengji_9.png', 'Resources/geetest.html', 'Resources/rating_a.png', 'Resources/rating_b.png', 'Resources/rating_c.png', 'Resources/rating_d.png']
+16:37:39.5346670Z Asset catalogs: ['Doushujun/Assets.xcassets']
+16:37:39.5347320Z 
+16:37:39.5347600Z Generated: /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun.xcodeproj/project.pbxproj
+16:37:39.5348030Z Total Swift files: 22
+16:37:39.5348270Z Total plist files: 1
+16:37:39.5348750Z Generated: /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun.xcodeproj/xcshareddata/xcschemes/Doushujun.xcscheme
+16:37:39.5399240Z ##[group]Run dump_crash() {
+16:37:39.5399640Z [36;1mdump_crash() {[0m
+16:37:39.5399900Z [36;1m  echo "=== latest crash reports ==="[0m
+16:37:39.5400300Z [36;1m  ls -t ~/Library/Logs/DiagnosticReports/ 2>/dev/null | head -5 || true[0m
+16:37:39.5400820Z [36;1m  CRASH=$(ls -t ~/Library/Logs/DiagnosticReports/xcodebuild*.ips 2>/dev/null | head -1)[0m
+16:37:39.5401210Z [36;1m  if [ -n "$CRASH" ]; then[0m
+16:37:39.5401430Z [36;1m    echo "=== $CRASH ==="[0m
+16:37:39.5401650Z [36;1m    head -c 4000 "$CRASH" || true[0m
+16:37:39.5401880Z [36;1m  fi[0m
+16:37:39.5402020Z [36;1m}[0m
+16:37:39.5402190Z [36;1mtry_list() {[0m
+16:37:39.5403600Z [36;1m  LABEL="$1"[0m
+16:37:39.5404090Z [36;1m  echo ""[0m
+16:37:39.5404620Z [36;1m  echo "############ [$LABEL] ############"[0m
+16:37:39.5406440Z [36;1m  rm -rf Doushujun.xcodeproj[0m
+16:37:39.5407330Z [36;1m  xcodebuild -list -project Doushujun.xcodeproj > list_out.txt 2>&1[0m
+16:37:39.5408190Z [36;1m  RC=$?[0m
+16:37:39.5408650Z [36;1m  if [ $RC -eq 0 ]; then[0m
+16:37:39.5409450Z [36;1m    echo "[$LABEL] xcodebuild -list OK"[0m
+16:37:39.5409810Z [36;1m    tail -12 list_out.txt[0m
+16:37:39.5410040Z [36;1m    return 0[0m
+16:37:39.5410210Z [36;1m  fi[0m
+16:37:39.5410470Z [36;1m  echo "[$LABEL] xcodebuild -list CRASHED (exit $RC)"[0m
+16:37:39.5411310Z [36;1m  tail -5 list_out.txt || true[0m
+16:37:39.5411680Z [36;1m  dump_crash[0m
+16:37:39.5411930Z [36;1m  return 1[0m
+16:37:39.5412110Z [36;1m}[0m
+16:37:39.5412290Z [36;1m[0m
+16:37:39.5412460Z [36;1mBISECT=0[0m
+16:37:39.5412720Z [36;1mecho "=== [1/3] full: uitest target + shared scheme ==="[0m
+16:37:39.5413100Z [36;1mpython3 generate_project.py > /dev/null || exit 1[0m
+16:37:39.5413430Z [36;1mtry_list "full" || BISECT=1[0m
+16:37:39.5413710Z [36;1m[0m
+16:37:39.5413870Z [36;1mecho ""[0m
+16:37:39.5414180Z [36;1mecho "=== [2/3] DSJ_NO_SCHEME: uitest target, no shared scheme ==="[0m
+16:37:39.5414730Z [36;1mDSJ_NO_SCHEME=1 python3 generate_project.py > /dev/null || exit 1[0m
+16:37:39.5415210Z [36;1mtry_list "no-scheme" || BISECT=2[0m
+16:37:39.5415490Z [36;1m[0m
+16:37:39.5415770Z [36;1mecho ""[0m
+16:37:39.5416160Z [36;1mecho "=== [3/3] DSJ_NO_UITEST: app target only ==="[0m
+16:37:39.5416800Z [36;1mDSJ_NO_UITEST=1 python3 generate_project.py > /dev/null || exit 1[0m
+16:37:39.5418000Z [36;1mtry_list "no-uitest" || BISECT=3[0m
+16:37:39.5418380Z [36;1m[0m
+16:37:39.5418610Z [36;1mecho ""[0m
+16:37:39.5418860Z [36;1mecho "=== restoring full project ==="[0m
+16:37:39.5419250Z [36;1mpython3 generate_project.py > /dev/null || exit 1[0m
+16:37:39.5419670Z [36;1mplutil -lint Doushujun.xcodeproj/project.pbxproj || true[0m
+16:37:39.5420000Z [36;1m[0m
+16:37:39.5420200Z [36;1mif [ "$BISECT" != "0" ]; then[0m
+16:37:39.5420420Z [36;1m  echo ""[0m
+16:37:39.5420840Z [36;1m  echo ">>> BISECT RESULT: crashed mode = $BISECT (1=full, 2=no-scheme, 3=no-uitest)"[0m
+16:37:39.5421290Z [36;1m  exit 1[0m
+16:37:39.5421510Z [36;1mfi[0m
+16:37:39.5421740Z [36;1mecho ">>> ALL 3 MODES OK - project file healthy"[0m
+16:37:39.5528450Z shell: /bin/bash -e {0}
+16:37:39.5528720Z ##[endgroup]
+16:37:39.5930530Z === [1/3] full: uitest target + shared scheme ===
+16:37:39.6331830Z 
+16:37:39.6332790Z ############ [full] ############
+16:37:43.1025970Z [full] xcodebuild -list CRASHED (exit 66)
+16:37:43.1168110Z User defaults from command line:
+16:37:43.1169140Z     IDEPackageSupportUseBuiltinSCM = YES
+16:37:43.1169960Z 
+16:37:43.1170890Z 2026-10-20 16:37:41.356 xcodebuild[2249:10155] Writing error result bundle to /var/folders/s6/5hzmn6lx4dz5nxs7k_0slzph0000gn/T/ResultBundle_2026-20-10_16-37-0041.xcresult
+16:37:43.1171620Z xcodebuild: error: 'Doushujun.xcodeproj' does not exist.
+16:37:43.1177030Z === latest crash reports ===
+16:37:43.1792340Z Retired
+16:37:43.1936890Z 
+16:37:43.1972790Z === [2/3] DSJ_NO_SCHEME: uitest target, no shared scheme ===
+16:37:43.2561040Z 
+16:37:43.2561850Z ############ [no-scheme] ############
+16:37:45.7911000Z [no-scheme] xcodebuild -list CRASHED (exit 66)
+16:37:45.8019540Z User defaults from command line:
+16:37:45.8130010Z     IDEPackageSupportUseBuiltinSCM = YES
+16:37:45.8241830Z 
+16:37:45.8345350Z 2026-10-20 16:37:44.444 xcodebuild[2353:10641] Writing error result bundle to /var/folders/s6/5hzmn6lx4dz5nxs7k_0slzph0000gn/T/ResultBundle_2026-20-10_16-37-0044.xcresult
+16:37:45.8452720Z xcodebuild: error: 'Doushujun.xcodeproj' does not exist.
+16:37:45.8554540Z === latest crash reports ===
+16:37:45.8656950Z Retired
+16:37:45.8758030Z 
+16:37:45.8859760Z === [3/3] DSJ_NO_UITEST: app target only ===
+16:37:45.8961150Z 
+16:37:45.9063330Z ############ [no-uitest] ############
+16:37:49.0765370Z [no-uitest] xcodebuild -list CRASHED (exit 66)
+16:37:49.0869920Z User defaults from command line:
+16:37:49.1127890Z     IDEPackageSupportUseBuiltinSCM = YES
+16:37:49.1229840Z 
+16:37:49.1342510Z 2026-10-20 16:37:47.779 xcodebuild[2474:11185] Writing error result bundle to /var/folders/s6/5hzmn6lx4dz5nxs7k_0slzph0000gn/T/ResultBundle_2026-20-10_16-37-0047.xcresult
+16:37:49.1445090Z xcodebuild: error: 'Doushujun.xcodeproj' does not exist.
+16:37:49.1546570Z === latest crash reports ===
+16:37:49.1650670Z Retired
+16:37:49.1744420Z 
+16:37:49.1846330Z === restoring full project ===
+16:37:49.1950040Z Doushujun.xcodeproj/project.pbxproj: OK
+16:37:49.2050850Z 
+16:37:49.2152620Z >>> BISECT RESULT: crashed mode = 3 (1=full, 2=no-scheme, 3=no-uitest)
+16:37:49.2338800Z ##[error]Process completed with exit code 1.
+16:37:49.2674340Z ##[group]Run actions/upload-artifact@v4
+16:37:49.2675720Z with:
+16:37:49.2676290Z   name: build-log
+16:37:49.2676870Z   path: build.log
+16:37:49.2677350Z   retention-days: 7
+16:37:49.2678310Z   if-no-files-found: warn
+16:37:49.2678800Z   compression-level: 6
+16:37:49.2679290Z   overwrite: false
+16:37:49.2679980Z   include-hidden-files: false
+16:37:49.2680660Z ##[endgroup]
+16:37:50.3770980Z (node:2720) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+16:37:50.3783550Z (Use `node --trace-deprecation ...` to show where the warning was created)
+16:37:50.3881320Z ##[warning]No files were found with the provided path: build.log. No artifacts will be uploaded.
+16:37:50.4259070Z Post job cleanup.
+16:37:50.6178550Z [command]/opt/homebrew/bin/git version
+16:37:50.6924050Z git version 2.55.0
+16:37:50.7393760Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/ee61318e-2dd6-4fe2-abbe-e28d2fbe3d67/.gitconfig'
+16:37:50.7509710Z Temporarily overriding HOME='/Users/runner/work/_temp/ee61318e-2dd6-4fe2-abbe-e28d2fbe3d67' before making global git config changes
+16:37:50.7612390Z Adding repository directory to the temporary git global config as a safe directory
+16:37:50.7721110Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/doushujun-ios/doushujun-ios
+16:37:50.8013400Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+16:37:50.8334590Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+16:37:50.9973410Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+16:37:51.0064230Z http.https://github.com/.extraheader
+16:37:51.0241390Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+16:37:51.0273670Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+16:37:51.2473810Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+16:37:51.2557740Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+16:37:51.4730050Z Cleaning up orphan processes
+16:37:52.3008080Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
