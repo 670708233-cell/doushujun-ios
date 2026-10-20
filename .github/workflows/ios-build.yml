@@ -194,8 +194,10 @@ jobs:
           cd backend
           cp env.ci .env
           mkdir -p runtime/cache runtime/log
-          # macos runner 不预装 composer（php 依赖 brew composer 自动带）
-          brew install composer 2>&1 | tail -2
+          # macos runner 不预装 composer；brew 默认 php 8.4 与生产 8.2 不兼容（think 8 已知炸）
+          brew install composer php@8.2 2>&1 | tail -2
+          export PATH="$(brew --prefix php@8.2)/bin:$PATH"
+          php -v | head -1
           composer install --no-scripts --no-interaction --prefer-dist --no-progress 2>&1 | tail -3
           nohup php think run --host 127.0.0.1 --port 8000 > server.log 2>&1 &
           BACKEND_UP=0
@@ -216,8 +218,10 @@ jobs:
           # 硬校验 1：slider/generate 必须 200；失败时打印异常详情页（APP_DEBUG 下含堆栈）
           GEN_CODE=$(curl -s -o gen_body.txt -w "%{http_code}" http://127.0.0.1:8000/api/captcha/slider/generate)
           if [ "$GEN_CODE" != "200" ]; then
-            echo "::error::slider/generate http $GEN_CODE, response body:"
-            head -c 3000 gen_body.txt || true
+            echo "::error::slider/generate http $GEN_CODE, exception summary:"
+            grep -oE '<h1>[^<]*</h1>|<h2>[^<]*</h2>|class="message"[^<]*<|<div class="info">[^<]*' gen_body.txt | head -10 || true
+            echo "--- full body first 6000 chars ---"
+            head -c 6000 gen_body.txt || true
             exit 1
           fi
           echo "slider/generate OK: $(head -c 200 gen_body.txt)"
