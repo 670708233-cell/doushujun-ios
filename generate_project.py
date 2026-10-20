@@ -618,6 +618,14 @@ if uitest_files and not os.environ.get("DSJ_NO_SCHEME"):
             ReferencedContainer = "container:Doushujun.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BlueprintIdentifier = "{target_id}"
+            BuildableName = "Doushujun.app"
+            BlueprintName = "Doushujun"
+            ReferencedContainer = "container:Doushujun.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -634,6 +642,14 @@ if uitest_files and not os.environ.get("DSJ_NO_SCHEME"):
             ReferencedContainer = "container:Doushujun.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BlueprintIdentifier = "{target_id}"
+            BuildableName = "Doushujun.app"
+            BlueprintName = "Doushujun"
+            ReferencedContainer = "container:Doushujun.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

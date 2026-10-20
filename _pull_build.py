@@ -3,7 +3,7 @@
 import io, json, urllib.request, urllib.error
 
 OWNER, REPO = "670708233-cell", "doushujun-ios"
-RUN_ID = "39459075440"
+RUN_ID = "39460046649"
 
 cred = io.open(r"d:\hubulider\dsj\doushujunfull\_cred_out.txt", encoding="utf-8").read()
 TOKEN = [l.strip()[9:] for l in cred.splitlines() if l.strip().startswith("password=")][0]
