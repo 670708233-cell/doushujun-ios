@@ -27,6 +27,15 @@ for sf in swift_files:
 for pf in plist_files:
     print(f"  {pf}")
 
+# Collect UI test sources (DoushujunUITests/) — XCUITest 自动化用例
+UITEST_DIR = os.path.join(BASE_DIR, "DoushujunUITests")
+uitest_files = []
+if os.path.isdir(UITEST_DIR):
+    for f in sorted(os.listdir(UITEST_DIR)):
+        if f.endswith(".swift"):
+            uitest_files.append(os.path.join("DoushujunUITests", f).replace("\\", "/"))
+print("UI test files:", uitest_files)
+
 # Collect bundle resources from top-level Resources/ (badges + geetest.html)
 resource_files = []
 RES_DIR = os.path.join(BASE_DIR, "Resources")
@@ -103,6 +112,16 @@ for f in all_files:
     parent_key = "/".join(parent_parts)
     groups[parent_key][1].append(fid)
 
+# UI test sources: file refs + build files + group（独立于 app target，绝不进 app 的 Sources）
+uitest_build_files = {}
+if uitest_files:
+    ensure_group(["DoushujunUITests"])
+    for f in uitest_files:
+        fid = gen_id("file:" + f)
+        file_refs[f] = fid
+        uitest_build_files[f] = gen_id("build:" + f)
+        groups["DoushujunUITests"][1].append(fid)
+
 # Bundle resources: file ref + Resources build file (land in bundle root)
 for f in resource_files:
     fid = gen_id("file:" + f)
@@ -140,6 +159,8 @@ lines.append("")
 lines.append("/* Begin PBXFileReference section */")
 app_fid = gen_id("file:Doushujun.app")
 lines.append(f"\t\t{app_fid} /* Doushujun.app */ = {{isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Doushujun.app; sourceTree = BUILT_PRODUCTS_DIR; }};")
+xctest_fid = gen_id("file:DoushujunUITests.xctest")
+lines.append(f"\t\t{xctest_fid} /* DoushujunUITests.xctest */ = {{isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DoushujunUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; }};")
 for f, fid in sorted(file_refs.items()):
     basename = os.path.basename(f)
     if f.endswith(".swift"):
@@ -160,13 +181,25 @@ for f, bid in sorted(build_files.items()):
     basename = os.path.basename(f)
     phase = "in Resources" if (f.endswith(".xcassets") or f in resource_files) else "in Sources"
     lines.append(f"\t\t{bid} /* {basename} {phase} */ = {{isa = PBXBuildFile; fileRef = {fid} /* {basename} */; }};")
+for f, bid in sorted(uitest_build_files.items()):
+    fid = file_refs[f]
+    basename = os.path.basename(f)
+    lines.append(f"\t\t{bid} /* {basename} in Sources */ = {{isa = PBXBuildFile; fileRef = {fid} /* {basename} */; }};")
 lines.append("/* End PBXBuildFile section */")
 lines.append("")
 
-# PBXFrameworksBuildPhase section
+# PBXFrameworksBuildPhase section（app 与 uitest 各一个空 phase）
 fw_bid = gen_id("fw:phase")
+uitest_fw_bid = gen_id("fw:phase:uitest")
 lines.append("/* Begin PBXFrameworksBuildPhase section */")
 lines.append(f"\t\t{fw_bid} /* Frameworks */ = {{")
+lines.append("\t\t\tisa = PBXFrameworksBuildPhase;")
+lines.append("\t\t\tbuildActionMask = 2147483647;")
+lines.append("\t\t\tfiles = (")
+lines.append("\t\t\t);")
+lines.append("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
+lines.append("\t\t};")
+lines.append(f"\t\t{uitest_fw_bid} /* Frameworks */ = {{")
 lines.append("\t\t\tisa = PBXFrameworksBuildPhase;")
 lines.append("\t\t\tbuildActionMask = 2147483647;")
 lines.append("\t\t\tfiles = (")
@@ -192,6 +225,7 @@ def render_child(child):
 for child in groups[""][1]:
     lines.append(render_child(child))
 lines.append(f"\t\t\t\t{app_fid} /* Doushujun.app */,")
+lines.append(f"\t\t\t\t{xctest_fid} /* DoushujunUITests.xctest */,")
 lines.append("\t\t\t);")
 lines.append("\t\t\tsourceTree = \"<group>\";")
 lines.append("\t\t};")
@@ -213,6 +247,7 @@ lines.append("/* End PBXGroup section */")
 lines.append("")
 
 # PBXNativeTarget section
+proj_id = gen_id("proj:Doushujun")   # 提前定义：UITest 的 ContainerItemProxy 需引用
 target_id = gen_id("target:Doushujun")
 src_phase_id = gen_id("src:phase")
 res_phase_id = gen_id("res:phase")
@@ -234,7 +269,48 @@ lines.append("\t\t\tproductName = Doushujun;")
 lines.append(f"\t\t\tproductReference = {app_fid} /* Doushujun.app */;")
 lines.append("\t\t\tproductType = \"com.apple.product-type.application\";")
 lines.append("\t\t};")
+# UITest target（依赖 app target：依赖 + PBXContainerItemProxy + PBXTargetDependency）
+uitest_target_id = gen_id("target:DoushujunUITests")
+uitest_src_phase_id = gen_id("src:phase:uitest")
+proxy_id = gen_id("proxy:uitest")
+dep_id = gen_id("dep:uitest")
+lines.append(f"\t\t{uitest_target_id} /* DoushujunUITests */ = {{")
+lines.append("\t\t\tisa = PBXNativeTarget;")
+lines.append(f"\t\t\tbuildConfigurationList = {gen_id('bcl:uitest')} /* Build configuration list for PBXNativeTarget \"DoushujunUITests\" */;")
+lines.append("\t\t\tbuildPhases = (")
+lines.append(f"\t\t\t\t{uitest_src_phase_id} /* Sources */,")
+lines.append(f"\t\t\t\t{uitest_fw_bid} /* Frameworks */,")
+lines.append("\t\t\t);")
+lines.append("\t\t\tbuildRules = (")
+lines.append("\t\t\t);")
+lines.append("\t\t\tdependencies = (")
+lines.append(f"\t\t\t\t{dep_id} /* PBXTargetDependency */,")
+lines.append("\t\t\t);")
+lines.append("\t\t\tname = DoushujunUITests;")
+lines.append("\t\t\tproductName = DoushujunUITests;")
+lines.append(f"\t\t\tproductReference = {xctest_fid} /* DoushujunUITests.xctest */;")
+lines.append("\t\t\tproductType = \"com.apple.product-type.bundle.ui-testing\";")
+lines.append("\t\t\ttestTargetID = " + target_id + ";")
+lines.append("\t\t};")
 lines.append("/* End PBXNativeTarget section */")
+lines.append("")
+lines.append("/* Begin PBXContainerItemProxy section */")
+lines.append(f"\t\t{proxy_id} /* PBXContainerItemProxy */ = {{")
+lines.append("\t\t\tisa = PBXContainerItemProxy;")
+lines.append("\t\t\tcontainerPortal = " + proj_id + " /* Project object */;")
+lines.append("\t\t\tproxyType = 1;")
+lines.append("\t\t\tremoteGlobalIDString = " + target_id + ";")
+lines.append("\t\t\tremoteInfo = Doushujun;")
+lines.append("\t\t};")
+lines.append("/* End PBXContainerItemProxy section */")
+lines.append("")
+lines.append("/* Begin PBXTargetDependency section */")
+lines.append(f"\t\t{dep_id} /* PBXTargetDependency */ = {{")
+lines.append("\t\t\tisa = PBXTargetDependency;")
+lines.append(f"\t\t\ttarget = {target_id} /* Doushujun */;")
+lines.append(f"\t\t\ttargetProxy = {proxy_id} /* PBXContainerItemProxy */;")
+lines.append("\t\t};")
+lines.append("/* End PBXTargetDependency section */")
 lines.append("")
 
 # PBXProject section
@@ -249,6 +325,10 @@ lines.append("\t\t\t\tLastUpgradeCheck = 1500;")
 lines.append("\t\t\t\tTargetAttributes = {")
 lines.append(f"\t\t\t\t\t{target_id} = {{")
 lines.append("\t\t\t\t\t\tCreatedOnToolsVersion = 15.0;")
+lines.append("\t\t\t\t\t};")
+lines.append(f"\t\t\t\t\t{uitest_target_id} = {{")
+lines.append("\t\t\t\t\t\tCreatedOnToolsVersion = 15.0;")
+lines.append("\t\t\t\t\t\tTestTargetID = " + target_id + ";")
 lines.append("\t\t\t\t\t};")
 lines.append("\t\t\t\t};")
 lines.append("\t\t\t};")
@@ -266,6 +346,7 @@ lines.append("\t\t\tprojectDirPath = \"\";")
 lines.append("\t\t\tprojectRoot = \"\";")
 lines.append("\t\t\ttargets = (")
 lines.append(f"\t\t\t\t{target_id} /* Doushujun */,")
+lines.append(f"\t\t\t\t{uitest_target_id} /* DoushujunUITests */,")
 lines.append("\t\t\t);")
 lines.append("\t\t};")
 lines.append("/* End PBXProject section */")
@@ -298,6 +379,15 @@ lines.append("\t\t\tfiles = (")
 for sf, bid in sorted(build_files.items()):
     if sf.endswith(".swift"):
         lines.append(f"\t\t\t\t{bid} /* {os.path.basename(sf)} in Sources */,")
+lines.append("\t\t\t);")
+lines.append("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
+lines.append("\t\t};")
+lines.append(f"\t\t{uitest_src_phase_id} /* Sources */ = {{")
+lines.append("\t\t\tisa = PBXSourcesBuildPhase;")
+lines.append("\t\t\tbuildActionMask = 2147483647;")
+lines.append("\t\t\tfiles = (")
+for sf, bid in sorted(uitest_build_files.items()):
+    lines.append(f"\t\t\t\t{bid} /* {os.path.basename(sf)} in Sources */,")
 lines.append("\t\t\t);")
 lines.append("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
 lines.append("\t\t};")
@@ -360,6 +450,34 @@ build_config(gen_id("pcfg:debug"), "Debug", False, True)
 build_config(gen_id("pcfg:release"), "Release", False, False)
 build_config(gen_id("tcfg:debug"), "Debug", True, True)
 build_config(gen_id("tcfg:release"), "Release", True, False)
+
+# UITest bundle 配置：TEST_HOST 指向 app 产物，TEST_TARGET_NAME 关联宿主
+uitest_tcfg_debug = gen_id("uitestcfg:debug")
+uitest_tcfg_release = gen_id("uitestcfg:release")
+def build_uitest_config(config_id, name):
+    lines.append(f"\t\t{config_id} /* {name} */ = {{")
+    lines.append("\t\t\tisa = XCBuildConfiguration;")
+    lines.append("\t\t\tbuildSettings = {")
+    lines.append("\t\t\t\tBUNDLE_LOADER = \"$(TEST_HOST)\";")
+    lines.append("\t\t\t\tCODE_SIGN_STYLE = Manual;")
+    lines.append("\t\t\t\tCURRENT_PROJECT_VERSION = 1;")
+    lines.append("\t\t\t\tGENERATE_INFOPLIST_FILE = YES;")
+    lines.append("\t\t\t\tIPHONEOS_DEPLOYMENT_TARGET = 16.0;")
+    lines.append("\t\t\t\tLD_RUNPATH_SEARCH_PATHS = (\"$(inherited)\", \"@executable_path/Frameworks\", \"@loader_path/Frameworks\", );")
+    lines.append("\t\t\t\tMARKETING_VERSION = 1.0;")
+    lines.append("\t\t\t\tPRODUCT_BUNDLE_IDENTIFIER = com.doushujun.member.UITests;")
+    lines.append("\t\t\t\tPRODUCT_NAME = \"$(TARGET_NAME)\";")
+    lines.append("\t\t\t\tSWIFT_EMIT_LOC_STRINGS = NO;")
+    lines.append("\t\t\t\tSWIFT_VERSION = 5.0;")
+    lines.append("\t\t\t\tTARGETED_DEVICE_FAMILY = \"1\";")
+    lines.append("\t\t\t\tTEST_HOST = \"$(BUILT_PRODUCTS_DIR)/Doushujun.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Doushujun\";")
+    lines.append("\t\t\t\tTEST_TARGET_NAME = Doushujun;")
+    lines.append("\t\t\t};")
+    lines.append(f"\t\t\tname = {name};")
+    lines.append("\t\t};")
+
+build_uitest_config(uitest_tcfg_debug, "Debug")
+build_uitest_config(uitest_tcfg_release, "Release")
 lines.append("")
 
 # XCConfigurationList sections
@@ -371,6 +489,16 @@ lines.append("\t\t\tisa = XCConfigurationList;")
 lines.append("\t\t\tbuildConfigurations = (")
 lines.append(f"\t\t\t\t{gen_id('tcfg:debug')} /* Debug */,")
 lines.append(f"\t\t\t\t{gen_id('tcfg:release')} /* Release */,")
+lines.append("\t\t\t);")
+lines.append("\t\t\tdefaultConfigurationIsVisible = 0;")
+lines.append("\t\t\tdefaultConfigurationName = Release;")
+lines.append("\t\t};")
+bcl_uitest = gen_id("bcl:uitest")
+lines.append(f"\t\t{bcl_uitest} /* Build configuration list for PBXNativeTarget \"DoushujunUITests\" */ = {{")
+lines.append("\t\t\tisa = XCConfigurationList;")
+lines.append("\t\t\tbuildConfigurations = (")
+lines.append(f"\t\t\t\t{uitest_tcfg_debug} /* Debug */,")
+lines.append(f"\t\t\t\t{uitest_tcfg_release} /* Release */,")
 lines.append("\t\t\t);")
 lines.append("\t\t\tdefaultConfigurationIsVisible = 0;")
 lines.append("\t\t\tdefaultConfigurationName = Release;")
@@ -399,3 +527,110 @@ with open(out_path, "w", encoding="utf-8") as f:
 print(f"\nGenerated: {out_path}")
 print(f"Total Swift files: {len(swift_files)}")
 print(f"Total plist files: {len(plist_files)}")
+
+# Shared scheme：TestAction 显式包含 UITest target（保证 xcodebuild test 直接可跑）
+if uitest_files:
+    scheme_dir = os.path.join(xcodeproj_dir, "xcshareddata", "xcschemes")
+    os.makedirs(scheme_dir, exist_ok=True)
+    scheme = f'''<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   LastUpgradeVersion = "1500"
+   version = "1.7">
+   <BuildAction
+      parallelizeBuildables = "YES"
+      buildImplicitDependencies = "YES">
+      <BuildActionEntries>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BlueprintIdentifier = "{target_id}"
+               BuildableName = "Doushujun.app"
+               BlueprintName = "Doushujun"
+               ReferencedContainer = "container:Doushujun.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BlueprintIdentifier = "{uitest_target_id}"
+               BuildableName = "DoushujunUITests.xctest"
+               BlueprintName = "DoushujunUITests"
+               ReferencedContainer = "container:Doushujun.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+   <TestAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      shouldAutocreateTestPlan = "YES">
+      <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BlueprintIdentifier = "{uitest_target_id}"
+               BuildableName = "DoushujunUITests.xctest"
+               BlueprintName = "DoushujunUITests"
+               ReferencedContainer = "container:Doushujun.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
+   </TestAction>
+   <LaunchAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      launchStyle = "0"
+      useCustomWorkingDirectory = "NO"
+      ignoresPersistentStateOnLaunch = "NO"
+      debugDocumentVersioning = "YES"
+      debugServiceExtension = "internal"
+      allowLocationSimulation = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BlueprintIdentifier = "{target_id}"
+            BuildableName = "Doushujun.app"
+            BlueprintName = "Doushujun"
+            ReferencedContainer = "container:Doushujun.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+   </LaunchAction>
+   <ProfileAction
+      buildConfiguration = "Release"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      savedToolIdentifier = ""
+      useCustomWorkingDirectory = "NO"
+      debugDocumentVersioning = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BlueprintIdentifier = "{target_id}"
+            BuildableName = "Doushujun.app"
+            BlueprintName = "Doushujun"
+            ReferencedContainer = "container:Doushujun.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+   </ProfileAction>
+   <AnalyzeAction
+      buildConfiguration = "Debug">
+   </AnalyzeAction>
+   <ArchiveAction
+      buildConfiguration = "Release"
+      revealArchiveInOrganizer = "YES">
+   </ArchiveAction>
+</Scheme>
+'''
+    with open(os.path.join(scheme_dir, "Doushujun.xcscheme"), "w", encoding="utf-8") as f:
+        f.write(scheme)
+    print(f"Generated: {os.path.join(scheme_dir, 'Doushujun.xcscheme')}")

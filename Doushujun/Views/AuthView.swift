@@ -49,6 +49,7 @@ struct CaptchaImage: View {
     @Binding var captchaKey: String                // 服务端发的验证码 key（提交时随表单回传）
     @Binding var code: String                      // 用户输入的验证码
     @State private var img: UIImage?               // 解码后的验证码图
+    @State private var answer = ""                 // debug 后端回传的明文答案（生产无此字段；供 UI 自动化读取）
 
     var body: some View {
         HStack(spacing: 10) {
@@ -68,6 +69,10 @@ struct CaptchaImage: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .overlay(RoundedRectangle(cornerRadius: 10).stroke(T.stroke, lineWidth: 1))
             }
+            // UI 自动化：XCUITest 读此元素 label 拿验证码答案自动填写（仅 debug 后端有值）
+            .accessibilityElement(children: .ignore)
+            .accessibilityIdentifier("captcha_answer")
+            .accessibilityLabel(answer)
         }
         .onAppear { refresh() }                    // 出现即拉首张
         .onChange(of: captchaKey) { k in           // 父面板失败清 key → 自动拉新码
@@ -88,6 +93,7 @@ struct CaptchaImage: View {
                 await MainActor.run {
                     img = Data(base64Encoded: b64).flatMap(UIImage.init)   // 解码失败得 nil 显示占位
                     captchaKey = d["captcha_key"].str ?? ""
+                    answer = d["captcha_code"].str ?? ""                   // debug 后端回传明文（生产空串）
                 }
             } catch {
                 await MainActor.run { img = nil; captchaKey = "" }   // 失败清空待重试
@@ -500,6 +506,8 @@ struct SliderCaptchaSheet: View {
                             RoundedRectangle(cornerRadius: 12)
                                 .fill(Color.white.opacity(0.06))
                                 .overlay(RoundedRectangle(cornerRadius: 12).stroke(T.stroke, lineWidth: 1))
+                                .accessibilityElement()
+                                .accessibilityIdentifier("slider_track")   // UI 自动化：拖动终点定位
                             // 已拖过区域（渐变，宽度随拖动）
                             RoundedRectangle(cornerRadius: 12)
                                 .fill(T.grad.opacity(0.35))
@@ -514,6 +522,7 @@ struct SliderCaptchaSheet: View {
                                 .fill(T.grad)
                                 .frame(width: 48, height: 48)
                                 .overlay(Image(systemName: "chevron.right.2").font(.system(size: 15, weight: .bold)).foregroundColor(T.bg))
+                                .accessibilityIdentifier("slider_knob")    // UI 自动化：拖动起点定位
                                 .offset(x: dragX)
                                 .gesture(
                                     DragGesture(minimumDistance: 0)
