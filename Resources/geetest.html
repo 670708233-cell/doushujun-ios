@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<!--
+  极验 4.0 验证容器页（iOS WKWebView 版，改自安卓 assets/geetest.html）：
+  通过 loadFileURL 加载，captcha_id 由 App 读取本文件后替换占位符写入沙盒副本；
+  桥接走 WKScriptMessageHandler（window.webkit.messageHandlers.dsj.postMessage），
+  消息体 = {event:"onCaptchaSuccess"|"onClose"|"onError", data:...}
+-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <style>
+    html, body { margin: 0; padding: 0; background: transparent; }
+    #dbg {
+      position: fixed; top: 4px; left: 6px; z-index: 99999;
+      color: #00E5FF; font: 10px/1.4 monospace; white-space: pre-wrap;
+      pointer-events: none; text-shadow: 0 0 3px #000;
+    }
+  </style>
+  <script>
+    // iOS 桥兼容层：与安卓 AndroidBridge 同名方法，内部转发给 WKScriptMessageHandler
+    window.AndroidBridge = {
+      onCaptchaSuccess: function (json) {
+        window.webkit.messageHandlers.dsj.postMessage({ event: 'onCaptchaSuccess', data: json });
+      },
+      onClose: function () {
+        window.webkit.messageHandlers.dsj.postMessage({ event: 'onClose' });
+      },
+      onError: function (msg) {
+        window.webkit.messageHandlers.dsj.postMessage({ event: 'onError', data: String(msg) });
+      }
+    };
+    window.onerror = function (msg, src, line) {
+      var b = window.AndroidBridge;
+      if (b) b.onError('JS错误: ' + msg + ' @L' + (line || '?'));
+      return false;
+    };
+  </script>
+  <script src="https://static.geetest.com/v4/gt4.js"
+          onerror="var d=document.getElementById('dbg'); if(d) d.textContent+='\ngt4.js 加载失败'; if(window.AndroidBridge) AndroidBridge.onError('验证脚本加载失败，请检查网络');"></script>
+</head>
+<body>
+<div id="cap"></div>
+<div id="dbg">boot</div>
+<script>
+  function dbg(s) {
+    var el = document.getElementById('dbg');
+    if (el) el.textContent += '\n' + s;
+  }
+  dbg('html loaded');
+
+  var captchaId = '__CAPTCHA_ID__';
+  var bridge = window.AndroidBridge;
+  dbg('bridge=' + (bridge ? 'ok' : 'MISSING') + ' cid=' + (captchaId || 'EMPTY'));
+
+  try {
+    if (!window.initGeetest4) {
+      dbg('initGeetest4 missing');
+      if (bridge) bridge.onError('验证脚本加载失败，请检查网络');
+    } else if (!captchaId) {
+      dbg('no captcha_id');
+      if (bridge) bridge.onError('验证配置缺失');
+    } else {
+      dbg('initGeetest4...');
+      initGeetest4(
+        {
+          captchaId: captchaId,
+          product: 'bind',
+          language: 'zh-cn'
+        },
+        function (captchaObj) {
+          dbg('obj ok, bind events');
+          captchaObj.onReady(function () {
+            dbg('onReady -> showCaptcha');
+            captchaObj.showCaptcha();
+          });
+          captchaObj.onSuccess(function () {
+            dbg('onSuccess');
+            var r = captchaObj.getValidate();
+            if (r && bridge) {
+              bridge.onCaptchaSuccess(JSON.stringify({
+                lot_number: r.lot_number,
+                captcha_output: r.captcha_output,
+                pass_token: r.pass_token,
+                gen_time: r.gen_time
+              }));
+            }
+          });
+          captchaObj.onClose(function () {
+            if (bridge) bridge.onClose();
+          });
+          captchaObj.onError(function () {
+            dbg('gt onError');
+            if (bridge) bridge.onError('验证出错，请重试');
+          });
+          dbg('callbacks bound');
+        }
+      );
+    }
+  } catch (e) {
+    dbg('EXC: ' + e.message);
+    if (bridge) bridge.onError('初始化异常: ' + e.message);
+  }
+</script>
+</body>
+</html>

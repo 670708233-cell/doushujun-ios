@@ -27,5 +27,9 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>用于将解析的无水印视频和图片保存到您的相册</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>用于将解析的无水印视频和图片保存到您的相册</string>
 </dict>
 </plist>

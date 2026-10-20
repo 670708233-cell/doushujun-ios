@@ -27,6 +27,23 @@ for sf in swift_files:
 for pf in plist_files:
     print(f"  {pf}")
 
+# Collect bundle resources from top-level Resources/ (badges + geetest.html)
+resource_files = []
+RES_DIR = os.path.join(BASE_DIR, "Resources")
+if os.path.isdir(RES_DIR):
+    for f in sorted(os.listdir(RES_DIR)):
+        full = os.path.join(RES_DIR, f)
+        if os.path.isfile(full):
+            resource_files.append(os.path.join("Resources", f).replace("\\", "/"))
+print("Bundle resources:", resource_files)
+
+def res_filetype(f):
+    if f.endswith(".png"):
+        return "image.png"
+    if f.endswith(".html"):
+        return "text.html"
+    return "file"
+
 # Collect asset catalogs (.xcassets) at the top level of SRC_DIR
 asset_catalogs = []
 for entry in sorted(os.listdir(SRC_DIR)):
@@ -86,6 +103,17 @@ for f in all_files:
     parent_key = "/".join(parent_parts)
     groups[parent_key][1].append(fid)
 
+# Bundle resources: file ref + Resources build file (land in bundle root)
+for f in resource_files:
+    fid = gen_id("file:" + f)
+    file_refs[f] = fid
+    bid = gen_id("build:" + f)
+    build_files[f] = bid
+    parts = f.split("/")
+    parent_parts = parts[:-1]
+    ensure_group(parent_parts)
+    groups["/".join(parent_parts)][1].append(fid)
+
 # Asset catalogs: file ref + Resources build file
 for ac in asset_catalogs:
     fid = gen_id("file:" + ac)
@@ -118,6 +146,8 @@ for f, fid in sorted(file_refs.items()):
         lines.append(f"\t\t{fid} /* {basename} */ = {{isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = {basename}; sourceTree = \"<group>\"; }};")
     elif f.endswith(".plist"):
         lines.append(f"\t\t{fid} /* {basename} */ = {{isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = {basename}; sourceTree = \"<group>\"; }};")
+    elif f in resource_files:
+        lines.append(f"\t\t{fid} /* {basename} */ = {{isa = PBXFileReference; lastKnownFileType = {res_filetype(f)}; path = {basename}; sourceTree = \"<group>\"; }};")
     elif f.endswith(".xcassets"):
         lines.append(f"\t\t{fid} /* {basename} */ = {{isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = {basename}; sourceTree = \"<group>\"; }};")
 lines.append("/* End PBXFileReference section */")
@@ -128,7 +158,7 @@ lines.append("/* Begin PBXBuildFile section */")
 for f, bid in sorted(build_files.items()):
     fid = file_refs[f]
     basename = os.path.basename(f)
-    phase = "in Resources" if f.endswith(".xcassets") else "in Sources"
+    phase = "in Resources" if (f.endswith(".xcassets") or f in resource_files) else "in Sources"
     lines.append(f"\t\t{bid} /* {basename} {phase} */ = {{isa = PBXBuildFile; fileRef = {fid} /* {basename} */; }};")
 lines.append("/* End PBXBuildFile section */")
 lines.append("")
@@ -250,6 +280,9 @@ lines.append("\t\t\tfiles = (")
 for ac in sorted(asset_catalogs):
     bid = build_files[ac]
     lines.append(f"\t\t\t\t{bid} /* {os.path.basename(ac)} in Resources */,")
+for f in sorted(resource_files):
+    bid = build_files[f]
+    lines.append(f"\t\t\t\t{bid} /* {os.path.basename(f)} in Resources */,")
 lines.append("\t\t\t);")
 lines.append("\t\t\trunOnlyForDeploymentPostprocessing = 0;")
 lines.append("\t\t};")
