@@ -87,7 +87,7 @@ struct MonitorChartView: View {
                                         LineChartView(series: series)
                                     }
                                     // 汇总行
-                                    let st = task.j["stats"].exists ? task.j["stats"] : task
+                                    let st = task.j["stats"].exists ? task.j["stats"] : task.j
                                     HStack {
                                         MetricCell(value: (st["play"].dbl ?? st["play_count"].dbl ?? 0).numFmtCn2, label: "总播放", color: T.primary)
                                         MetricCell(value: (st["like"].dbl ?? st["like_count"].dbl ?? 0).numFmtCn2, label: "总点赞", color: T.secondary)

@@ -8,14 +8,14 @@ enum Crypto {
 
     static func sha256Hex(_ s: String) -> String {
         let bytes = Array(s.utf8)
-        var buf = [UInt8](repeating: 0, count: CC_SHA256_DIGEST_LENGTH)
+        var buf = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
         _ = CC_SHA256(bytes, CC_LONG(bytes.count), &buf)
         return buf.map { String(format: "%02x", $0) }.joined()
     }
 
     static func md5Hex(_ s: String) -> String {
         let bytes = Array(s.utf8)
-        var buf = [UInt8](repeating: 0, count: CC_MD5_DIGEST_LENGTH)
+        var buf = [UInt8](repeating: 0, count: Int(CC_MD5_DIGEST_LENGTH))
         _ = CC_MD5(bytes, CC_LONG(bytes.count), &buf)
         return buf.map { String(format: "%02x", $0) }.joined()
     }

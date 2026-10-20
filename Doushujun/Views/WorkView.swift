@@ -187,7 +187,7 @@ struct WorkView: View {
 
         // 作者信息
         let author = r["author_info"]
-        func aField(_ k: String) -> String {
+        let aField: (String) -> String = { k in
             let v = r[k].str
             if let v = v, !v.isEmpty { return v }
             return author[k].str ?? ""
