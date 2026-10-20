@@ -461,14 +461,14 @@ build_config(gen_id("pcfg:release"), "Release", False, False)
 build_config(gen_id("tcfg:debug"), "Debug", True, True)
 build_config(gen_id("tcfg:release"), "Release", True, False)
 
-# UITest bundle 配置：TEST_HOST 指向 app 产物，TEST_TARGET_NAME 关联宿主
+# UITest bundle 配置：ui-testing 由 XCUITest runner 启动宿主 app，
+# 不可设 TEST_HOST/BUNDLE_LOADER（与 USES_XCTRUNNER 互斥），用 TEST_TARGET_NAME 关联宿主
 uitest_tcfg_debug = gen_id("uitestcfg:debug") if uitest_files else None
 uitest_tcfg_release = gen_id("uitestcfg:release") if uitest_files else None
 def build_uitest_config(config_id, name):
     lines.append(f"\t\t{config_id} /* {name} */ = {{")
     lines.append("\t\t\tisa = XCBuildConfiguration;")
     lines.append("\t\t\tbuildSettings = {")
-    lines.append("\t\t\t\tBUNDLE_LOADER = \"$(TEST_HOST)\";")
     lines.append("\t\t\t\tCODE_SIGN_STYLE = Manual;")
     lines.append("\t\t\t\tCURRENT_PROJECT_VERSION = 1;")
     lines.append("\t\t\t\tGENERATE_INFOPLIST_FILE = YES;")
@@ -480,7 +480,6 @@ def build_uitest_config(config_id, name):
     lines.append("\t\t\t\tSWIFT_EMIT_LOC_STRINGS = NO;")
     lines.append("\t\t\t\tSWIFT_VERSION = 5.0;")
     lines.append("\t\t\t\tTARGETED_DEVICE_FAMILY = \"1\";")
-    lines.append("\t\t\t\tTEST_HOST = \"$(BUILT_PRODUCTS_DIR)/Doushujun.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Doushujun\";")
     lines.append("\t\t\t\tTEST_TARGET_NAME = Doushujun;")
     lines.append("\t\t\t};")
     lines.append(f"\t\t\tname = {name};")

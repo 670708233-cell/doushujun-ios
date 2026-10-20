@@ -1,0 +1,676 @@
+﻿2026-10-20T16:55:56.0715280Z Current runner version: '2.337.0'
+2026-10-20T16:55:56.0730390Z ##[group]Runner Image Provisioner
+2026-10-20T16:55:56.0730920Z Hosted Compute Agent
+2026-10-20T16:55:56.0731280Z Version: 20260828.587
+2026-10-20T16:55:56.0731670Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+2026-10-20T16:55:56.0732130Z Build Date: 2026-08-28T16:44:25Z
+2026-10-20T16:55:56.0732550Z Worker ID: {1a070538-2597-4b3f-b37b-ebe93637d0f3}
+2026-10-20T16:55:56.0732990Z Azure Region: westus
+2026-10-20T16:55:56.0733350Z ##[endgroup]
+2026-10-20T16:55:56.0734240Z ##[group]Operating System
+2026-10-20T16:55:56.0734620Z macOS
+2026-10-20T16:55:56.0734920Z 14.8.9
+2026-10-20T16:55:56.0735230Z 23J631
+2026-10-20T16:55:56.0735550Z ##[endgroup]
+2026-10-20T16:55:56.0735890Z ##[group]Runner Image
+2026-10-20T16:55:56.0736250Z Image: macos-14-arm64
+2026-10-20T16:55:56.0736610Z Version: 20260831.0302.1
+2026-10-20T16:55:56.0737400Z Included Software: https://github.com/actions/runner-images/blob/macos-14-arm64/20260831.0302/images/macos/macos-14-arm64-Readme.md
+2026-10-20T16:55:56.0738420Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-14-arm64%2F20260831.0302
+2026-10-20T16:55:56.0739060Z ##[endgroup]
+2026-10-20T16:55:56.0739820Z ##[group]GITHUB_TOKEN Permissions
+2026-10-20T16:55:56.0740830Z Contents: read
+2026-10-20T16:55:56.0741180Z Metadata: read
+2026-10-20T16:55:56.0741520Z Packages: read
+2026-10-20T16:55:56.0741860Z ##[endgroup]
+2026-10-20T16:55:56.0743400Z Secret source: Actions
+2026-10-20T16:55:56.0743940Z Cache mode: write
+2026-10-20T16:55:56.0744360Z Prepare workflow directory
+2026-10-20T16:55:56.0952850Z Prepare all required actions
+2026-10-20T16:55:56.0990540Z Getting action download info
+2026-10-20T16:55:56.2392510Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-20T16:55:56.5287290Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-20T16:55:56.7260180Z Complete job name: Build Unsigned IPA
+2026-10-20T16:55:56.8020490Z ##[group]Run actions/checkout@v4
+2026-10-20T16:55:56.8021240Z with:
+2026-10-20T16:55:56.8021670Z   repository: 670708233-cell/doushujun-ios
+2026-10-20T16:55:56.8028130Z   token: ***
+2026-10-20T16:55:56.8028580Z   ssh-strict: true
+2026-10-20T16:55:56.8028950Z   ssh-user: git
+2026-10-20T16:55:56.8029310Z   persist-credentials: true
+2026-10-20T16:55:56.8029740Z   clean: true
+2026-10-20T16:55:56.8030090Z   sparse-checkout-cone-mode: true
+2026-10-20T16:55:56.8030540Z   fetch-depth: 1
+2026-10-20T16:55:56.8030910Z   fetch-tags: false
+2026-10-20T16:55:56.8031290Z   show-progress: true
+2026-10-20T16:55:56.8032040Z   lfs: false
+2026-10-20T16:55:56.8032490Z   submodules: false
+2026-10-20T16:55:56.8032840Z   set-safe-directory: true
+2026-10-20T16:55:56.8033520Z   allow-unsafe-pr-checkout: false
+2026-10-20T16:55:56.8034590Z ##[endgroup]
+2026-10-20T16:55:57.1344880Z Syncing repository: 670708233-cell/doushujun-ios
+2026-10-20T16:55:57.1346690Z ##[group]Getting Git version info
+2026-10-20T16:55:57.1347430Z Working directory is '/Users/runner/work/doushujun-ios/doushujun-ios'
+2026-10-20T16:55:57.1348350Z [command]/opt/homebrew/bin/git version
+2026-10-20T16:55:57.1554630Z git version 2.55.0
+2026-10-20T16:55:57.1566690Z ##[endgroup]
+2026-10-20T16:55:57.1572790Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/056f411e-802d-4bf6-8325-3b65fe05d35b/.gitconfig'
+2026-10-20T16:55:57.1578030Z Temporarily overriding HOME='/Users/runner/work/_temp/056f411e-802d-4bf6-8325-3b65fe05d35b' before making global git config changes
+2026-10-20T16:55:57.1579150Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-20T16:55:57.1581460Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:55:57.1679110Z Deleting the contents of '/Users/runner/work/doushujun-ios/doushujun-ios'
+2026-10-20T16:55:57.1683590Z ##[group]Initializing the repository
+2026-10-20T16:55:57.1687000Z [command]/opt/homebrew/bin/git init /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:55:57.1873720Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-20T16:55:57.1874510Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-20T16:55:57.1875840Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-20T16:55:57.1876760Z hint: call:
+2026-10-20T16:55:57.1877440Z hint:
+2026-10-20T16:55:57.1878240Z hint: 	git config --global init.defaultBranch <name>
+2026-10-20T16:55:57.1879180Z hint:
+2026-10-20T16:55:57.1880170Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-20T16:55:57.1881200Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-20T16:55:57.1882080Z hint:
+2026-10-20T16:55:57.1882670Z hint: 	git branch -m <name>
+2026-10-20T16:55:57.1883340Z hint:
+2026-10-20T16:55:57.1884140Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-20T16:55:57.1993660Z Initialized empty Git repository in /Users/runner/work/doushujun-ios/doushujun-ios/.git/
+2026-10-20T16:55:57.2001430Z [command]/opt/homebrew/bin/git remote add origin https://github.com/670708233-cell/doushujun-ios
+2026-10-20T16:55:57.2059040Z ##[endgroup]
+2026-10-20T16:55:57.2060330Z ##[group]Disabling automatic garbage collection
+2026-10-20T16:55:57.2062970Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-10-20T16:55:57.2107590Z ##[endgroup]
+2026-10-20T16:55:57.2108160Z ##[group]Setting up auth
+2026-10-20T16:55:57.2113360Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-20T16:55:57.2191770Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-20T16:55:57.2834980Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-20T16:55:57.2873640Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-20T16:55:57.3386150Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-20T16:55:57.3429310Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-20T16:55:57.3904170Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-20T16:55:57.3999870Z ##[endgroup]
+2026-10-20T16:55:57.4000540Z ##[group]Fetching the repository
+2026-10-20T16:55:57.4005260Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +19be783bfcd1b2270c7b644a1c6770e89b5be22b:refs/remotes/origin/main
+2026-10-20T16:55:58.1199690Z From https://github.com/670708233-cell/doushujun-ios
+2026-10-20T16:55:58.1203080Z  * [new ref]         19be783bfcd1b2270c7b644a1c6770e89b5be22b -> origin/main
+2026-10-20T16:55:58.1206930Z ##[endgroup]
+2026-10-20T16:55:58.1207980Z ##[group]Determining the checkout info
+2026-10-20T16:55:58.1208930Z ##[endgroup]
+2026-10-20T16:55:58.1209520Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-10-20T16:55:58.1261200Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-20T16:55:58.1309040Z ##[group]Checking out the ref
+2026-10-20T16:55:58.1310800Z [command]/opt/homebrew/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-10-20T16:55:58.1472150Z Switched to a new branch 'main'
+2026-10-20T16:55:58.1477980Z branch 'main' set up to track 'origin/main'.
+2026-10-20T16:55:58.1481330Z ##[endgroup]
+2026-10-20T16:55:58.1544010Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-10-20T16:55:58.1586530Z 19be783bfcd1b2270c7b644a1c6770e89b5be22b
+2026-10-20T16:55:58.1763340Z ##[group]Run xcodebuild -version
+2026-10-20T16:55:58.1764230Z [36;1mxcodebuild -version[0m
+2026-10-20T16:55:58.1765130Z [36;1mxcodebuild -showsdks | grep iphoneos[0m
+2026-10-20T16:55:58.1819540Z shell: /bin/bash -e {0}
+2026-10-20T16:55:58.1820240Z ##[endgroup]
+2026-10-20T16:55:58.4164960Z Xcode 15.4
+2026-10-20T16:55:58.4171170Z Build version 15F31d
+2026-10-20T16:55:59.3606770Z 	iOS 17.5                      	-sdk iphoneos17.5
+2026-10-20T16:55:59.3684640Z ##[group]Run python3 generate_project.py
+2026-10-20T16:55:59.3685040Z [36;1mpython3 generate_project.py[0m
+2026-10-20T16:55:59.3747720Z shell: /bin/bash -e {0}
+2026-10-20T16:55:59.3748120Z ##[endgroup]
+2026-10-20T16:55:59.5968680Z Found 22 Swift files and 1 plist files:
+2026-10-20T16:55:59.5969880Z   Doushujun/DoushujunApp.swift
+2026-10-20T16:55:59.5970660Z   Doushujun/Core/AppState.swift
+2026-10-20T16:55:59.5972180Z   Doushujun/Core/AppUpdater.swift
+2026-10-20T16:55:59.5974270Z   Doushujun/Core/Charts.swift
+2026-10-20T16:55:59.5974940Z   Doushujun/Core/Components.swift
+2026-10-20T16:55:59.5975470Z   Doushujun/Core/Crypto.swift
+2026-10-20T16:55:59.5975790Z   Doushujun/Core/LinkParser.swift
+2026-10-20T16:55:59.5976390Z   Doushujun/Core/Network.swift
+2026-10-20T16:55:59.5976760Z   Doushujun/Core/SessionStore.swift
+2026-10-20T16:55:59.5977300Z   Doushujun/Core/Theme.swift
+2026-10-20T16:55:59.5977640Z   Doushujun/Views/AuthView.swift
+2026-10-20T16:55:59.5978140Z   Doushujun/Views/FeedbackView.swift
+2026-10-20T16:55:59.5978750Z   Doushujun/Views/InviteView.swift
+2026-10-20T16:55:59.5980300Z   Doushujun/Views/MaterialView.swift
+2026-10-20T16:55:59.5981200Z   Doushujun/Views/MineView.swift
+2026-10-20T16:55:59.5982120Z   Doushujun/Views/MonitorChartView.swift
+2026-10-20T16:55:59.5983260Z   Doushujun/Views/MonitorView.swift
+2026-10-20T16:55:59.5984380Z   Doushujun/Views/VipView.swift
+2026-10-20T16:55:59.5985410Z   Doushujun/Views/WeightHistoryView.swift
+2026-10-20T16:55:59.5987260Z   Doushujun/Views/WeightView.swift
+2026-10-20T16:55:59.5988140Z   Doushujun/Views/WorkHistoryView.swift
+2026-10-20T16:55:59.5989040Z   Doushujun/Views/WorkView.swift
+2026-10-20T16:55:59.5989820Z   Doushujun/Info.plist
+2026-10-20T16:55:59.5990680Z UI test files: ['DoushujunUITests/DoushujunUITests.swift']
+2026-10-20T16:55:59.5994170Z Bundle resources: ['Resources/dengji_1.png', 'Resources/dengji_2.png', 'Resources/dengji_3.png', 'Resources/dengji_4.png', 'Resources/dengji_5.png', 'Resources/dengji_6.png', 'Resources/dengji_7.png', 'Resources/dengji_8.png', 'Resources/dengji_9.png', 'Resources/geetest.html', 'Resources/rating_a.png', 'Resources/rating_b.png', 'Resources/rating_c.png', 'Resources/rating_d.png']
+2026-10-20T16:55:59.5995810Z Asset catalogs: ['Doushujun/Assets.xcassets']
+2026-10-20T16:55:59.5996080Z 
+2026-10-20T16:55:59.5996450Z Generated: /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun.xcodeproj/project.pbxproj
+2026-10-20T16:55:59.5997310Z Total Swift files: 22
+2026-10-20T16:55:59.5997620Z Total plist files: 1
+2026-10-20T16:55:59.5998230Z Generated: /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun.xcodeproj/xcshareddata/xcschemes/Doushujun.xcscheme
+2026-10-20T16:55:59.6064780Z ##[group]Run run_list() {
+2026-10-20T16:55:59.6065270Z [36;1mrun_list() {[0m
+2026-10-20T16:55:59.6065640Z [36;1m  # 用法: run_list <label> [ENV=1 ...]  —— 先清理再生成再 list[0m
+2026-10-20T16:55:59.6066040Z [36;1m  LABEL="$1"; shift[0m
+2026-10-20T16:55:59.6066430Z [36;1m  rm -rf Doushujun.xcodeproj[0m
+2026-10-20T16:55:59.6066840Z [36;1m  env "$@" python3 generate_project.py > /dev/null || exit 1[0m
+2026-10-20T16:55:59.6067310Z [36;1m  echo ""[0m
+2026-10-20T16:55:59.6067570Z [36;1m  echo "############ [$LABEL] ($*) ############"[0m
+2026-10-20T16:55:59.6068620Z [36;1m  xcodebuild -list -project Doushujun.xcodeproj > list_out.txt 2>&1[0m
+2026-10-20T16:55:59.6069040Z [36;1m  RC=$?[0m
+2026-10-20T16:55:59.6069320Z [36;1m  if [ $RC -eq 0 ]; then[0m
+2026-10-20T16:55:59.6069650Z [36;1m    echo "[$LABEL] xcodebuild -list OK"[0m
+2026-10-20T16:55:59.6070080Z [36;1m    tail -12 list_out.txt[0m
+2026-10-20T16:55:59.6070980Z [36;1m    return 0[0m
+2026-10-20T16:55:59.6071420Z [36;1m  fi[0m
+2026-10-20T16:55:59.6071790Z [36;1m  echo "[$LABEL] xcodebuild -list FAILED (exit $RC)"[0m
+2026-10-20T16:55:59.6072140Z [36;1m  tail -8 list_out.txt || true[0m
+2026-10-20T16:55:59.6072470Z [36;1m  return 1[0m
+2026-10-20T16:55:59.6072720Z [36;1m}[0m
+2026-10-20T16:55:59.6072970Z [36;1m[0m
+2026-10-20T16:55:59.6073170Z [36;1mBISECT=0[0m
+2026-10-20T16:55:59.6073460Z [36;1mrun_list full || BISECT=1[0m
+2026-10-20T16:55:59.6073750Z [36;1mrun_list no-scheme DSJ_NO_SCHEME=1 || BISECT=2[0m
+2026-10-20T16:55:59.6074150Z [36;1mrun_list no-uitest DSJ_NO_UITEST=1 || BISECT=3[0m
+2026-10-20T16:55:59.6074570Z [36;1m[0m
+2026-10-20T16:55:59.6075330Z [36;1mif [ "$BISECT" != "0" ]; then[0m
+2026-10-20T16:55:59.6075710Z [36;1m  echo ""[0m
+2026-10-20T16:55:59.6076120Z [36;1m  echo ">>> BISECT RESULT: failed mode = $BISECT (1=full, 2=no-scheme, 3=no-uitest)"[0m
+2026-10-20T16:55:59.6076580Z [36;1m  echo ""[0m
+2026-10-20T16:55:59.6076890Z [36;1m  echo "=== lldb backtrace on full mode ==="[0m
+2026-10-20T16:55:59.6077220Z [36;1m  rm -rf Doushujun.xcodeproj[0m
+2026-10-20T16:55:59.6077570Z [36;1m  python3 generate_project.py > /dev/null[0m
+2026-10-20T16:55:59.6078350Z [36;1m  lldb -b -o run -o 'thread backtrace' -o 'quit' -- xcodebuild -list -project Doushujun.xcodeproj 2>&1 | tail -60[0m
+2026-10-20T16:55:59.6078950Z [36;1m  echo ""[0m
+2026-10-20T16:55:59.6079320Z [36;1m  echo "=== crash reports (after 15s wait) ==="[0m
+2026-10-20T16:55:59.6080040Z [36;1m  sleep 15[0m
+2026-10-20T16:55:59.6080540Z [36;1m  ls -t ~/Library/Logs/DiagnosticReports/ 2>/dev/null | head -8 || true[0m
+2026-10-20T16:55:59.6081220Z [36;1m  CRASH=$(ls -t ~/Library/Logs/DiagnosticReports/xcodebuild*.ips 2>/dev/null | head -1)[0m
+2026-10-20T16:55:59.6081800Z [36;1m  if [ -n "$CRASH" ]; then[0m
+2026-10-20T16:55:59.6082130Z [36;1m    echo "=== $CRASH ==="[0m
+2026-10-20T16:55:59.6082540Z [36;1m    head -c 6000 "$CRASH" || true[0m
+2026-10-20T16:55:59.6082930Z [36;1m  fi[0m
+2026-10-20T16:55:59.6083350Z [36;1m  exit 1[0m
+2026-10-20T16:55:59.6083630Z [36;1mfi[0m
+2026-10-20T16:55:59.6084030Z [36;1mecho ">>> ALL 3 MODES OK - project file healthy"[0m
+2026-10-20T16:55:59.6147250Z shell: /bin/bash -e {0}
+2026-10-20T16:55:59.6147660Z ##[endgroup]
+2026-10-20T16:55:59.6883720Z 
+2026-10-20T16:55:59.6884230Z ############ [full] () ############
+2026-10-20T16:56:08.6508030Z [full] xcodebuild -list OK
+2026-10-20T16:56:08.6649360Z         Doushujun
+2026-10-20T16:56:08.6650100Z         DoushujunUITests
+2026-10-20T16:56:08.6650770Z 
+2026-10-20T16:56:08.6654530Z     Build Configurations:
+2026-10-20T16:56:08.6667090Z         Debug
+2026-10-20T16:56:08.6668300Z         Release
+2026-10-20T16:56:08.6672320Z 
+2026-10-20T16:56:08.6672760Z     If no build configuration is specified and -scheme is not passed then "Release" is used.
+2026-10-20T16:56:08.6673190Z 
+2026-10-20T16:56:08.6673410Z     Schemes:
+2026-10-20T16:56:08.6673750Z         Doushujun
+2026-10-20T16:56:08.6674180Z 
+2026-10-20T16:56:08.7344010Z 
+2026-10-20T16:56:08.7345040Z ############ [no-scheme] (DSJ_NO_SCHEME=1) ############
+2026-10-20T16:56:10.0901440Z [no-scheme] xcodebuild -list OK
+2026-10-20T16:56:10.0922050Z         Doushujun
+2026-10-20T16:56:10.0924120Z         DoushujunUITests
+2026-10-20T16:56:10.0924730Z 
+2026-10-20T16:56:10.0926420Z     Build Configurations:
+2026-10-20T16:56:10.0926920Z         Debug
+2026-10-20T16:56:10.0927210Z         Release
+2026-10-20T16:56:10.0927310Z 
+2026-10-20T16:56:10.0927600Z     If no build configuration is specified and -scheme is not passed then "Release" is used.
+2026-10-20T16:56:10.0928040Z 
+2026-10-20T16:56:10.0928180Z     Schemes:
+2026-10-20T16:56:10.0928370Z         Doushujun
+2026-10-20T16:56:10.0928550Z 
+2026-10-20T16:56:10.1377650Z 
+2026-10-20T16:56:10.1381220Z ############ [no-uitest] (DSJ_NO_UITEST=1) ############
+2026-10-20T16:56:11.1799410Z [no-uitest] xcodebuild -list OK
+2026-10-20T16:56:11.1826410Z     Targets:
+2026-10-20T16:56:11.1835150Z         Doushujun
+2026-10-20T16:56:11.1835470Z 
+2026-10-20T16:56:11.1835800Z     Build Configurations:
+2026-10-20T16:56:11.1839320Z         Debug
+2026-10-20T16:56:11.1839850Z         Release
+2026-10-20T16:56:11.1841340Z 
+2026-10-20T16:56:11.1841840Z     If no build configuration is specified and -scheme is not passed then "Release" is used.
+2026-10-20T16:56:11.1857940Z 
+2026-10-20T16:56:11.1858270Z     Schemes:
+2026-10-20T16:56:11.1858810Z         Doushujun
+2026-10-20T16:56:11.1859160Z 
+2026-10-20T16:56:11.1860910Z >>> ALL 3 MODES OK - project file healthy
+2026-10-20T16:56:11.1925320Z ##[group]Run echo "=== Cleaning ==="
+2026-10-20T16:56:11.1925710Z [36;1mecho "=== Cleaning ==="[0m
+2026-10-20T16:56:11.1925900Z [36;1mrm -rf build[0m
+2026-10-20T16:56:11.1926130Z [36;1mmkdir -p build[0m
+2026-10-20T16:56:11.1926420Z [36;1m[0m
+2026-10-20T16:56:11.1926620Z [36;1mecho "=== Building ==="[0m
+2026-10-20T16:56:11.1927010Z [36;1mset -o pipefail[0m
+2026-10-20T16:56:11.1927240Z [36;1m[0m
+2026-10-20T16:56:11.1927590Z [36;1mxcodebuild build \[0m
+2026-10-20T16:56:11.1927930Z [36;1m  -project Doushujun.xcodeproj \[0m
+2026-10-20T16:56:11.1928230Z [36;1m  -scheme Doushujun \[0m
+2026-10-20T16:56:11.1928610Z [36;1m  -configuration Release \[0m
+2026-10-20T16:56:11.1928920Z [36;1m  -destination 'generic/platform=iOS' \[0m
+2026-10-20T16:56:11.1929320Z [36;1m  -derivedDataPath build \[0m
+2026-10-20T16:56:11.1929580Z [36;1m  CODE_SIGNING_ALLOWED=NO \[0m
+2026-10-20T16:56:11.1930030Z [36;1m  CODE_SIGNING_REQUIRED=NO \[0m
+2026-10-20T16:56:11.1930470Z [36;1m  2>&1 | tee build.log[0m
+2026-10-20T16:56:11.1930710Z [36;1m[0m
+2026-10-20T16:56:11.1930960Z [36;1mEXIT_CODE=${PIPESTATUS[0]}[0m
+2026-10-20T16:56:11.1931220Z [36;1mecho "Build exit code: $EXIT_CODE"[0m
+2026-10-20T16:56:11.1931560Z [36;1mecho "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"[0m
+2026-10-20T16:56:11.1931880Z [36;1m[0m
+2026-10-20T16:56:11.1932210Z [36;1mgrep -q "BUILD SUCCEEDED" build.log || {[0m
+2026-10-20T16:56:11.1932550Z [36;1m  echo "ERROR: BUILD SUCCEEDED not found in log"[0m
+2026-10-20T16:56:11.1932940Z [36;1m  exit 1[0m
+2026-10-20T16:56:11.1933210Z [36;1m}[0m
+2026-10-20T16:56:11.2178700Z shell: /bin/bash -e {0}
+2026-10-20T16:56:11.2179150Z ##[endgroup]
+2026-10-20T16:56:11.2701130Z === Cleaning ===
+2026-10-20T16:56:11.2742130Z === Building ===
+2026-10-20T16:56:11.8144450Z Command line invocation:
+2026-10-20T16:56:11.8193190Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/xcodebuild build -project Doushujun.xcodeproj -scheme Doushujun -configuration Release -destination generic/platform=iOS -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
+2026-10-20T16:56:11.8207020Z 
+2026-10-20T16:56:11.8207580Z User defaults from command line:
+2026-10-20T16:56:11.8210700Z     IDEDerivedDataPathOverride = /Users/runner/work/doushujun-ios/doushujun-ios/build
+2026-10-20T16:56:11.8211500Z     IDEPackageSupportUseBuiltinSCM = YES
+2026-10-20T16:56:11.8299720Z 
+2026-10-20T16:56:11.8319950Z Build settings from command line:
+2026-10-20T16:56:11.8320540Z     CODE_SIGNING_ALLOWED = NO
+2026-10-20T16:56:11.8320840Z     CODE_SIGNING_REQUIRED = NO
+2026-10-20T16:56:11.8321140Z 
+2026-10-20T16:56:12.1074770Z Prepare packages
+2026-10-20T16:56:12.1074910Z 
+2026-10-20T16:56:12.4504180Z ComputeTargetDependencyGraph
+2026-10-20T16:56:12.4781960Z note: Building targets in dependency order
+2026-10-20T16:56:12.4782650Z note: Target dependency graph (1 target)
+2026-10-20T16:56:12.4783390Z     Target 'Doushujun' in project 'Doushujun' (no dependencies)
+2026-10-20T16:56:12.4795190Z 
+2026-10-20T16:56:12.4796810Z GatherProvisioningInputs
+2026-10-20T16:56:12.4798890Z 
+2026-10-20T16:56:12.4799160Z CreateBuildDescription
+2026-10-20T16:56:12.4984740Z 
+2026-10-20T16:56:12.4986190Z ExecuteExternalTool /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Assets.xcassets
+2026-10-20T16:56:14.7135170Z 
+2026-10-20T16:56:14.7214340Z ExecuteExternalTool /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk -x c -c /dev/null
+2026-10-20T16:56:14.7305750Z 
+2026-10-20T16:56:14.7345490Z ExecuteExternalTool /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+2026-10-20T16:56:14.7350570Z 
+2026-10-20T16:56:14.7363220Z ExecuteExternalTool /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -v
+2026-10-20T16:56:15.4848180Z 
+2026-10-20T16:56:15.4950560Z ExecuteExternalTool /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+2026-10-20T16:56:15.7300730Z 
+2026-10-20T16:56:15.7563230Z Build description signature: 5910e5d221b53f2457d76f7e21e97b16
+2026-10-20T16:56:15.7621780Z Build description path: /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/XCBuildData/5910e5d221b53f2457d76f7e21e97b16.xcbuilddata
+2026-10-20T16:56:15.7723050Z CreateBuildDirectory /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products
+2026-10-20T16:56:15.7827340Z     cd /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun.xcodeproj
+2026-10-20T16:56:15.7906100Z     builtin-create-build-directory /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products
+2026-10-20T16:56:15.7979650Z 
+2026-10-20T16:56:15.8010600Z ClangStatCache /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk /Users/runner/work/doushujun-ios/doushujun-ios/build/SDKStatCaches.noindex/iphoneos17.5-21F77-f0fa7969d082b13145125136a829df3a.sdkstatcache
+2026-10-20T16:56:15.8034500Z     cd /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun.xcodeproj
+2026-10-20T16:56:15.8109760Z     /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk -o /Users/runner/work/doushujun-ios/doushujun-ios/build/SDKStatCaches.noindex/iphoneos17.5-21F77-f0fa7969d082b13145125136a829df3a.sdkstatcache
+2026-10-20T16:56:17.9413250Z 
+2026-10-20T16:56:17.9423960Z CreateBuildDirectory /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex
+2026-10-20T16:56:17.9527470Z     cd /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun.xcodeproj
+2026-10-20T16:56:17.9632070Z     builtin-create-build-directory /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex
+2026-10-20T16:56:17.9667170Z 
+2026-10-20T16:56:17.9668830Z CreateBuildDirectory /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos
+2026-10-20T16:56:17.9671020Z     cd /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun.xcodeproj
+2026-10-20T16:56:17.9673400Z     builtin-create-build-directory /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos
+2026-10-20T16:56:17.9674070Z 
+2026-10-20T16:56:17.9675320Z CreateBuildDirectory /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/EagerLinkingTBDs/Release-iphoneos
+2026-10-20T16:56:17.9676340Z     cd /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun.xcodeproj
+2026-10-20T16:56:17.9677090Z     builtin-create-build-directory /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/EagerLinkingTBDs/Release-iphoneos
+2026-10-20T16:56:17.9679290Z 
+2026-10-20T16:56:17.9679790Z MkDir /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9681700Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9682340Z     /bin/mkdir -p /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app
+2026-10-20T16:56:17.9688920Z 
+2026-10-20T16:56:17.9690180Z WriteAuxiliaryFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/all-product-headers.yaml (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9691160Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9692480Z     write-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/all-product-headers.yaml
+2026-10-20T16:56:17.9695310Z 
+2026-10-20T16:56:17.9696970Z WriteAuxiliaryFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun.hmap (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9704590Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9706810Z     write-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun.hmap
+2026-10-20T16:56:17.9707420Z 
+2026-10-20T16:56:17.9708420Z WriteAuxiliaryFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-project-headers.hmap (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9709850Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9710950Z     write-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-project-headers.hmap
+2026-10-20T16:56:17.9711630Z 
+2026-10-20T16:56:17.9714700Z WriteAuxiliaryFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-own-target-headers.hmap (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9716380Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9717640Z     write-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-own-target-headers.hmap
+2026-10-20T16:56:17.9718300Z 
+2026-10-20T16:56:17.9719450Z WriteAuxiliaryFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-generated-files.hmap (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9720680Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9722990Z     write-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-generated-files.hmap
+2026-10-20T16:56:17.9724760Z 
+2026-10-20T16:56:17.9727220Z WriteAuxiliaryFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-all-target-headers.hmap (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9758970Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9762620Z     write-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-all-target-headers.hmap
+2026-10-20T16:56:17.9763410Z 
+2026-10-20T16:56:17.9764750Z WriteAuxiliaryFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-all-non-framework-target-headers.hmap (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9768970Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9770320Z     write-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-all-non-framework-target-headers.hmap
+2026-10-20T16:56:17.9771630Z 
+2026-10-20T16:56:17.9773280Z WriteAuxiliaryFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun_const_extract_protocols.json (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9775570Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9779450Z     write-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun_const_extract_protocols.json
+2026-10-20T16:56:17.9801420Z 
+2026-10-20T16:56:17.9804090Z WriteAuxiliaryFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.LinkFileList (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9805230Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9806180Z     write-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.LinkFileList
+2026-10-20T16:56:17.9806880Z 
+2026-10-20T16:56:17.9807700Z WriteAuxiliaryFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.SwiftFileList (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9808660Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9809580Z     write-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.SwiftFileList
+2026-10-20T16:56:17.9810310Z 
+2026-10-20T16:56:17.9811150Z WriteAuxiliaryFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun-OutputFileMap.json (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9817980Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9819410Z     write-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun-OutputFileMap.json
+2026-10-20T16:56:17.9820110Z 
+2026-10-20T16:56:17.9822090Z GenerateAssetSymbols /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Assets.xcassets (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9822950Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9838540Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/actool --output-format human-readable-text --notices --warnings --export-dependency-info /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/assetcatalog_dependencies --output-partial-info-plist /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/assetcatalog_generated_info.plist --app-icon AppIcon --compress-pngs --enable-on-demand-resources YES --development-region en --target-device iphone --minimum-deployment-target 16.0 --platform iphoneos --compile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Assets.xcassets --bundle-identifier com.doushujun.member --generate-swift-asset-symbol-extensions NO --generate-swift-asset-symbols /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources/GeneratedAssetSymbols.swift --generate-objc-asset-symbols /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources/GeneratedAssetSymbols.h --generate-asset-symbol-index /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources/GeneratedAssetSymbols-Index.plist
+2026-10-20T16:56:17.9857340Z /* com.apple.actool.compilation-results */
+2026-10-20T16:56:17.9862780Z /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources/GeneratedAssetSymbols-Index.plist
+2026-10-20T16:56:17.9873980Z /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources/GeneratedAssetSymbols.h
+2026-10-20T16:56:17.9886330Z /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources/GeneratedAssetSymbols.swift
+2026-10-20T16:56:17.9893590Z 
+2026-10-20T16:56:17.9893690Z 
+2026-10-20T16:56:17.9894630Z CpResource /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/geetest.html /Users/runner/work/doushujun-ios/doushujun-ios/Resources/geetest.html (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9896650Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9902250Z     builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Users/runner/work/doushujun-ios/doushujun-ios/Resources/geetest.html /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app
+2026-10-20T16:56:17.9911930Z 
+2026-10-20T16:56:17.9913830Z CopyPNGFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/rating_d.png /Users/runner/work/doushujun-ios/doushujun-ios/Resources/rating_d.png (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9918550Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9922630Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/doushujun-ios/doushujun-ios/Resources/rating_d.png /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/rating_d.png
+2026-10-20T16:56:17.9924400Z 
+2026-10-20T16:56:17.9925940Z CopyPNGFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/rating_c.png /Users/runner/work/doushujun-ios/doushujun-ios/Resources/rating_c.png (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9929260Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9931190Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/doushujun-ios/doushujun-ios/Resources/rating_c.png /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/rating_c.png
+2026-10-20T16:56:17.9932350Z 
+2026-10-20T16:56:17.9933660Z CopyPNGFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/rating_b.png /Users/runner/work/doushujun-ios/doushujun-ios/Resources/rating_b.png (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9934960Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9939070Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/doushujun-ios/doushujun-ios/Resources/rating_b.png /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/rating_b.png
+2026-10-20T16:56:17.9941680Z 
+2026-10-20T16:56:17.9944120Z CopyPNGFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/rating_a.png /Users/runner/work/doushujun-ios/doushujun-ios/Resources/rating_a.png (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9947050Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9949310Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/doushujun-ios/doushujun-ios/Resources/rating_a.png /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/rating_a.png
+2026-10-20T16:56:17.9953690Z 
+2026-10-20T16:56:17.9956160Z CopyPNGFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_9.png /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_9.png (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9959150Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:17.9960610Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_9.png /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_9.png
+2026-10-20T16:56:17.9962410Z 
+2026-10-20T16:56:17.9965920Z CopyPNGFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_8.png /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_8.png (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:17.9967710Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:18.0101490Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_8.png /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_8.png
+2026-10-20T16:56:18.0103290Z 
+2026-10-20T16:56:18.0107250Z CopyPNGFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_7.png /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_7.png (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:18.0109840Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:18.0112910Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_7.png /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_7.png
+2026-10-20T16:56:18.0113840Z 
+2026-10-20T16:56:18.0115180Z CopyPNGFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_6.png /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_6.png (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:18.0117840Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:18.0120450Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_6.png /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_6.png
+2026-10-20T16:56:18.0122990Z 
+2026-10-20T16:56:18.0125220Z CopyPNGFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_5.png /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_5.png (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:18.0127730Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:18.0130340Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_5.png /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_5.png
+2026-10-20T16:56:18.0131760Z 
+2026-10-20T16:56:18.0132650Z CopyPNGFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_4.png /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_4.png (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:18.0136220Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:18.0140710Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_4.png /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_4.png
+2026-10-20T16:56:18.0143840Z 
+2026-10-20T16:56:18.0146790Z CopyPNGFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_3.png /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_3.png (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:18.0149460Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:18.0152040Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_3.png /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_3.png
+2026-10-20T16:56:18.0154460Z 
+2026-10-20T16:56:18.0157740Z CopyPNGFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_2.png /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_2.png (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:18.0159450Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:18.0161080Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_2.png /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_2.png
+2026-10-20T16:56:18.0161970Z 
+2026-10-20T16:56:18.0162900Z CopyPNGFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_1.png /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_1.png (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:18.0164600Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:18.0166610Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/doushujun-ios/doushujun-ios/Resources/dengji_1.png /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/dengji_1.png
+2026-10-20T16:56:18.0168430Z 
+2026-10-20T16:56:18.0170080Z CompileAssetCatalog /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Assets.xcassets (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:18.0171080Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:18.0174920Z     /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/actool --output-format human-readable-text --notices --warnings --export-dependency-info /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/assetcatalog_dependencies --output-partial-info-plist /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/assetcatalog_generated_info.plist --app-icon AppIcon --compress-pngs --enable-on-demand-resources YES --development-region en --target-device iphone --minimum-deployment-target 16.0 --platform iphoneos --compile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Assets.xcassets
+2026-10-20T16:56:19.3319850Z /* com.apple.actool.compilation-results */
+2026-10-20T16:56:19.3340640Z /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/assetcatalog_generated_info.plist
+2026-10-20T16:56:19.3342160Z /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/AppIcon60x60@2x.png
+2026-10-20T16:56:19.3344980Z /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/AppIcon76x76@2x~ipad.png
+2026-10-20T16:56:19.3346610Z /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/Assets.car
+2026-10-20T16:56:19.3356310Z 
+2026-10-20T16:56:19.3356630Z 
+2026-10-20T16:56:19.3357810Z SwiftDriver Doushujun normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:19.3364730Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:19.3380030Z     builtin-SwiftDriver -- /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Doushujun -O -whole-module-optimization -enforce-exclusivity\=checked @/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.SwiftFileList -sdk /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk -target arm64-apple-ios16.0 -enable-bare-slash-regex -g -module-cache-path /Users/runner/work/doushujun-ios/doushujun-ios/build/ModuleCache.noindex -Xfrontend -serialize-debugging-options -swift-version 5 -I /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos -F /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos -c -num-threads 3 -Xcc -ivfsstatcache -Xcc /Users/runner/work/doushujun-ios/doushujun-ios/build/SDKStatCaches.noindex/iphoneos17.5-21F77-f0fa7969d082b13145125136a829df3a.sdkstatcache -output-file-map /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/doushujun-ios/doushujun-ios/build/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-generated-files.hmap -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-own-target-headers.hmap -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-project-headers.hmap -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/include -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources -emit-objc-header -emit-objc-header-path /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun-Swift.h -working-directory /Users/runner/work/doushujun-ios/doushujun-ios -no-emit-module-separately-wmo
+2026-10-20T16:56:19.3404890Z 
+2026-10-20T16:56:19.3405430Z SwiftDriver\ Compilation Doushujun normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:19.3406670Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:19.3423780Z     builtin-Swift-Compilation -- /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Doushujun -O -whole-module-optimization -enforce-exclusivity\=checked @/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.SwiftFileList -sdk /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk -target arm64-apple-ios16.0 -enable-bare-slash-regex -g -module-cache-path /Users/runner/work/doushujun-ios/doushujun-ios/build/ModuleCache.noindex -Xfrontend -serialize-debugging-options -swift-version 5 -I /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos -F /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos -c -num-threads 3 -Xcc -ivfsstatcache -Xcc /Users/runner/work/doushujun-ios/doushujun-ios/build/SDKStatCaches.noindex/iphoneos17.5-21F77-f0fa7969d082b13145125136a829df3a.sdkstatcache -output-file-map /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/doushujun-ios/doushujun-ios/build/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-generated-files.hmap -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-own-target-headers.hmap -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-project-headers.hmap -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/include -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources -emit-objc-header -emit-objc-header-path /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun-Swift.h -working-directory /Users/runner/work/doushujun-ios/doushujun-ios -no-emit-module-separately-wmo
+2026-10-20T16:56:19.3437590Z 
+2026-10-20T16:56:19.3448010Z SwiftCompile normal arm64 Compiling\ AppState.swift,\ AppUpdater.swift,\ Charts.swift,\ Components.swift,\ Crypto.swift,\ LinkParser.swift,\ Network.swift,\ SessionStore.swift,\ Theme.swift,\ DoushujunApp.swift,\ AuthView.swift,\ FeedbackView.swift,\ InviteView.swift,\ MaterialView.swift,\ MineView.swift,\ MonitorChartView.swift,\ MonitorView.swift,\ VipView.swift,\ WeightHistoryView.swift,\ WeightView.swift,\ WorkHistoryView.swift,\ WorkView.swift,\ GeneratedAssetSymbols.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/AppState.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/AppUpdater.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/Charts.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/Components.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/Crypto.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/LinkParser.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/Network.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/SessionStore.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/Theme.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/DoushujunApp.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/AuthView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/FeedbackView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/InviteView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/MaterialView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/MineView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/MonitorChartView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/MonitorView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/VipView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/WeightHistoryView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/WeightView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/WorkHistoryView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/WorkView.swift /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:19.3456780Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:19.3528300Z     builtin-swiftTaskExecution -- /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/AppState.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/AppUpdater.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/Charts.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/Components.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/Crypto.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/LinkParser.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/Network.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/SessionStore.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/Theme.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/DoushujunApp.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/AuthView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/FeedbackView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/InviteView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/MaterialView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/MineView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/MonitorChartView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/MonitorView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/VipView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/WeightHistoryView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/WeightView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/WorkHistoryView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/WorkView.swift /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources/GeneratedAssetSymbols.swift -supplementary-output-file-map /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/supplementaryOutputs-1 -target arm64-apple-ios16.0 -Xllvm -aarch64-use-tbi -enable-objc-interop -stack-check -sdk /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk -I /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos -F /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos -no-color-diagnostics -g -module-cache-path /Users/runner/work/doushujun-ios/doushujun-ios/build/ModuleCache.noindex -swift-version 5 -enforce-exclusivity\=checked -O -serialize-debugging-options -const-gather-protocols-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun_const_extract_protocols.json -enable-bare-slash-regex -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/runner/work/doushujun-ios/doushujun-ios/build/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/runner/work/doushujun-ios/doushujun-ios -resource-dir /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift -Xcc -ivfsstatcache -Xcc /Users/runner/work/doushujun-ios/doushujun-ios/build/SDKStatCaches.noindex/iphoneos17.5-21F77-f0fa7969d082b13145125136a829df3a.sdkstatcache -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-generated-files.hmap -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-own-target-headers.hmap -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-project-headers.hmap -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/include -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources -module-name Doushujun -frontend-parseable-output -disable-clang-spi -target-sdk-version 17.5 -target-sdk-name iphoneos17.5 -external-plugin-path /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk/usr/lib/swift/host/plugins\#/Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk/usr/bin/swift-plugin-server -external-plugin-path /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk/usr/local/lib/swift/host/plugins\#/Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk/usr/bin/swift-plugin-server -external-plugin-path /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins\#/Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server -external-plugin-path /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/local/lib/swift/host/plugins\#/Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server -plugin-path /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins -plugin-path /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/local/lib/swift/host/plugins -enable-default-cmo -num-threads 3 -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/AppState.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/AppUpdater.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Charts.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Components.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Crypto.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/LinkParser.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Network.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/SessionStore.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Theme.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/DoushujunApp.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/AuthView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/FeedbackView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/InviteView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/MaterialView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/MineView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/MonitorChartView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/MonitorView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/VipView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/WeightHistoryView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/WeightView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/WorkHistoryView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/WorkView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/GeneratedAssetSymbols.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/AppState.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/AppUpdater.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Charts.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Components.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Crypto.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/LinkParser.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Network.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/SessionStore.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Theme.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/DoushujunApp.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/AuthView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/FeedbackView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/InviteView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/MaterialView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/MineView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/MonitorChartView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/MonitorView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/VipView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/WeightHistoryView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/WeightView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/WorkHistoryView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/WorkView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/GeneratedAssetSymbols.o
+2026-10-20T16:56:19.3620660Z CompileSwift normal arm64 (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:19.3621160Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:19.3698010Z     /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -c /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/AppState.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/AppUpdater.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/Charts.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/Components.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/Crypto.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/LinkParser.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/Network.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/SessionStore.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/Theme.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/DoushujunApp.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/AuthView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/FeedbackView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/InviteView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/MaterialView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/MineView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/MonitorChartView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/MonitorView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/VipView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/WeightHistoryView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/WeightView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/WorkHistoryView.swift /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/WorkView.swift /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources/GeneratedAssetSymbols.swift -supplementary-output-file-map /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/supplementaryOutputs-1 -target arm64-apple-ios16.0 -Xllvm -aarch64-use-tbi -enable-objc-interop -stack-check -sdk /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk -I /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos -F /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos -no-color-diagnostics -g -module-cache-path /Users/runner/work/doushujun-ios/doushujun-ios/build/ModuleCache.noindex -swift-version 5 -enforce-exclusivity\=checked -O -serialize-debugging-options -const-gather-protocols-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun_const_extract_protocols.json -enable-bare-slash-regex -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/runner/work/doushujun-ios/doushujun-ios/build/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/runner/work/doushujun-ios/doushujun-ios -resource-dir /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift -Xcc -ivfsstatcache -Xcc /Users/runner/work/doushujun-ios/doushujun-ios/build/SDKStatCaches.noindex/iphoneos17.5-21F77-f0fa7969d082b13145125136a829df3a.sdkstatcache -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-generated-files.hmap -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-own-target-headers.hmap -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-project-headers.hmap -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/include -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources -module-name Doushujun -frontend-parseable-output -disable-clang-spi -target-sdk-version 17.5 -target-sdk-name iphoneos17.5 -external-plugin-path /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk/usr/lib/swift/host/plugins\#/Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk/usr/bin/swift-plugin-server -external-plugin-path /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk/usr/local/lib/swift/host/plugins\#/Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk/usr/bin/swift-plugin-server -external-plugin-path /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins\#/Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server -external-plugin-path /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/local/lib/swift/host/plugins\#/Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server -plugin-path /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins -plugin-path /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/local/lib/swift/host/plugins -enable-default-cmo -num-threads 3 -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/AppState.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/AppUpdater.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Charts.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Components.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Crypto.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/LinkParser.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Network.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/SessionStore.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Theme.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/DoushujunApp.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/AuthView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/FeedbackView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/InviteView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/MaterialView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/MineView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/MonitorChartView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/MonitorView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/VipView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/WeightHistoryView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/WeightView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/WorkHistoryView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/WorkView.o -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/GeneratedAssetSymbols.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/AppState.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/AppUpdater.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Charts.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Components.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Crypto.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/LinkParser.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Network.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/SessionStore.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Theme.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/DoushujunApp.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/AuthView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/FeedbackView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/InviteView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/MaterialView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/MineView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/MonitorChartView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/MonitorView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/VipView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/WeightHistoryView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/WeightView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/WorkHistoryView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/WorkView.o -index-unit-output-path /Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/GeneratedAssetSymbols.o
+2026-10-20T16:56:47.3879340Z /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Core/Crypto.swift:23:13: warning: 'CC_MD5' was deprecated in iOS 13.0: This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).
+2026-10-20T16:56:47.3906920Z         _ = CC_MD5(bytes, CC_LONG(bytes.count), &buf)                    // 执行摘要
+2026-10-20T16:56:47.3923580Z /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Views/MaterialView.swift:188:50: warning: 'windows' was deprecated in iOS 15.0: Use UIWindowScene.windows on a relevant window scene instead
+2026-10-20T16:56:47.3925030Z                             UIApplication.shared.windows.first?.rootViewController?.present(vc, animated: true)
+2026-10-20T16:56:47.3925660Z                                                  ^
+2026-10-20T16:56:47.3926040Z 
+2026-10-20T16:56:47.3926850Z ProcessInfoPlistFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/Info.plist /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Info.plist (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:47.3928750Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:47.3931050Z     builtin-infoPlistUtility /Users/runner/work/doushujun-ios/doushujun-ios/Doushujun/Info.plist -producttype com.apple.product-type.application -genpkginfo /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/PkgInfo -expandbuildsettings -format binary -platform iphoneos -additionalcontentfile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/assetcatalog_generated_info.plist -requiredArchitecture arm64 -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/Info.plist
+2026-10-20T16:56:47.3933300Z 
+2026-10-20T16:56:47.3934970Z SwiftDriverJobDiscovery normal arm64 Compiling AppState.swift, AppUpdater.swift, Charts.swift, Components.swift, Crypto.swift, LinkParser.swift, Network.swift, SessionStore.swift, Theme.swift, DoushujunApp.swift, AuthView.swift, FeedbackView.swift, InviteView.swift, MaterialView.swift, MineView.swift, MonitorChartView.swift, MonitorView.swift, VipView.swift, WeightHistoryView.swift, WeightView.swift, WorkHistoryView.swift, WorkView.swift, GeneratedAssetSymbols.swift (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:47.3936750Z 
+2026-10-20T16:56:47.3937290Z SwiftDriver\ Compilation\ Requirements Doushujun normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:47.3938000Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:47.3950770Z     builtin-Swift-Compilation-Requirements -- /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Doushujun -O -whole-module-optimization -enforce-exclusivity\=checked @/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.SwiftFileList -sdk /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk -target arm64-apple-ios16.0 -enable-bare-slash-regex -g -module-cache-path /Users/runner/work/doushujun-ios/doushujun-ios/build/ModuleCache.noindex -Xfrontend -serialize-debugging-options -swift-version 5 -I /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos -F /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos -c -num-threads 3 -Xcc -ivfsstatcache -Xcc /Users/runner/work/doushujun-ios/doushujun-ios/build/SDKStatCaches.noindex/iphoneos17.5-21F77-f0fa7969d082b13145125136a829df3a.sdkstatcache -output-file-map /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/doushujun-ios/doushujun-ios/build/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-generated-files.hmap -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-own-target-headers.hmap -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Doushujun-project-headers.hmap -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/include -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources -emit-objc-header -emit-objc-header-path /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun-Swift.h -working-directory /Users/runner/work/doushujun-ios/doushujun-ios -no-emit-module-separately-wmo
+2026-10-20T16:56:47.3968530Z 
+2026-10-20T16:56:47.4156080Z SwiftMergeGeneratedHeaders /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources/Doushujun-Swift.h /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun-Swift.h (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:47.4160170Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:47.4163730Z     builtin-swiftHeaderTool -arch arm64 /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun-Swift.h -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/DerivedSources/Doushujun-Swift.h
+2026-10-20T16:56:47.4176470Z 
+2026-10-20T16:56:47.4186640Z Copy /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.swiftmodule/arm64-apple-ios.swiftmodule /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.swiftmodule (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:47.4192110Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:47.4194280Z     builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.swiftmodule /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.swiftmodule/arm64-apple-ios.swiftmodule
+2026-10-20T16:56:47.4196900Z 
+2026-10-20T16:56:47.4198620Z Copy /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.swiftmodule/arm64-apple-ios.swiftdoc /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.swiftdoc (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:47.4200290Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:47.4201810Z     builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.swiftdoc /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.swiftmodule/arm64-apple-ios.swiftdoc
+2026-10-20T16:56:47.4203360Z 
+2026-10-20T16:56:47.4204780Z Copy /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.swiftmodule/arm64-apple-ios.abi.json /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.abi.json (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:47.4206230Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:47.4207960Z     builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.abi.json /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.swiftmodule/arm64-apple-ios.abi.json
+2026-10-20T16:56:47.4209600Z 
+2026-10-20T16:56:47.4213390Z Copy /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.swiftmodule/Project/arm64-apple-ios.swiftsourceinfo /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.swiftsourceinfo (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:47.4235380Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:47.4237360Z     builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.swiftsourceinfo /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.swiftmodule/Project/arm64-apple-ios.swiftsourceinfo
+2026-10-20T16:56:47.4238910Z 
+2026-10-20T16:56:47.4240140Z Ld /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/Doushujun normal (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:47.4242740Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:47.4257800Z     /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios16.0 -isysroot /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk -Os -L/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/EagerLinkingTBDs/Release-iphoneos -L/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos -F/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/EagerLinkingTBDs/Release-iphoneos -F/Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos -filelist /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.LinkFileList -Xlinker -rpath -Xlinker @executable_path/Frameworks -dead_strip -Xlinker -object_path_lto -Xlinker /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun_lto.o -fobjc-link-runtime -L/Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.swiftmodule -Xlinker -dependency_info -Xlinker /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun_dependency_info.dat -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/Doushujun
+2026-10-20T16:56:47.9408020Z 
+2026-10-20T16:56:47.9560870Z GenerateDSYMFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app.dSYM /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/Doushujun (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:47.9579390Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:47.9583210Z     /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/dsymutil /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/Doushujun -o /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app.dSYM
+2026-10-20T16:56:48.5031730Z 
+2026-10-20T16:56:48.5033420Z WriteAuxiliaryFile /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.SwiftConstValuesFileList (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:48.5035100Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:48.5036250Z     write-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.SwiftConstValuesFileList
+2026-10-20T16:56:48.5037600Z 
+2026-10-20T16:56:48.5039250Z CopySwiftLibs /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:48.5043880Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:48.5048930Z     builtin-swiftStdLibTool --copy --verbose --scan-executable /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/Doushujun --scan-folder /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/Frameworks --scan-folder /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/PlugIns --scan-folder /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/SystemExtensions --scan-folder /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/Extensions --platform iphoneos --toolchain /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+2026-10-20T16:56:48.5053800Z Ignoring --strip-bitcode because --sign was not passed
+2026-10-20T16:56:48.5054140Z 
+2026-10-20T16:56:48.5054420Z ExtractAppIntentsMetadata (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:48.5055010Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:48.5061520Z     /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --output /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app --toolchain-dir /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name Doushujun --sdk-root /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk --xcode-version 15F31d --platform-family iOS --deployment-target 16.0 --target-triple arm64-apple-ios16.0 --binary-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/Doushujun --dependency-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun_dependency_info.dat --stringsdata-file /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.SwiftFileList --swift-const-vals-list /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/Objects-normal/arm64/Doushujun.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing
+2026-10-20T16:56:48.5067850Z note: Metadata extraction skipped. No AppIntents.framework dependency found. (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:48.5068380Z 
+2026-10-20T16:56:48.5068600Z AppIntentsSSUTraining (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:48.5069110Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:48.5071520Z     /Applications/Xcode_15.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsnltrainingprocessor --infoplist-path /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/Info.plist --temp-dir-path /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Intermediates.noindex/Doushujun.build/Release-iphoneos/Doushujun.build/ssu --bundle-id com.doushujun.member --product-path /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app --extracted-metadata-path /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app/Metadata.appintents --archive-ssu-assets
+2026-10-20T16:56:48.5074050Z 2026-10-20 16:56:48.251 appintentsnltrainingprocessor[2260:10271] Parsing options for appintentsnltrainingprocessor
+2026-10-20T16:56:48.5074730Z 2026-10-20 16:56:48.259 appintentsnltrainingprocessor[2260:10271] No AppShortcuts found - Skipping.
+2026-10-20T16:56:48.5075080Z 
+2026-10-20T16:56:48.5075840Z RegisterExecutionPolicyException /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:48.5078580Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:48.5079390Z     builtin-RegisterExecutionPolicyException /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app
+2026-10-20T16:56:48.5583070Z 
+2026-10-20T16:56:48.5592010Z Validate /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:48.5595210Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:48.5596080Z     builtin-validationUtility /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app
+2026-10-20T16:56:48.5596760Z 
+2026-10-20T16:56:48.5597340Z Touch /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app (in target 'Doushujun' from project 'Doushujun')
+2026-10-20T16:56:48.5599220Z     cd /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:48.5599800Z     /usr/bin/touch -c /Users/runner/work/doushujun-ios/doushujun-ios/build/Build/Products/Release-iphoneos/Doushujun.app
+2026-10-20T16:56:48.5647690Z 
+2026-10-20T16:56:48.5955690Z ** BUILD SUCCEEDED **
+2026-10-20T16:56:48.5956300Z 
+2026-10-20T16:56:48.6688900Z Build exit code: 0
+2026-10-20T16:56:48.7289320Z ##[group]Run echo "=== Packaging IPA ==="
+2026-10-20T16:56:48.7296380Z [36;1mecho "=== Packaging IPA ==="[0m
+2026-10-20T16:56:48.7296800Z [36;1mAPP=$(find build -name "Doushujun.app" -type d 2>/dev/null | head -1)[0m
+2026-10-20T16:56:48.7297640Z [36;1m[0m
+2026-10-20T16:56:48.7304830Z [36;1mecho "App path: '$APP'"[0m
+2026-10-20T16:56:48.7311290Z [36;1m[0m
+2026-10-20T16:56:48.7312400Z [36;1mif [ -z "$APP" ]; then[0m
+2026-10-20T16:56:48.7316330Z [36;1m  echo "ERROR: No Doushujun.app found!"[0m
+2026-10-20T16:56:48.7323990Z [36;1m  find build -name "*.app" -type d 2>/dev/null[0m
+2026-10-20T16:56:48.7324860Z [36;1m  exit 1[0m
+2026-10-20T16:56:48.7326490Z [36;1mfi[0m
+2026-10-20T16:56:48.7327510Z [36;1m[0m
+2026-10-20T16:56:48.7327910Z [36;1mecho "Found app: $APP"[0m
+2026-10-20T16:56:48.7328410Z [36;1mdu -sh "$APP"[0m
+2026-10-20T16:56:48.7329120Z [36;1m[0m
+2026-10-20T16:56:48.7329590Z [36;1mif [ ! -f "$APP/Doushujun" ]; then[0m
+2026-10-20T16:56:48.7330640Z [36;1m  echo "ERROR: Binary not found!"[0m
+2026-10-20T16:56:48.7331100Z [36;1m  ls -la "$APP"[0m
+2026-10-20T16:56:48.7331790Z [36;1m  exit 1[0m
+2026-10-20T16:56:48.7332650Z [36;1mfi[0m
+2026-10-20T16:56:48.7333620Z [36;1m[0m
+2026-10-20T16:56:48.7334200Z [36;1mrm -rf Payload && mkdir Payload[0m
+2026-10-20T16:56:48.7334840Z [36;1mcp -R "$APP" Payload/[0m
+2026-10-20T16:56:48.7335740Z [36;1m[0m
+2026-10-20T16:56:48.7338750Z [36;1mecho "=== Creating IPA ==="[0m
+2026-10-20T16:56:48.7340530Z [36;1mzip -qr Doushujun-unsigned.ipa Payload/[0m
+2026-10-20T16:56:48.7347180Z [36;1mrm -rf Payload[0m
+2026-10-20T16:56:48.7360040Z [36;1m[0m
+2026-10-20T16:56:48.7367000Z [36;1mif [ -f Doushujun-unsigned.ipa ]; then[0m
+2026-10-20T16:56:48.7368080Z [36;1m  echo "=== IPA created ==="[0m
+2026-10-20T16:56:48.7368470Z [36;1m  ls -lh Doushujun-unsigned.ipa[0m
+2026-10-20T16:56:48.7369180Z [36;1m  unzip -l Doushujun-unsigned.ipa | head -20[0m
+2026-10-20T16:56:48.7369680Z [36;1melse[0m
+2026-10-20T16:56:48.7373150Z [36;1m  echo "ERROR: IPA file not created!"[0m
+2026-10-20T16:56:48.7373750Z [36;1m  ls -la *.ipa 2>/dev/null || echo "No .ipa files"[0m
+2026-10-20T16:56:48.7374210Z [36;1m  exit 1[0m
+2026-10-20T16:56:48.7374600Z [36;1mfi[0m
+2026-10-20T16:56:48.7890900Z shell: /bin/bash -e {0}
+2026-10-20T16:56:48.7891240Z ##[endgroup]
+2026-10-20T16:56:49.0681120Z === Packaging IPA ===
+2026-10-20T16:56:49.0827780Z App path: 'build/Build/Products/Release-iphoneos/Doushujun.app'
+2026-10-20T16:56:49.0828510Z Found app: build/Build/Products/Release-iphoneos/Doushujun.app
+2026-10-20T16:56:49.0922380Z 4.0M	build/Build/Products/Release-iphoneos/Doushujun.app
+2026-10-20T16:56:49.1420340Z === Creating IPA ===
+2026-10-20T16:56:49.3448980Z === IPA created ===
+2026-10-20T16:56:49.3532800Z -rw-r--r--  1 runner  staff   1.0M Oct 20 16:56 Doushujun-unsigned.ipa
+2026-10-20T16:56:49.3799670Z Archive:  Doushujun-unsigned.ipa
+2026-10-20T16:56:49.3801840Z   Length      Date    Time    Name
+2026-10-20T16:56:49.3803450Z ---------  ---------- -----   ----
+2026-10-20T16:56:49.3804000Z         0  10-20-2026 16:56   Payload/
+2026-10-20T16:56:49.3805180Z         0  10-20-2026 16:56   Payload/Doushujun.app/
+2026-10-20T16:56:49.3805730Z      3811  10-20-2026 16:56   Payload/Doushujun.app/geetest.html
+2026-10-20T16:56:49.3806230Z      1397  10-20-2026 16:56   Payload/Doushujun.app/dengji_8.png
+2026-10-20T16:56:49.3806930Z      1338  10-20-2026 16:56   Payload/Doushujun.app/dengji_9.png
+2026-10-20T16:56:49.3807590Z      6340  10-20-2026 16:56   Payload/Doushujun.app/AppIcon60x60@2x.png
+2026-10-20T16:56:49.3808180Z   3999336  10-20-2026 16:56   Payload/Doushujun.app/Doushujun
+2026-10-20T16:56:49.3808890Z     28722  10-20-2026 16:56   Payload/Doushujun.app/rating_d.png
+2026-10-20T16:56:49.3809420Z     37960  10-20-2026 16:56   Payload/Doushujun.app/Assets.car
+2026-10-20T16:56:49.3810150Z      8092  10-20-2026 16:56   Payload/Doushujun.app/AppIcon76x76@2x~ipad.png
+2026-10-20T16:56:49.3811380Z     26517  10-20-2026 16:56   Payload/Doushujun.app/rating_a.png
+2026-10-20T16:56:49.3811970Z     26407  10-20-2026 16:56   Payload/Doushujun.app/rating_b.png
+2026-10-20T16:56:49.3868890Z     25653  10-20-2026 16:56   Payload/Doushujun.app/rating_c.png
+2026-10-20T16:56:49.3869560Z      1195  10-20-2026 16:56   Payload/Doushujun.app/dengji_7.png
+2026-10-20T16:56:49.3870140Z      1385  10-20-2026 16:56   Payload/Doushujun.app/dengji_6.png
+2026-10-20T16:56:49.3870570Z      1177  10-20-2026 16:56   Payload/Doushujun.app/dengji_4.png
+2026-10-20T16:56:49.3871070Z      1322  10-20-2026 16:56   Payload/Doushujun.app/dengji_5.png
+2026-10-20T16:56:49.4186060Z ##[group]Run actions/upload-artifact@v4
+2026-10-20T16:56:49.4186390Z with:
+2026-10-20T16:56:49.4186600Z   name: Doushujun-unsigned
+2026-10-20T16:56:49.4186870Z   path: Doushujun-unsigned.ipa
+2026-10-20T16:56:49.4187110Z   retention-days: 7
+2026-10-20T16:56:49.4187340Z   if-no-files-found: warn
+2026-10-20T16:56:49.4187540Z   compression-level: 6
+2026-10-20T16:56:49.4187770Z   overwrite: false
+2026-10-20T16:56:49.4187990Z   include-hidden-files: false
+2026-10-20T16:56:49.4188220Z ##[endgroup]
+2026-10-20T16:56:50.0412710Z (node:2280) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-20T16:56:50.0487290Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-20T16:56:50.0544840Z With the provided path, there will be 1 file uploaded
+2026-10-20T16:56:50.0558890Z Artifact name is valid!
+2026-10-20T16:56:50.0559340Z Root directory input is valid!
+2026-10-20T16:56:50.2802620Z Beginning upload of artifact content to blob storage
+2026-10-20T16:56:50.3507240Z (node:2280) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-20T16:56:50.4332340Z Uploaded bytes 1070961
+2026-10-20T16:56:50.4544590Z Finished uploading artifact content to blob storage!
+2026-10-20T16:56:50.4545230Z SHA256 digest of uploaded artifact zip is cb8c4537b199535491fe1c5c6c35ddada6e7733d9119a14aecd730f8a6119059
+2026-10-20T16:56:50.4546470Z Finalizing artifact upload
+2026-10-20T16:56:50.6562180Z Artifact Doushujun-unsigned.zip successfully finalized. Artifact ID 12282657820
+2026-10-20T16:56:50.6562990Z Artifact Doushujun-unsigned has been successfully uploaded! Final size is 1070961 bytes. Artifact ID is 12282657820
+2026-10-20T16:56:50.6575230Z Artifact download URL: https://github.com/670708233-cell/doushujun-ios/actions/runs/39461707854/artifacts/12282657820
+2026-10-20T16:56:50.6848860Z ##[group]Run actions/upload-artifact@v4
+2026-10-20T16:56:50.6849800Z with:
+2026-10-20T16:56:50.6850210Z   name: build-log
+2026-10-20T16:56:50.6850800Z   path: build.log
+2026-10-20T16:56:50.6851870Z   retention-days: 7
+2026-10-20T16:56:50.6852360Z   if-no-files-found: warn
+2026-10-20T16:56:50.6852920Z   compression-level: 6
+2026-10-20T16:56:50.6853410Z   overwrite: false
+2026-10-20T16:56:50.6854090Z   include-hidden-files: false
+2026-10-20T16:56:50.6854690Z ##[endgroup]
+2026-10-20T16:56:50.9634210Z (node:2284) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-20T16:56:50.9636070Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-20T16:56:50.9688150Z With the provided path, there will be 1 file uploaded
+2026-10-20T16:56:50.9690480Z Artifact name is valid!
+2026-10-20T16:56:50.9691410Z Root directory input is valid!
+2026-10-20T16:56:51.1710860Z Beginning upload of artifact content to blob storage
+2026-10-20T16:56:51.1887410Z (node:2284) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-20T16:56:51.2205020Z Uploaded bytes 5603
+2026-10-20T16:56:51.2352270Z Finished uploading artifact content to blob storage!
+2026-10-20T16:56:51.2358500Z SHA256 digest of uploaded artifact zip is 5eb8ecc928e9d9463662120bd8a954447f5ed6b18f85dfdf11ac94db40808ef9
+2026-10-20T16:56:51.2359240Z Finalizing artifact upload
+2026-10-20T16:56:51.4656310Z Artifact build-log.zip successfully finalized. Artifact ID 12283327210
+2026-10-20T16:56:51.4659860Z Artifact build-log has been successfully uploaded! Final size is 5603 bytes. Artifact ID is 12283327210
+2026-10-20T16:56:51.4679730Z Artifact download URL: https://github.com/670708233-cell/doushujun-ios/actions/runs/39461707854/artifacts/12283327210
+2026-10-20T16:56:51.5007030Z Post job cleanup.
+2026-10-20T16:56:51.7194350Z [command]/opt/homebrew/bin/git version
+2026-10-20T16:56:51.7658400Z git version 2.55.0
+2026-10-20T16:56:51.7676520Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/9c4551aa-aaf1-43f3-bf39-462598e016e3/.gitconfig'
+2026-10-20T16:56:51.7692500Z Temporarily overriding HOME='/Users/runner/work/_temp/9c4551aa-aaf1-43f3-bf39-462598e016e3' before making global git config changes
+2026-10-20T16:56:51.7694060Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-20T16:56:51.7695090Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/doushujun-ios/doushujun-ios
+2026-10-20T16:56:51.7815300Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-20T16:56:51.7879280Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-20T16:56:51.9087040Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-20T16:56:51.9156140Z http.https://github.com/.extraheader
+2026-10-20T16:56:51.9164960Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-20T16:56:51.9239520Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-20T16:56:52.0080790Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-20T16:56:52.0142270Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-20T16:56:52.1116410Z Cleaning up orphan processes
+2026-10-20T16:56:52.7955100Z Terminate orphan process: pid (1846) (ibtoold)
+2026-10-20T16:56:53.0563120Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
