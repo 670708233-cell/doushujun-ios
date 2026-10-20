@@ -226,7 +226,7 @@ jobs:
           fi
           echo "slider/generate OK: $(head -c 200 gen_body.txt)"
           # 硬校验 2：debug 模式回传明文验证码（缺失直接 fail，避免 UI 测试空跑 7 分钟）
-          curl -s "http://127.0.0.1:8000/api/captcha/image" | grep -o "captcha_code" || { echo "::error::captcha_code missing - APP_DEBUG not effective"; exit 1; }
+          curl -s "http://127.0.0.1:8000/api/captcha/generate" | grep -o "captcha_code" || { echo "::error::captcha_code missing - APP_DEBUG not effective"; exit 1; }
 
       - name: Generate Xcode project
         run: python3 generate_project.py
