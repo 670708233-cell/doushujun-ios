@@ -58,7 +58,8 @@ struct CaptchaImage: View {
             } label: {
                 Group {
                     if let img = img {             // 已加载：显示图
-                        Image(uiImage: img).resizable().scaledToFill()
+                        // scaledToFit 完整显示（scaledToFill 会按容器宽高比裁边，验证码字符被切）
+                        Image(uiImage: img).resizable().scaledToFit()
                     } else {                       // 加载失败占位
                         Text("点击刷新").font(.system(size: 11)).foregroundColor(T.textSub)
                     }
@@ -69,6 +70,9 @@ struct CaptchaImage: View {
             }
         }
         .onAppear { refresh() }                    // 出现即拉首张
+        .onChange(of: captchaKey) { k in           // 父面板失败清 key → 自动拉新码
+            if k.isEmpty { refresh() }
+        }
     }
 
     /// 拉取验证码：剥 dataURI 前缀 → base64 解码 → 回填 key
@@ -89,6 +93,32 @@ struct CaptchaImage: View {
                 await MainActor.run { img = nil; captchaKey = "" }   // 失败清空待重试
             }
         }
+    }
+}
+
+// MARK: - 统一错误弹窗
+
+/// 错误弹窗修饰符：message 非空时弹 alert，点「确定」清空。
+/// 替代原 ErrorText 小字——键盘弹起时会遮挡错误提示，用户看不到失败原因。
+struct ErrorAlert: ViewModifier {
+    @Binding var message: String                   // 错误文案（空串=不弹）
+
+    func body(content: Content) -> some View {
+        content.alert("提示", isPresented: Binding(   // isPresented 派生自 message 是否非空
+            get: { !message.isEmpty },
+            set: { if !$0 { message = "" } }           // 关闭弹窗即清文案
+        )) {
+            Button("确定", role: .cancel) {}           // 唯一确认按钮
+        } message: {
+            Text(message)                              // 错误正文（后端业务文案/本地校验文案）
+        }
+    }
+}
+
+extension View {
+    /// 挂统一错误弹窗：`.errorAlert($error)`
+    func errorAlert(_ message: Binding<String>) -> some View {
+        modifier(ErrorAlert(message: message))
     }
 }
 
@@ -118,7 +148,6 @@ private struct LoginPanel: View {
                     DSJField(placeholder: "用户名或邮箱", text: $username)
                     DSJField(placeholder: "密码", text: $password, secure: true)
                     CaptchaImage(captchaKey: $captchaKey, code: $captchaCode)   // 图形验证码行
-                    ErrorText(text: error)
                     PrimaryButton(title: "登  录", loading: loading) { showGeeTest = true }   // 点登录→先滑块
                 }
             }
@@ -154,6 +183,7 @@ private struct LoginPanel: View {
         } message: {
             Text("需微信开放平台移动应用资质，当前请使用账号密码登录")
         }
+        .errorAlert($error)                        // 登录错误统一弹窗
     }
 
     /// 登录提交：校验 → 拼表单（可选带 slider_token）→ 存会话 → 总线同步 → 回调
@@ -186,6 +216,7 @@ private struct LoginPanel: View {
         } catch {
             self.error = (error as? ApiError)?.errorDescription ?? "登录失败，请稍后重试"
             captchaCode = ""                                   // 失败清验证码输入防重放
+            captchaKey = ""                                    // 旧图形码已被消费，清 key 触发子组件自动换码
         }
     }
 }
@@ -236,7 +267,6 @@ private struct RegisterPanel: View {
                         }
                         .disabled(sending || countdown > 0)   // 发送中/冷却中禁点
                     }
-                    ErrorText(text: error)
                     PrimaryButton(title: "注  册", loading: loading) { showGeeTest = true }   // 注册前滑块
                 }
             }
@@ -258,6 +288,7 @@ private struct RegisterPanel: View {
                 showGeeTest = false
             }
         }
+        .errorAlert($error)                        // 注册/发码错误统一弹窗
     }
 
     /// 发送邮箱验证码：邮箱格式+图形码前置校验 → 成功起 60s 冷却
@@ -278,6 +309,7 @@ private struct RegisterPanel: View {
         } catch {
             self.error = (error as? ApiError)?.errorDescription ?? "发送失败"
             captchaCode = ""                       // 失败清码防重放
+            captchaKey = ""                        // 旧图形码已消费，触发自动换码
         }
     }
 
@@ -308,6 +340,7 @@ private struct RegisterPanel: View {
         } catch {
             self.error = (error as? ApiError)?.errorDescription ?? "注册失败"
             captchaCode = ""
+            captchaKey = ""                        // 旧图形码已消费，触发自动换码
         }
     }
 }
@@ -335,7 +368,6 @@ private struct ForgotPanel: View {
                     SectionTitle(text: "找回密码")
                     if !checked {                  // 阶段 1：验邮箱
                         DSJField(placeholder: "注册邮箱", text: $email, keyboard: .emailAddress)
-                        ErrorText(text: error)
                         PrimaryButton(title: "下一步", loading: loading) {
                             Task { await checkEmail() }
                         }
@@ -355,7 +387,6 @@ private struct ForgotPanel: View {
                             .disabled(sending || countdown > 0)
                         }
                         DSJField(placeholder: "新密码（至少6位）", text: $newPassword, secure: true)
-                        ErrorText(text: error)
                         PrimaryButton(title: "重置密码", loading: loading) {
                             Task { await reset() }
                         }
@@ -371,6 +402,7 @@ private struct ForgotPanel: View {
                 countdown -= 1
             }
         }
+        .errorAlert($error)                        // 找回流程错误统一弹窗
     }
 
     /// 阶段 1：验证邮箱已注册 → 进阶段 2
