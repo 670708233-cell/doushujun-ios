@@ -194,16 +194,24 @@ jobs:
           cd backend
           cp env.ci .env
           mkdir -p runtime/cache runtime/log
+          # macos runner 不预装 composer（php 依赖 brew composer 自动带）
+          brew install composer 2>&1 | tail -2
           composer install --no-interaction --prefer-dist --no-progress 2>&1 | tail -3
           nohup php think run --host 127.0.0.1 --port 8000 > server.log 2>&1 &
-          for i in $(seq 1 20); do
-            curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8000/api/captcha/slider/generate | grep -q 200 && { echo "backend UP"; break; }
+          BACKEND_UP=0
+          for i in $(seq 1 30); do
+            curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8000/api/captcha/slider/generate | grep -q 200 && { echo "backend UP"; BACKEND_UP=1; break; }
             sleep 2
           done
+          if [ "$BACKEND_UP" != "1" ]; then
+            echo "::error::backend failed to start"
+            tail -30 server.log || true
+            exit 1
+          fi
           curl -s http://127.0.0.1:8000/api/captcha/slider/generate | head -c 200
           echo ""
-          # 验证 debug 模式回传明文验证码
-          curl -s "http://127.0.0.1:8000/api/captcha/image" | grep -o "captcha_code" || echo "WARN: captcha_code missing"
+          # 验证 debug 模式回传明文验证码（缺失直接 fail，避免 UI 测试空跑 7 分钟）
+          curl -s "http://127.0.0.1:8000/api/captcha/image" | grep -o "captcha_code" || { echo "::error::captcha_code missing - APP_DEBUG not effective"; exit 1; }
 
       - name: Generate Xcode project
         run: python3 generate_project.py
