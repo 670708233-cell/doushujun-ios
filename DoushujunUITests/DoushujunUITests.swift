@@ -72,26 +72,33 @@ final class DoushujunUITests: XCTestCase {
         return false
     }
 
-    /// 正向链路：预填账号 + 自动验证码 + 拖满滑块 → 登录成功进主页
+    /// 正向链路：预填账号 + 自动验证码 + 拖满滑块 → 登录成功进主页。
+    /// 冷启动首用例的 accessibility 快照偶发缺元素（实证 flake：captcha_answer/
+    /// 图形验证码先后中招，热启动第二用例从未挂过），失败热启动重试一轮吸收。
     func testLoginFullFlow() throws {
+        if runFullFlowOnce() { return }
+        XCTAssertTrue(runFullFlowOnce(), "热启动重试后正向链路仍未通过")
+    }
+
+    /// 正向单轮：全部就绪检查通过且进主页返回 true；任何一步超时返回 false（不抛断言）
+    @discardableResult
+    private func runFullFlowOnce() -> Bool {
         let app = launch(user: "uitester", pass: "Uitest#2026")
 
         // —— 登录面板出现，且用户名已预填到位 ——
         let userField = app.textFields["用户名或邮箱"]
-        waitExists(userField, 15, "登录面板未出现")
-        waitValue(userField, "uitester", 5, "用户名预填失败")
+        guard userField.waitForExistence(timeout: 15) else { return false }
+        guard waitValueBool(userField, "uitester", 5) else { return false }
 
-        // —— 图形验证码：app 自动填明文，测试读 accessibility label 校验 debug 链路 ——
+        // —— 图形验证码：app 自动填明文（answer 恒在树上，等 4 字符答案=拉码就绪）——
         let captcha = app.otherElements["captcha_answer"]
-        waitExists(captcha, 15, "验证码组件未出现")
-        let answer = waitCaptchaAnswer(captcha)
-        XCTAssertFalse(answer.isEmpty, "验证码答案为空——后端是否处于 APP_DEBUG=true？")
-        XCTAssertEqual(answer.count, 4, "验证码应为 4 字符，实际: \(answer)")
+        guard captcha.waitForExistence(timeout: 15),
+              waitCaptchaAnswer(captcha).count == 4 else { return false }
 
         // 输入框已被 app 自动填充（与当前答案动态比对，容忍拉码刷新换答案）
         let codeField = app.textFields["图形验证码"]
-        waitExists(codeField, 5)
-        XCTAssertTrue(waitCodeFilled(codeField, captcha, 8), "验证码未自动填入输入框")
+        guard codeField.waitForExistence(timeout: 8),
+              waitCodeFilled(codeField, captcha, 8) else { return false }
 
         // —— app 端自动链（UITEST_AUTO=1）：验证码自动填完 → 延时自动弹滑块 sheet →
         // autoSlide 合成真人轨迹 verify → doLogin。测试端全程不 tap（无头模拟器 Button tap
@@ -105,8 +112,16 @@ final class DoushujunUITests: XCTestCase {
             print("=== APP ACCESSIBILITY TREE DUMP (home missing) ===")
             print(app.debugDescription)
             print("=== END DUMP ===")
-            XCTFail("登录后未进入主页。错误弹窗文案: \(alertMsg ?? "无（无弹窗）")")
+            return false
         }
+        return true
+    }
+
+    /// waitValue 的 Bool 版（不落断言，供重试包装）
+    private func waitValueBool(_ el: XCUIElement, _ value: String, _ timeout: TimeInterval) -> Bool {
+        let exp = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "value == %@", value), object: el)
+        return XCTWaiter().wait(for: [exp], timeout: timeout) == .completed
     }
 
     /// 负路径：错误密码 → 滑块通过后登录被拒 → 弹窗提示（验证弹窗机制本身）
