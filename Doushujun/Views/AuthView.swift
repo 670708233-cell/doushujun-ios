@@ -202,9 +202,11 @@ private struct LoginPanel: View {
         }
         .sheet(isPresented: $showGeeTest) {
             CaptchaSheet { sliderToken in    // 滑块通过：拿 token 提交登录
+                geeProbe = "VERIFIED tok=\(sliderToken.prefix(6))"
                 showGeeTest = false
                 Task { await doLogin(sliderToken: sliderToken) }
             } onClosed: {
+                geeProbe = "ONCLOSED"
                 showGeeTest = false
             }
         }
@@ -224,6 +226,7 @@ private struct LoginPanel: View {
         let pw = password
         guard !un.isEmpty, !pw.isEmpty else { error = "请输入账号和密码"; return }               // 前置校验
         if captchaKey.isEmpty && !captchaCode.isEmpty { error = "请输入图形验证码"; return }     // 无 key 却有输入=没拉到码
+        geeProbe = "DOLOGIN key=\(captchaKey.prefix(6)) code=\(captchaCode.prefix(4))"
         loading = true
         error = ""
         defer { loading = false }
@@ -237,6 +240,7 @@ private struct LoginPanel: View {
             if !sliderToken.isEmpty { body["slider_token"] = sliderToken }   // 生产后端强校验，滑块必过才有值
             let d = try await Network.post("user/login", body: body)
             let token = d["token"].str ?? ""
+            geeProbe = "LOGIN_RESP tok=\(token.isEmpty ? "empty" : token.prefix(6))"
             guard !token.isEmpty else { throw ApiError.business("登录失败，请稍后重试") }
             SessionStore.saveLogin(token: token,               // 持久化会话
                                    username: d["username"].str,
