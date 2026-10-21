@@ -53,9 +53,21 @@ final class DoushujunUITests: XCTestCase {
             }, object: nil)
         if XCTWaiter().wait(for: [hasAnswer], timeout: 10) != .completed {
             captcha.tap()                                      // 触发刷新
-            _ = XCTWaiter().wait(for: [hasAnswer], timeout: 10)
+            let retry = XCTNSPredicateExpectation(
+                predicate: NSPredicate { _, _ in
+                    !captcha.label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                }, object: nil)
+            _ = XCTWaiter().wait(for: [retry], timeout: 10)
         }
         return captcha.label.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// 探针（gee_state）是否已变 GEE=1（每次新建 expectation——XCTWaiter 的 expectation 只能 wait 一次）
+    @discardableResult
+    private func waitGeeOn(_ probe: XCUIElement, _ timeout: TimeInterval) -> Bool {
+        let exp = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "label == 'GEE=1'"), object: probe)
+        return XCTWaiter().wait(for: [exp], timeout: timeout) == .completed
     }
 
     /// 正向链路：预填账号 + 自动验证码 + 拖满滑块 → 登录成功进主页
@@ -87,13 +99,11 @@ final class DoushujunUITests: XCTestCase {
         // 探针驱动：GEE=1 表示按钮 action 已触发。iOS 17 无头模拟器上 SwiftUI Button 的
         // element.tap() 偶发不派发 action（已知坑），coordinate.tap() 重试兜底
         let probe = app.descendants(matching: .any).matching(identifier: "gee_state").firstMatch
-        let geeOn = XCTNSPredicateExpectation(
-            predicate: NSPredicate(format: "label == 'GEE=1'"), object: probe)
-        if XCTWaiter().wait(for: [geeOn], timeout: 4) != .completed {
+        if !waitGeeOn(probe, 4) {
             let c = loginBtn.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
             for i in 0..<3 {
                 c.tap()
-                if XCTWaiter().wait(for: [geeOn], timeout: 3) == .completed { break }
+                if waitGeeOn(probe, 3) { break }
                 print("=== PROBE retry \(i) gee=\(probe.exists ? probe.label : "N/A") ===")
             }
         }
@@ -153,13 +163,11 @@ final class DoushujunUITests: XCTestCase {
         loginBtn.tap()
         // 探针驱动重试（同正向）
         let probe = app.descendants(matching: .any).matching(identifier: "gee_state").firstMatch
-        let geeOn = XCTNSPredicateExpectation(
-            predicate: NSPredicate(format: "label == 'GEE=1'"), object: probe)
-        if XCTWaiter().wait(for: [geeOn], timeout: 4) != .completed {
+        if !waitGeeOn(probe, 4) {
             let c = loginBtn.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
             for _ in 0..<3 {
                 c.tap()
-                if XCTWaiter().wait(for: [geeOn], timeout: 3) == .completed { break }
+                if waitGeeOn(probe, 3) { break }
             }
         }
 
