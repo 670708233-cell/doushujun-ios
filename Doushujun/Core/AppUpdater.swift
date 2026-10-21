@@ -19,7 +19,8 @@ final class AppUpdater: ObservableObject {
     func checkOnLaunch() {
         Task {  // 后台并发任务
             try? await Task.sleep(nanoseconds: 2_500_000_000)  // 睡 2.5s（纳秒），出错忽略
-            guard let d = try? await Network.get("app/check-update") else { return }  // 请求失败静默跳过
+            // 带 platform=ios：后端按平台读 ios_app_update_* 配置（不传=安卓键，老安卓包兼容）
+            guard let d = try? await Network.get("app/check-update", query: ["platform": "ios"]) else { return }  // 请求失败静默跳过
             // iOS 端无安卓 APK，仅当后端下发了 ios/通用提示时展示（无版本强比对的 URL 载体时忽略）
             guard let log = d["update_log"].str, !log.isEmpty else { return }  // 无更新日志：视为无更新
             let vc = d["version_code"].int ?? 0           // 远端版本号（数字比对基准）
