@@ -38,6 +38,12 @@ struct WorkView: View {
                                 .overlay(RoundedRectangle(cornerRadius: 10).stroke(T.stroke, lineWidth: 1))
                             HStack(spacing: 10) {
                                 PrimaryButton(title: "立即分析", loading: loading) { doQuery() }   // 主查询按钮
+                                Button { paste() } label: {           // 粘贴按钮（对齐权重分析页）
+                                    Image(systemName: "doc.on.clipboard")
+                                        .foregroundColor(T.primary).frame(width: 48, height: 50)
+                                        .background(RoundedRectangle(cornerRadius: 14).fill(T.primary.opacity(0.12)))
+                                }
+                                .disabled(loading)
                                 Button { onOpenHistory() } label: {   // 历史入口按钮
                                     Image(systemName: "clock.arrow.circlepath")
                                         .foregroundColor(T.primary).frame(width: 48, height: 50)
@@ -510,6 +516,16 @@ struct WorkView: View {
     }
 
     // MARK: - 主查询
+
+    /// 剪贴板粘贴输入框（对齐权重分析页 paste）
+    private func paste() {
+        if let s = UIPasteboard.general.string, !s.trimmingCharacters(in: .whitespaces).isEmpty {
+            input = s.trimmingCharacters(in: .whitespaces)
+            snackbar = "已粘贴，点击「立即分析」开始"
+        } else {
+            snackbar = "剪贴板是空的，先去复制分享链接吧"
+        }
+    }
 
     /// 手动查询：本地提 ID（失败走服务端短链解析）→ v2/query/douyin
     private func doQuery() {
