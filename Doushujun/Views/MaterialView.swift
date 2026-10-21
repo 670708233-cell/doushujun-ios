@@ -34,7 +34,7 @@ struct MaterialView: View {
                     // 输入卡
                     GlassCard {
                         VStack(alignment: .leading, spacing: 12) {
-                            TextField("粘贴抖音作品分享链接", text: $input)  // 链接输入
+                            TextField("粘贴作品分享链接", text: $input)  // 链接输入
                                 .font(.system(size: 14)).foregroundColor(T.textMain)
                                 .padding(10)
                                 .background(RoundedRectangle(cornerRadius: 10).fill(Color.white.opacity(0.05)))
@@ -217,20 +217,28 @@ struct MaterialView: View {
 
     // MARK: - 解析（旧版 MD5 签名协议）
 
-    /// 解析入口：提链接 → 提 ID → legacySign 签名 → 请求无水印接口
+    /// 解析入口：提链接 → 提 ID（本地失败走服务端 parse-link 短链解析）→ legacySign 签名 → 请求无水印接口
     private func parse() {
         let raw = input.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !raw.isEmpty else { error = "请输入分享链接"; return }   // 空输入拦截
-        let target = LinkParser.extractVideoTarget(raw)               // 文案中提视频 ID
-        guard let vid = target.id else { error = "无法识别作品ID，请检查链接"; return }
         loading = true
         error = ""
         Task {
             defer { loading = false }
             do {
-                let sig = Crypto.legacySign(awemeId: vid)             // 旧版时间戳+nonce+MD5 签名
+                // 本地正则提 19 位 ID；提不出（如 v.douyin.com 短链分享文案）→ 服务端
+                // parse-link 解析（对齐安卓 MaterialScreen；纯端上无法跟进短链 302）
+                let target = LinkParser.extractVideoTarget(raw)
+                var vid = target.id
+                if vid == nil {
+                    guard let url = target.url else { throw ApiError.business("无法识别链接，请检查后重试") }
+                    let pd = try await Network.post("query/parse-link", body: ["douyin_url": url])
+                    vid = pd["video_id"].str
+                }
+                guard let v = vid, !v.isEmpty else { throw ApiError.business("无法识别链接，请检查后重试") }
+                let sig = Crypto.legacySign(awemeId: v)               // 旧版时间戳+nonce+MD5 签名
                 let d = try await Network.post("tools/video/remove_watermark", body: [
-                    "input": vid,
+                    "input": v,
                     "timestamp": Int64(sig.timestamp) ?? 0,
                     "nonce": sig.nonce,
                     "signature": sig.signature,
@@ -238,7 +246,7 @@ struct MaterialView: View {
                 await MainActor.run {
                     result = d
                     imgPage = 0                                       // 图集回第一页
-                    SessionStore.pushHistory(SessionStore.materialHistoryKey, id: vid,  // 记入历史
+                    SessionStore.pushHistory(SessionStore.materialHistoryKey, id: v,  // 记入历史
                                              name: d["preview_title"].str ?? "")
                     history = SessionStore.history(SessionStore.materialHistoryKey)
                 }

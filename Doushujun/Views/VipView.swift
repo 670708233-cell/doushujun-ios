@@ -248,7 +248,8 @@ struct VipView: View {
             do {
                 let d = try await Network.post("vip/create-order", body: [
                     "package_id": pkgId,
-                    "pay_method": "alipay",                  // 固定支付宝通道
+                    "user_email": SessionStore.email,        // 后端必校验（缺=「缺少必要参数」实证）
+                    "type": "alipay",                        // 支付渠道（参数名对齐安卓）
                     "device_type": "pc",
                 ])
                 let url = d["pay_url"].str ?? d["recharge_url"].str ?? ""   // 收银台链接双字段兼容
@@ -270,11 +271,19 @@ struct VipView: View {
         var amount = selectedTier ?? 0
         if let ca = Double(customAmount), ca > 0 {           // 自定义金额优先
             amount = ca
-            // 自定义金额按套餐比例找点数；找不到按 1元=10点 兜底
-            amount = ca
         }
         guard amount > 0 else { error = "请选择或输入充值金额"; return }
-        let points = pointTiers.first { $0.amount == amount }?.points ?? amount * 10  // 档位点数或 1:10 兜底
+        // 档位点数优先（recharge/packages 后端下发）；自定义金额按后端分段公式
+        // （对齐 Recharge::getPointsForAmount：≤75 ×10；76-200 ×15；201-500 ×20；501+ ×30，
+        //  不匹配会被后端以「点数计算不匹配」拒单）
+        let points = pointTiers.first { $0.amount == amount }?.points ?? {
+            switch amount {
+            case ..<76: return amount * 10
+            case ..<201: return amount * 15
+            case ..<501: return amount * 20
+            default: return amount * 30
+            }
+        }()
         paying = true
         error = ""
         Task {

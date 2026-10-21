@@ -55,7 +55,7 @@ struct WeightView: View {
                                 }
                             }
                             if showHelp {
-                                Text("① 复制抖音APP分享的链接或输入账号ID\n② 点击「立即查询」开始分析\n③ 等待结果后可点击「AI 账号权重分析」获取深度建议\n\n支持：短视频链接 / 直播间链接 / 主页链接 / sec_uid / 账号ID")
+                                Text("① 复制APP分享的链接或输入账号ID\n② 点击「立即查询」开始分析\n③ 等待结果后可点击「AI 账号权重分析」获取深度建议\n\n支持：短视频链接 / 直播间链接 / 主页链接 / sec_uid / 账号ID")
                                     .font(.system(size: 12)).foregroundColor(T.textSub)
                                     .padding(10)
                                     .background(RoundedRectangle(cornerRadius: 10).fill(T.primary.opacity(0.06)))

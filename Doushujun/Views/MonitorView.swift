@@ -167,9 +167,11 @@ struct MonitorView: View {
         Task {
             defer { loading = false }
             do {
-                let d = try await Network.get("monitor/gettasklist", query: ["user_email": SessionStore.email])
-                var arr = d["tasks"].arr
-                if arr.isEmpty { arr = d.arr }           // 根级数组兜底
+                // 后端路由为 POST（GET 请求 404 实证），参数与安卓对齐
+                let d = try await Network.post("monitor/gettasklist", body: ["user_email": SessionStore.email])
+                var arr = d["list"].arr                    // 后端首选 data.list
+                if arr.isEmpty { arr = d["tasks"].arr }    // 旧版 tasks 字段兜底
+                if arr.isEmpty { arr = d.arr }             // 根级数组兜底
                 await MainActor.run { tasks = arr; error = "" }
             } catch {
                 await MainActor.run { self.error = (error as? ApiError)?.errorDescription ?? "加载失败" }
@@ -182,7 +184,7 @@ struct MonitorView: View {
         guard let id = t["task_id"].str else { return }
         Task {
             do {
-                _ = try await Network.post("monitor/deltask", body: [
+                _ = try await Network.post("monitor/delete-task", body: [
                     "user_email": SessionStore.email, "task_id": id,
                 ])
                 await MainActor.run {
@@ -296,7 +298,7 @@ struct CreateTaskFlow: View {
         GlassCard {
             VStack(alignment: .leading, spacing: 12) {
                 SectionTitle(text: "① 粘贴作品分享链接")
-                TextField("粘贴抖音分享链接", text: $link)
+                TextField("粘贴作品分享链接", text: $link)
                     .font(.system(size: 14)).foregroundColor(T.textMain)
                     .padding(10)
                     .background(RoundedRectangle(cornerRadius: 10).fill(Color.white.opacity(0.05)))
@@ -387,7 +389,9 @@ struct CreateTaskFlow: View {
             do {
                 var id = LinkParser.extractAwemeId(raw)          // 先本地正则
                 if id == nil {                                   // 本地提不出 → 服务端短链解析
-                    let url = LinkParser.extractUrl(raw)
+                    guard let url = LinkParser.extractUrl(raw) else {
+                        throw ApiError.business("无法识别作品，请检查链接是否完整")
+                    }
                     let d = try await Network.post("query/parse-link", body: ["douyin_url": url])
                     id = d["video_id"].str
                 }
@@ -396,7 +400,7 @@ struct CreateTaskFlow: View {
                 }
                 videoId = vid
                 // 预览详情（失败不阻塞）
-                if let d = try? await Network.post("monitor/video-detail", body: ["user_email": SessionStore.email, "video_id": vid]) {
+                if let d = try? await Network.post("monitor/douyin_video_detail", body: ["user_email": SessionStore.email, "aweme_id": vid]) {
                     let v = d["video_info"].exists ? d["video_info"] : d  // 结构双兼容
                     await MainActor.run { videoInfo = v.exists ? v : nil }
                 }
@@ -414,10 +418,16 @@ struct CreateTaskFlow: View {
         Task {
             defer { submitting = false }
             do {
+                let v = videoInfo                                // 预览详情（可能 nil）
+                let pt = v?["publish_time"].dbl ?? v?["create_time"].dbl ?? 0  // 毫秒/秒级兼容
                 _ = try await Network.post("monitor/create-task", body: [
                     "user_email": SessionStore.email,
-                    "video_id": videoId,
-                    "duration_days": duration,
+                    "aweme_id": videoId,                         // 后端参数名（原 video_id 404 实证）
+                    "content_title": v?["desc"].str ?? v?["title"].str ?? "未命名作品",
+                    "content_url": v?["share_url"].str ?? "",
+                    "content_image": v?["aweme_cover"].str ?? v?["cover"].str ?? v?["cover_url"].str ?? "",
+                    "publish_time": pt > 1e12 ? Int(pt / 1000) : Int(pt),  // 毫秒转秒
+                    "monitor_duration": duration,                // 后端参数名（原 duration_days）
                 ])
                 await MainActor.run { step = 3 }
             } catch {

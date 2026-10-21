@@ -55,7 +55,7 @@ struct WorkView: View {
                                 .background(Capsule().fill(T.primary.opacity(0.12)))
                                 .frame(maxWidth: .infinity)
                             if showHelp {          // 展开的帮助文案
-                                Text("① 复制抖音APP分享的作品链接或输入19位作品ID\n② 点击「立即分析」开始查询\n③ 查询完成后点击「AI作品分析」获取优化建议\n\n数据为发布以来累计值，建议先看播放/推荐量判断流量池层级")
+                                Text("① 复制APP分享的作品链接或输入19位作品ID\n② 点击「立即分析」开始查询\n③ 查询完成后点击「AI作品分析」获取优化建议\n\n数据为发布以来累计值，建议先看播放/推荐量判断流量池层级")
                                     .font(.system(size: 12)).foregroundColor(T.textSub)
                                     .padding(10)
                                     .background(RoundedRectangle(cornerRadius: 10).fill(T.primary.opacity(0.06)))
@@ -683,7 +683,7 @@ let WorkTips: [String: String] = [
     "互动率": "各互动行为合计÷播放量，衡量内容的互动效率",
     "加权互动率": "互动行为按权重加权后÷播放量，更贴近算法评估视角",
     "查询时间": "本次（或最近一次）查询该作品数据的时间",
-    "发布时间": "作品在抖音发布的具体时间",
+    "发布时间": "作品发布的具体时间",
     "是否带货": "作品是否挂载商品（购物车/小黄车）",
     "产品类型": "挂载商品的类型或带货形式",
     "销售线索": "作品带来的销售线索数量",

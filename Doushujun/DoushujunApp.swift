@@ -81,7 +81,7 @@ struct MainTabs: View {
                 .tabItem { Label("作品", systemImage: "doc.text.magnifyingglass") }
                 .tag(1)
             MonitorView()                                                  // 2 数据监控
-                .tabItem { Label("监控", systemImage: "chart.line.uptrend.xyaxis") }
+                .tabItem { Label("作品数据监控走势", systemImage: "chart.line.uptrend.xyaxis") }
                 .tag(2)
             MaterialView()                                                 // 3 取素材
                 .tabItem { Label("取素材", systemImage: "arrow.down.doc.fill") }
