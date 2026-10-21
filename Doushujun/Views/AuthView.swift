@@ -94,6 +94,8 @@ struct CaptchaImage: View {
                     img = Data(base64Encoded: b64).flatMap(UIImage.init)   // 解码失败得 nil 显示占位
                     captchaKey = d["captcha_key"].str ?? ""
                     answer = d["captcha_code"].str ?? ""                   // debug 后端回传明文（生产空串）
+                    // UI 自动化：UITEST_AUTO=1 时把明文自动填入输入框（CI 无键盘焦点，typeText 不可用）
+                    if ProcessInfo.processInfo.environment["UITEST_AUTO"] == "1" { code = answer }
                 }
             } catch {
                 await MainActor.run { img = nil; captchaKey = "" }   // 失败清空待重试
@@ -136,8 +138,9 @@ private struct LoginPanel: View {
     var goRegister: () -> Void                     // 切注册
     var goForgot: () -> Void                       // 切忘记密码
 
-    @State private var username = ""
-    @State private var password = ""
+    // UI 自动化预填：CI 无头模拟器软键盘不弹（typeText 报 keyboard focus），经 launchEnvironment 注入初值
+    @State private var username = ProcessInfo.processInfo.environment["UITEST_USER"] ?? ""
+    @State private var password = ProcessInfo.processInfo.environment["UITEST_PASS"] ?? ""
     @State private var captchaCode = ""            // 图形验证码输入
     @State private var captchaKey = ""             // 图形验证码 key
     @State private var loading = false             // 登录请求中
