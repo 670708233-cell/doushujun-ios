@@ -586,7 +586,12 @@ struct SliderCaptchaSheet: View {
     /// CI 模式由 app 侧接管拖满动作，verify 接口/登录链路仍全程真实。手势交互留待真机回归。
     private func autoSlide() async {
         guard ProcessInfo.processInfo.environment["UITEST_AUTO"] == "1" else { return }
-        try? await Task.sleep(nanoseconds: 800_000_000)             // 等 refresh 完成
+        try? await Task.sleep(nanoseconds: 500_000_000)
+        for _ in 0..<20 {                                           // 最多等 10s 轨道渲染就绪
+            let w = await MainActor.run { trackW }
+            if w > 48 { break }
+            try? await Task.sleep(nanoseconds: 500_000_000)
+        }
         let w = await MainActor.run { trackW }
         guard w > 48 else { return }
         let maxMove = w - 48
