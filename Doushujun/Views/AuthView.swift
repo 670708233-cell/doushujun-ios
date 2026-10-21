@@ -48,6 +48,7 @@ struct AuthView: View {
 struct CaptchaImage: View {
     @Binding var captchaKey: String                // 服务端发的验证码 key（提交时随表单回传）
     @Binding var code: String                      // 用户输入的验证码
+    var onAutoFill: (() -> Void)? = nil            // UI 自动化：autoFill 后回调（LoginPanel 触发滑块）
     @State private var img: UIImage?               // 解码后的验证码图
     @State private var answer = ""                 // debug 后端回传的明文答案（生产无此字段；供 UI 自动化读取）
 
@@ -95,7 +96,10 @@ struct CaptchaImage: View {
                     captchaKey = d["captcha_key"].str ?? ""
                     answer = d["captcha_code"].str ?? ""                   // debug 后端回传明文（生产空串）
                     // UI 自动化：UITEST_AUTO=1 时把明文自动填入输入框（CI 无键盘焦点，typeText 不可用）
-                    if ProcessInfo.processInfo.environment["UITEST_AUTO"] == "1" { code = answer }
+                    if ProcessInfo.processInfo.environment["UITEST_AUTO"] == "1" {
+                        code = answer
+                        onAutoFill?()               // 通知面板触发滑块（tap 在无头模拟器不可靠）
+                    }
                 }
             } catch {
                 await MainActor.run { img = nil; captchaKey = "" }   // 失败清空待重试
@@ -156,18 +160,15 @@ private struct LoginPanel: View {
                     SectionTitle(text: "登录")
                     DSJField(placeholder: "用户名或邮箱", text: $username)
                     DSJField(placeholder: "密码", text: $password, secure: true)
-                    CaptchaImage(captchaKey: $captchaKey, code: $captchaCode)   // 图形验证码行
-                    PrimaryButton(title: "登  录", loading: loading) { showGeeTest = true }   // 点登录→先滑块
-                    // UI 自动化（UITEST_AUTO=1）：无头模拟器 Button tap 事件随机丢失（element/coordinate
-                    // 均有 ~50% 丢率实证），验证码自动填完后延时自动触发滑块 sheet，测试端不再依赖 tap
-                    .onChange(of: captchaCode) { v in
-                        if !v.isEmpty && ProcessInfo.processInfo.environment["UITEST_AUTO"] == "1" {
-                            Task { @MainActor in
-                                try? await Task.sleep(nanoseconds: 1_200_000_000)
-                                if !loading { showGeeTest = true }
-                            }
+                    CaptchaImage(captchaKey: $captchaKey, code: $captchaCode) {   // 图形验证码行
+                        // UI 自动化（UITEST_AUTO=1）：无头模拟器 Button tap 事件随机丢失
+                        // （element/coordinate 均有 ~50% 丢率实证），autoFill 后延时自动触发滑块
+                        Task { @MainActor in
+                            try? await Task.sleep(nanoseconds: 1_200_000_000)
+                            if !loading { showGeeTest = true }
                         }
                     }
+                    PrimaryButton(title: "登  录", loading: loading) { showGeeTest = true }   // 点登录→先滑块
                 }
             }
             HStack {                               // 注册/忘记密码切换行
