@@ -125,7 +125,7 @@ struct CaptchaImage: View {
                 await MainActor.run {
                     img = nil; captchaKey = ""      // 失败清空待重试
                     #if DEBUG
-                    dbg = "n=\(attempt + 1) err=\((e as? ApiError)?.errorDescription ?? String(describing: e).prefix(30)) ans=\(answer.count)"
+                    dbg = "n=\(attempt + 1) err=\((e as? ApiError)?.errorDescription ?? String(String(describing: e).prefix(30))) ans=\(answer.count)"
                     #endif
                 }
             }
