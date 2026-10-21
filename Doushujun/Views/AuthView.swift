@@ -151,6 +151,7 @@ private struct LoginPanel: View {
     @State private var error = ""                  // 错误文案
     @State private var showGeeTest = false         // 滑块弹窗显隐（先验证后提交）
     @State private var showWechatTip = false       // 微信登录提示弹窗
+    @State private var geeProbe = ""               // UI 自动化探针：onAutoFill 链路状态
     @ObservedObject private var bus = SessionBus.shared
 
     var body: some View {
@@ -163,9 +164,12 @@ private struct LoginPanel: View {
                     CaptchaImage(captchaKey: $captchaKey, code: $captchaCode) {   // 图形验证码行
                         // UI 自动化（UITEST_AUTO=1）：无头模拟器 Button tap 事件随机丢失
                         // （element/coordinate 均有 ~50% 丢率实证），autoFill 后延时自动触发滑块
+                        geeProbe = "TASK_CREATED"
                         Task { @MainActor in
                             try? await Task.sleep(nanoseconds: 1_200_000_000)
+                            geeProbe = "SLEEP_DONE loading=\(loading)"
                             if !loading { showGeeTest = true }
+                            geeProbe = "SET_TRUE loading=\(loading)"
                         }
                     }
                     PrimaryButton(title: "登  录", loading: loading) { showGeeTest = true }   // 点登录→先滑块
@@ -190,8 +194,8 @@ private struct LoginPanel: View {
                 .background(RoundedRectangle(cornerRadius: 14).fill(Color(hex: "07C160")).opacity(0.85))  // 微信绿
             }
             #if DEBUG
-            // UI 自动化探针：sheet 请求状态（测试断言用，视觉不可见）
-            Text(showGeeTest ? "GEE=1" : "GEE=0")
+            // UI 自动化探针：sheet 请求链路状态（测试断言用，视觉不可见）
+            Text("GEE=\(showGeeTest ? 1 : 0) \(geeProbe)")
                 .font(.system(size: 1)).foregroundColor(.clear)
                 .accessibilityIdentifier("gee_state")
             #endif
