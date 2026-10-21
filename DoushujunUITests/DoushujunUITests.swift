@@ -89,6 +89,17 @@ final class DoushujunUITests: XCTestCase {
         XCTAssertTrue(runFullFlowOnce(), "热启动重试后正向链路仍未通过")
     }
 
+    /// 诊断摘要：拉码探针 + 树上关键元素清单（失败定位用）
+    private func diagBrief(_ app: XCUIApplication) -> String {
+        var parts = ["probe=<\(app.otherElements["captcha_debug"].exists ? app.otherElements["captcha_debug"].label : "n/a")>"]
+        for (desc, q) in [("user", app.textFields["用户名或邮箱"]),
+                          ("code", app.textFields["图形验证码"]),
+                          ("answer", app.otherElements["captcha_answer"])] {
+            parts.append("\(desc):\(q.exists ? "label=\(q.label.prefix(12))" : "MISSING")")
+        }
+        return parts.joined(separator: " ")
+    }
+
     /// 正向单轮：全部就绪检查通过且进主页返回 true；任何一步超时返回 false（不抛断言）
     @discardableResult
     private func runFullFlowOnce() -> Bool {
@@ -96,16 +107,24 @@ final class DoushujunUITests: XCTestCase {
 
         // —— 登录面板出现，且用户名已预填到位 ——
         let userField = app.textFields["用户名或邮箱"]
-        guard userField.waitForExistence(timeout: 15) else { return false }
-        guard waitValueBool(userField, "uitester", 5) else { return false }
+        guard userField.waitForExistence(timeout: 15) else {
+            print("DIAG no-userField: \(diagBrief(app))"); return false
+        }
+        guard waitValueBool(userField, "uitester", 5) else {
+            print("DIAG bad-prefill: \(diagBrief(app))"); return false
+        }
 
         // —— 图形验证码：app 自动填明文（answer 恒在树上，等 4 字符答案=拉码就绪）——
         guard app.otherElements["captcha_answer"].waitForExistence(timeout: 15),
-              waitCaptchaAnswer(app).count == 4 else { return false }
+              waitCaptchaAnswer(app).count == 4 else {
+            print("DIAG no-answer: \(diagBrief(app))"); return false
+        }
 
         // 输入框已被 app 自动填充（与当前答案动态比对，容忍拉码刷新换答案）
         guard app.textFields["图形验证码"].waitForExistence(timeout: 8),
-              waitCodeFilled(app, 8) else { return false }
+              waitCodeFilled(app, 8) else {
+            print("DIAG not-filled: \(diagBrief(app))"); return false
+        }
 
         // —— app 端自动链（UITEST_AUTO=1）：验证码自动填完 → 延时自动弹滑块 sheet →
         // autoSlide 合成真人轨迹 verify → doLogin。测试端全程不 tap（无头模拟器 Button tap

@@ -51,10 +51,17 @@ struct CaptchaImage: View {
     var onAutoFill: (() -> Void)? = nil            // UI 自动化：autoFill 后回调（LoginPanel 触发滑块）
     @State private var img: UIImage?               // 解码后的验证码图
     @State private var answer = ""                 // debug 后端回传的明文答案（生产无此字段；供 UI 自动化读取）
+    #if DEBUG
+    @State private var dbg = "n=0"                 // CI 诊断：拉码循环状态（次数/错误/答案长度）
+    #endif
 
     var body: some View {
         HStack(spacing: 10) {
             DSJField(placeholder: "图形验证码", text: $code)   // 用户输入
+            #if DEBUG
+            Text(dbg).font(.system(size: 1)).foregroundColor(.clear)
+                .accessibilityIdentifier("captcha_debug")     // 测试失败时读此元素定位拉码问题
+            #endif
             Button {
                 refresh()                          // 点图刷新
             } label: {
@@ -104,6 +111,9 @@ struct CaptchaImage: View {
                     img = Data(base64Encoded: b64).flatMap(UIImage.init)   // 解码失败得 nil 显示占位
                     captchaKey = d["captcha_key"].str ?? ""
                     answer = ans
+                    #if DEBUG
+                    dbg = "n=\(attempt + 1) err= ans=\(ans.count) key=\(captchaKey.count)"
+                    #endif
                     // UI 自动化：UITEST_AUTO=1 时把明文自动填入输入框（CI 无键盘焦点，typeText 不可用）
                     if ProcessInfo.processInfo.environment["UITEST_AUTO"] == "1" && !ans.isEmpty {
                         code = ans
@@ -111,8 +121,13 @@ struct CaptchaImage: View {
                     }
                 }
                 if !ans.isEmpty { return }          // 拿到答案：成功收工
-            } catch {
-                await MainActor.run { img = nil; captchaKey = "" }   // 失败清空待重试
+            } catch let e {
+                await MainActor.run {
+                    img = nil; captchaKey = ""      // 失败清空待重试
+                    #if DEBUG
+                    dbg = "n=\(attempt + 1) err=\((e as? ApiError)?.errorDescription ?? String(describing: e).prefix(30)) ans=\(answer.count)"
+                    #endif
+                }
             }
             if attempt < 4 { try? await Task.sleep(nanoseconds: 1_000_000_000) }
         }
