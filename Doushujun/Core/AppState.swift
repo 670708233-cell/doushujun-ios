@@ -45,6 +45,7 @@ final class SessionBus: ObservableObject {
 
     /// 登录成功后同步账号三件套到总线（nil 字段保留本地旧值）
     func syncLogin(username: String?, email: String?, balance: Double?) {
+        loggedIn = true                                    // 切主页（此前缺失：登录成功后停在登录页，重启才恢复）
         self.username = username ?? SessionStore.username  // 用户名：缺省回退本地
         self.email = email ?? SessionStore.email           // 邮箱：缺省回退本地
         if let b = balance {                               // 余额有值才同步：
