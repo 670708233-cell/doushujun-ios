@@ -137,10 +137,26 @@ final class SessionBus: ObservableObject {
                     balance = b                                      // 更新总线
                     SessionStore.setBalance(b)                       // 落盘
                 }
-                vipLevel = data["vip_level_name"].str ?? (data["vip_level"].int.flatMap { $0 > 0 ? "VIP\($0)" : nil } ?? "免费用户")  // 等级名：后端名 > 数字拼 VIP > 免费用户
-                isVip = data["is_vip"].bool ?? isVip                 // 是否 VIP（驱动 VIP 卡分支）
-                vipExpire = data["vip_expire_time"].str ?? ""        // 到期完整时间
-                vipPackageName = data["vip_package_name"].str ?? ""  // 套餐名（「月低请求版」等）
+                // VIP 身份与等级名推导（2026-10-21 修复「VIP 显示免费用户」：
+                // profile 接口并无 vip_level_name/vip_level 字段，旧解析恒回退「免费用户」，
+                // 导致会员与充值页右上角显示错 + 到期时间被藏。现按后端实际字段推导）
+                let isSuper = data["is_super_vip"].bool ?? false     // 超级VIP（users 表，最高优先）
+                let isNorm = data["is_vip"].bool ?? false            // 普通VIP（user_vip 表有效记录）
+                if isSuper {                                         // 超级VIP：等级名固定，到期取超级字段
+                    vipLevel = "超级会员"
+                    vipExpire = data["super_vip_expire_time"].str ?? ""  // 超级VIP到期时间
+                    isVip = true
+                } else if isNorm {                                   // 普通VIP：套餐名即等级名（如「月低请求版」）
+                    let pkg = data["vip_package_name"].str ?? ""
+                    vipLevel = pkg.isEmpty ? "VIP会员" : pkg
+                    vipExpire = data["vip_expire_time"].str ?? ""    // 到期完整时间
+                    isVip = true
+                } else {                                             // 无任何有效VIP
+                    vipLevel = "免费用户"
+                    vipExpire = ""
+                    isVip = false
+                }
+                vipPackageName = data["vip_package_name"].str ?? ""  // 套餐名（VIP 卡胶囊徽章）
                 consumeToday = data["consume_today"].int ?? consumeToday  // 今日消耗
                 dailyLimit = data["daily_limit"].int ?? dailyLimit   // 每日额度
                 // 作品类配额（新字段 work_* 优先，回退老字段 today_used/today_remaining——两者后端口径均为作品类）
