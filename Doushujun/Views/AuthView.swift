@@ -258,7 +258,7 @@ private struct LoginPanel: View {
                                    username: d["username"].str,
                                    email: d["email"].str,
                                    balance: d["balance"].dbl)
-            bus.syncLogin(username: d["username"].str, email: d["email"].str, balance: d["balance"].dbl)   // 总线同步登录态
+            await bus.syncLogin(username: d["username"].str, email: d["email"].str, balance: d["balance"].dbl)   // 总线同步登录态（@MainActor：自动 hop 主线程）
             bus.refreshAccount()                               // 补拉账户（余额/用量/VIP）
             onSuccess()                                        // 根容器切主页
         } catch {

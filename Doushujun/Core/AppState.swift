@@ -43,7 +43,11 @@ final class SessionBus: ObservableObject {
     // 权重历史 → 权重页直查
     @Published var pendingWeightId: String? = nil   // 非 nil 时权重页自动发起该 ID 分析
 
-    /// 登录成功后同步账号三件套到总线（nil 字段保留本地旧值）
+    /// 登录成功后同步账号三件套到总线（nil 字段保留本地旧值）。
+    /// ★必须主线程：@Published 后台写入触发 objectWillChange 跨线程 fire，
+    /// iOS 18 新运行时下恰逢 SwiftUI 渲染事务会直接 crash 进程
+    /// （实证：CI 正向用例登录成功切主页瞬间 app 死亡 state=notRunning）
+    @MainActor
     func syncLogin(username: String?, email: String?, balance: Double?) {
         loggedIn = true                                    // 切主页（此前缺失：登录成功后停在登录页，重启才恢复）
         self.username = username ?? SessionStore.username  // 用户名：缺省回退本地
