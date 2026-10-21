@@ -389,7 +389,7 @@ struct CreateTaskFlow: View {
             do {
                 var id = LinkParser.extractAwemeId(raw)          // 先本地正则
                 if id == nil {                                   // 本地提不出 → 服务端短链解析
-                    guard let url = LinkParser.extractUrl(raw) else {
+                    guard let url = LinkParser.extractVideoTarget(raw).url, !url.isEmpty else {
                         throw ApiError.business("无法识别作品，请检查链接是否完整")
                     }
                     let d = try await Network.post("query/parse-link", body: ["douyin_url": url])
