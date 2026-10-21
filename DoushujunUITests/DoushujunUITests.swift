@@ -46,12 +46,13 @@ final class DoushujunUITests: XCTestCase {
                        msg(), file: file, line: line)
     }
 
-    /// 等验证码答案非空（不点刷新：刷新会换答案导致与已填入 code 漂移，CI 后端拉码够快）
+    /// 等验证码答案就绪（4 字符才算：app 侧答案未到时 label 显示 pending 哨兵；
+    /// 不点刷新：刷新会换答案导致与已填入 code 漂移，app 侧已有 5 次自动重试兜底）
     private func waitCaptchaAnswer(_ captcha: XCUIElement) -> String {
-        let deadline = Date().addingTimeInterval(12)
+        let deadline = Date().addingTimeInterval(20)
         while Date() < deadline {
             let a = captcha.label.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !a.isEmpty { return a }
+            if a.count == 4 { return a }
             usleep(400_000)
         }
         return captcha.label.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -65,7 +66,7 @@ final class DoushujunUITests: XCTestCase {
         while Date() < deadline {
             let a = captcha.label.trimmingCharacters(in: .whitespacesAndNewlines)
             let v = codeField.value as? String ?? ""
-            if !a.isEmpty && v == a { return true }
+            if a.count == 4 && v == a { return true }
             usleep(400_000)
         }
         return false

@@ -71,9 +71,11 @@ struct CaptchaImage: View {
                 .overlay(RoundedRectangle(cornerRadius: 10).stroke(T.stroke, lineWidth: 1))
             }
             // UI 自动化：XCUITest 读此元素 label 拿验证码答案自动填写（仅 debug 后端有值）
+            // label 恒非空（答案未到显示 pending）：SwiftUI 剔除空 label 元素，若不兜底，
+            // 冷启动首拉失败期间元素从 accessibility 树消失，测试误判「组件未出现」
             .accessibilityElement(children: .ignore)
             .accessibilityIdentifier("captcha_answer")
-            .accessibilityLabel(answer)
+            .accessibilityLabel(answer.isEmpty ? "pending" : answer)
         }
         .onAppear { refresh() }                    // 出现即拉首张
         .onChange(of: captchaKey) { k in           // 父面板失败清 key → 自动拉新码
@@ -81,29 +83,38 @@ struct CaptchaImage: View {
         }
     }
 
-    /// 拉取验证码：剥 dataURI 前缀 → base64 解码 → 回填 key
+    /// 拉取验证码（入口）：剥 dataURI 前缀 → base64 解码 → 回填 key。
+    /// 失败自动重试：CI 冷启动时模拟器网络栈未就绪，首拉常超时，不重试则答案永不到
     func refresh() {
         code = ""                                  // 换码必清输入
-        Task {
+        Task { await pullAnswer() }
+    }
+
+    /// 拉码重试循环：拿到明文答案即止；失败/无答案 1s 后再试，最多 5 次
+    private func pullAnswer() async {
+        for attempt in 0..<5 {
             do {
                 let d = try await Network.get("captcha/generate")
                 let uri = d["captcha_image"].str ?? ""
                 let b64 = uri.replacingOccurrences(of: "^data:image/\\w+;base64,", with: "", options: .regularExpression)  // 正则剥 dataURI 头
                     .replacingOccurrences(of: "\n", with: "")   // 清换行（base64 容错）
                     .replacingOccurrences(of: "\r", with: "")
+                let ans = d["captcha_code"].str ?? ""                  // debug 后端回传明文（生产空串）
                 await MainActor.run {
                     img = Data(base64Encoded: b64).flatMap(UIImage.init)   // 解码失败得 nil 显示占位
                     captchaKey = d["captcha_key"].str ?? ""
-                    answer = d["captcha_code"].str ?? ""                   // debug 后端回传明文（生产空串）
+                    answer = ans
                     // UI 自动化：UITEST_AUTO=1 时把明文自动填入输入框（CI 无键盘焦点，typeText 不可用）
-                    if ProcessInfo.processInfo.environment["UITEST_AUTO"] == "1" {
-                        code = answer
+                    if ProcessInfo.processInfo.environment["UITEST_AUTO"] == "1" && !ans.isEmpty {
+                        code = ans
                         onAutoFill?()               // 通知面板触发滑块（tap 在无头模拟器不可靠）
                     }
                 }
+                if !ans.isEmpty { return }          // 拿到答案：成功收工
             } catch {
                 await MainActor.run { img = nil; captchaKey = "" }   // 失败清空待重试
             }
+            if attempt < 4 { try? await Task.sleep(nanoseconds: 1_000_000_000) }
         }
     }
 }
