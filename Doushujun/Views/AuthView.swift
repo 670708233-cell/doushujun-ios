@@ -158,6 +158,16 @@ private struct LoginPanel: View {
                     DSJField(placeholder: "密码", text: $password, secure: true)
                     CaptchaImage(captchaKey: $captchaKey, code: $captchaCode)   // 图形验证码行
                     PrimaryButton(title: "登  录", loading: loading) { showGeeTest = true }   // 点登录→先滑块
+                    // UI 自动化（UITEST_AUTO=1）：无头模拟器 Button tap 事件随机丢失（element/coordinate
+                    // 均有 ~50% 丢率实证），验证码自动填完后延时自动触发滑块 sheet，测试端不再依赖 tap
+                    .onChange(of: captchaCode) { v in
+                        if !v.isEmpty && ProcessInfo.processInfo.environment["UITEST_AUTO"] == "1" {
+                            Task { @MainActor in
+                                try? await Task.sleep(nanoseconds: 1_200_000_000)
+                                if !loading { showGeeTest = true }
+                            }
+                        }
+                    }
                 }
             }
             HStack {                               // 注册/忘记密码切换行
