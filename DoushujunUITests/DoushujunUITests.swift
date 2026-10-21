@@ -47,26 +47,35 @@ final class DoushujunUITests: XCTestCase {
     }
 
     /// 等验证码答案就绪（4 字符才算：app 侧答案未到时 label 显示 pending 哨兵；
-    /// 不点刷新：刷新会换答案导致与已填入 code 漂移，app 侧已有 5 次自动重试兜底）
-    private func waitCaptchaAnswer(_ captcha: XCUIElement) -> String {
+    /// 不点刷新：刷新会换答案导致与已填入 code 漂移，app 侧已有 5 次自动重试兜底）。
+    /// ⚠每轮重新 resolve 查询：持有旧元素引用访问 .label 时若快照失效，
+    /// XCUITest 抛 ObjC 异常 "Failed to match snapshot"（Swift catch 不住，测试直接崩）
+    private func waitCaptchaAnswer(_ app: XCUIApplication) -> String {
         let deadline = Date().addingTimeInterval(20)
         while Date() < deadline {
-            let a = captcha.label.trimmingCharacters(in: .whitespacesAndNewlines)
-            if a.count == 4 { return a }
+            let el = app.otherElements["captcha_answer"]
+            if el.exists {
+                let a = el.label.trimmingCharacters(in: .whitespacesAndNewlines)
+                if a.count == 4 { return a }
+            }
             usleep(400_000)
         }
-        return captcha.label.trimmingCharacters(in: .whitespacesAndNewlines)
+        return app.otherElements["captcha_answer"].label.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    /// 等验证码输入框 value 与 captcha_answer 当前 label 一致（label 动态读取，容忍拉码刷新换答案）
+    /// 等验证码输入框 value 与 captcha_answer 当前 label 一致（label 动态读取，容忍拉码刷新换答案；
+    /// 同 waitCaptchaAnswer：每轮重新 resolve 防失效快照抛异常）
     @discardableResult
-    private func waitCodeFilled(_ codeField: XCUIElement, _ captcha: XCUIElement,
-                                _ timeout: TimeInterval) -> Bool {
+    private func waitCodeFilled(_ app: XCUIApplication, _ timeout: TimeInterval) -> Bool {
         let deadline = Date().addingTimeInterval(timeout)
         while Date() < deadline {
-            let a = captcha.label.trimmingCharacters(in: .whitespacesAndNewlines)
-            let v = codeField.value as? String ?? ""
-            if a.count == 4 && v == a { return true }
+            let captcha = app.otherElements["captcha_answer"]
+            let codeField = app.textFields["图形验证码"]
+            if captcha.exists, codeField.exists {
+                let a = captcha.label.trimmingCharacters(in: .whitespacesAndNewlines)
+                let v = codeField.value as? String ?? ""
+                if a.count == 4 && v == a { return true }
+            }
             usleep(400_000)
         }
         return false
@@ -91,14 +100,12 @@ final class DoushujunUITests: XCTestCase {
         guard waitValueBool(userField, "uitester", 5) else { return false }
 
         // —— 图形验证码：app 自动填明文（answer 恒在树上，等 4 字符答案=拉码就绪）——
-        let captcha = app.otherElements["captcha_answer"]
-        guard captcha.waitForExistence(timeout: 15),
-              waitCaptchaAnswer(captcha).count == 4 else { return false }
+        guard app.otherElements["captcha_answer"].waitForExistence(timeout: 15),
+              waitCaptchaAnswer(app).count == 4 else { return false }
 
         // 输入框已被 app 自动填充（与当前答案动态比对，容忍拉码刷新换答案）
-        let codeField = app.textFields["图形验证码"]
-        guard codeField.waitForExistence(timeout: 8),
-              waitCodeFilled(codeField, captcha, 8) else { return false }
+        guard app.textFields["图形验证码"].waitForExistence(timeout: 8),
+              waitCodeFilled(app, 8) else { return false }
 
         // —— app 端自动链（UITEST_AUTO=1）：验证码自动填完 → 延时自动弹滑块 sheet →
         // autoSlide 合成真人轨迹 verify → doLogin。测试端全程不 tap（无头模拟器 Button tap
@@ -138,10 +145,9 @@ final class DoushujunUITests: XCTestCase {
 
         let captcha = app.otherElements["captcha_answer"]
         waitExists(captcha, 15)
-        let answer = waitCaptchaAnswer(captcha)
+        let answer = waitCaptchaAnswer(app)
         XCTAssertFalse(answer.isEmpty)
-        let codeField = app.textFields["图形验证码"]
-        XCTAssertTrue(waitCodeFilled(codeField, captcha, 8), "验证码未自动填入输入框")
+        XCTAssertTrue(waitCodeFilled(app, 8), "验证码未自动填入输入框")
 
         // app 端自动链（同正向）：自动弹 sheet → autoSlide verify → doLogin(WrongPass)
         // sheet 生命周期 ~1s 不做中间断言，直接等登录结果弹窗
