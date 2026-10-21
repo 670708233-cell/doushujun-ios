@@ -162,17 +162,26 @@ struct ErrorText: View {
     }
 }
 
-/// 配额行（今日已用/上限）
+/// 配额行（今日已用/上限）：查询输入卡顶部一行（作品/权重两页共用）
+/// 右侧：VIP 用户显金色到期日（对齐安卓 QuotaRow），非 VIP 显对应类剩余次数（替代原余额显示）
 struct QuotaRow: View {
+    var isWeight: Bool = false    // false=作品类配额（作品分析页），true=权重类配额（权重分析页）
     var body: some View {
         let bus = SessionBus.shared                                       // 直接读总线（非观察，页面级刷新）
-        HStack {                                                          // 左：额度，右：余额
+        let used = isWeight ? bus.weightUsedToday : bus.usedToday         // 对应类今日已用
+        let remain = isWeight ? bus.weightRemainingToday : bus.todayRemaining  // 对应类今日剩余
+        HStack {                                                          // 左：额度，右：到期/剩余
             Image(systemName: "bolt.fill").font(.system(size: 12)).foregroundColor(T.warn)  // 闪电图标
-            Text("今日已用 \(bus.usedToday)/\(bus.dailyLimit <= 0 ? "∞" : String(bus.dailyLimit))")  // 已用/上限（0 视为无限）
+            Text("今日已用 \(used)/\(bus.dailyLimit <= 0 ? "∞" : String(bus.dailyLimit))")  // 已用/上限（0 视为无限）
                 .font(.system(size: 12)).foregroundColor(T.textSub)
             Spacer()                                                      // 两端分布
-            Text("余额 \(String(format: "%.2f", bus.balance))")           // 余额两位小数
-                .font(.system(size: 12)).foregroundColor(T.primary)       // 品牌青
+            if bus.vipLevel != "免费用户" {   // VIP：金色到期日（只取日期段）
+                Text("到期 \(String(bus.vipExpire.prefix(10)))")
+                    .font(.system(size: 12, weight: .semibold)).foregroundColor(T.warn)
+            } else {                              // 非 VIP：剩余查询次数
+                Text("剩 \(remain) 次")
+                    .font(.system(size: 12)).foregroundColor(T.primary)   // 品牌青
+            }
         }
     }
 }

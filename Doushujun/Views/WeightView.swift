@@ -30,7 +30,7 @@ struct WeightView: View {
                     // 查询输入卡
                     GlassCard {
                         VStack(alignment: .leading, spacing: 12) {
-                            QuotaRow()
+                            QuotaRow(isWeight: true)   // 权重类配额行（今日已用读 weight_*，右侧同款到期/剩余）
                             TextField("粘贴APP分享的链接或输入账号", text: $input)
                                 .font(.system(size: 14)).foregroundColor(T.textMain)
                                 .padding(10)
