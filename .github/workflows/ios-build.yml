@@ -253,6 +253,29 @@ jobs:
           }
           grep -E "Test Case.*(failed|passed)" uitest.log
 
+      - name: Backend liveness probe
+        if: always()
+        run: |
+          # php -S 是单线程服务器：慢请求可阻塞全部后续请求甚至崩掉
+          # （实证：负向用例的登录请求根本没到后端，弹窗是客户端网络失败兜底文案）
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://127.0.0.1:8000/api/captcha/generate || echo "000")
+          echo "backend probe after tests: http $CODE"
+          pgrep -fl "php think run" || echo "!! php server NOT running"
+          echo "--- server.log tail ---"
+          tail -15 backend/server.log || true
+
+      - name: Collect crash reports
+        if: always()
+        run: |
+          # app 进程中途死亡（XCUITest 报 state=notRunning）必留崩溃痕迹
+          for f in ~/Library/Logs/DiagnosticReports/Doushujun*.ips ~/Library/Logs/DiagnosticReports/*.ips; do
+            [ -f "$f" ] || continue
+            echo "=== $(basename "$f") ==="
+            head -c 2500 "$f"
+            echo
+          done
+          ls ~/Library/Logs/DiagnosticReports/ 2>/dev/null | head -10 || echo "(no diag reports)"
+
       - name: Upload UI test log
         if: always()
         uses: actions/upload-artifact@v4

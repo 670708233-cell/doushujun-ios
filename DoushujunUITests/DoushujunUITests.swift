@@ -104,41 +104,35 @@ final class DoushujunUITests: XCTestCase {
         return parts.joined(separator: " ")
     }
 
-    /// 正向单轮：全部就绪检查通过且进主页返回 true；任何一步超时返回 false（不抛断言）
+    /// 正向单轮：进主页返回 true；任何一步超时返回 false（不抛断言）
+    /// ⚠验证码链做软检查：app 自动链极快（实测拉码→滑块→登录 200 全程 ~4s，本地后端），
+    /// 测试逐元素等待时 app 可能已完成登录切主页，登录页元素全部消失——那不是失败，
+    /// 唯一硬断言是主页出现。
     @discardableResult
     private func runFullFlowOnce() -> Bool {
         let app = launch(user: "uitester", pass: "Uitest#2026")
 
-        // —— 登录面板出现，且用户名已预填到位 ——
+        // —— 登录面板出现（唯一的前置硬条件：后面所有元素都可能因登录完成而消失）——
         let userField = app.textFields["用户名或邮箱"]
-        guard userField.waitForExistence(timeout: 15) else {
-            print("DIAG no-userField: \(diagBrief(app))"); return false
-        }
-        guard waitValueBool(userField, "uitester", 5) else {
-            print("DIAG bad-prefill: \(diagBrief(app))"); return false
+        guard userField.waitForExistence(timeout: 15),
+              waitValueBool(userField, "uitester", 5) else {
+            print("DIAG no-panel: \(diagBrief(app))"); return false
         }
 
-        // —— 图形验证码：app 自动填明文（answer 恒在树上，等 4 字符答案=拉码就绪）——
-        guard app.otherElements["captcha_answer"].waitForExistence(timeout: 15),
-              waitCaptchaAnswer(app).count == 4 else {
-            print("DIAG no-answer: \(diagBrief(app))"); return false
+        // —— 软检查：验证码自动填链（失败只记录，不 return——可能 app 已切主页）——
+        if !app.otherElements["captcha_answer"].waitForExistence(timeout: 15) {
+            print("SOFT-Fail no-answer-el: \(diagBrief(app))")
+        } else {
+            let a = waitCaptchaAnswer(app)
+            if a.count != 4 { print("SOFT-Fail answer=\(a)") }
+            if !waitCodeFilled(app, 8) { print("SOFT-Fail not-filled") }
         }
 
-        // 输入框已被 app 自动填充（与当前答案动态比对，容忍拉码刷新换答案）
-        guard app.textFields["图形验证码"].waitForExistence(timeout: 8),
-              waitCodeFilled(app, 8) else {
-            print("DIAG not-filled: \(diagBrief(app))"); return false
-        }
-
-        // —— app 端自动链（UITEST_AUTO=1）：验证码自动填完 → 延时自动弹滑块 sheet →
-        // autoSlide 合成真人轨迹 verify → doLogin。测试端全程不 tap（无头模拟器 Button tap
-        // 事件随机丢失实证）。sheet 生命周期仅 ~1s（autoSlide 完成即关），
-        // 故不做中间断言，直接等登录最终结果 ——
-
-        // —— 断言登录成功：主页 tab 出现（失败时打印错误弹窗文案辅助排障）——
+        // —— 硬断言：主页 tab 出现（登录成功；30s 内不出=登录链某环真挂了）——
         let homeTab = app.buttons["权重"]
         if !homeTab.waitForExistence(timeout: 30) {
-            let alertMsg = app.staticTexts.matching(NSPredicate(format: "label CONTAINS '失败' OR label CONTAINS '错误' OR label CONTAINS '验证'")).allElementsBoundByIndex.first?.label
+            let alertMsg = app.staticTexts.matching(NSPredicate(format: "label CONTAINS '失败' OR label CONTAINS '错误' OR label CONTAINS '验证' OR label CONTAINS '提示'")).allElementsBoundByIndex.first?.label
+            print("DIAG home-missing alert=<\(alertMsg ?? "无")>: \(diagBrief(app))")
             print("=== APP ACCESSIBILITY TREE DUMP (home missing) ===")
             print(app.debugDescription)
             print("=== END DUMP ===")
@@ -175,14 +169,25 @@ final class DoushujunUITests: XCTestCase {
         // app 端自动链（同正向）：自动弹 sheet → autoSlide verify → doLogin(WrongPass)
         // sheet 生命周期 ~1s 不做中间断言，直接等登录结果弹窗
 
-        // 期望「提示」弹窗出现（账号或密码错误）；主页不应出现
-        let alertTitle = app.staticTexts["提示"]
-        if !alertTitle.waitForExistence(timeout: 30) {
+        // 期望「提示」弹窗出现，且文案必须是后端业务拒绝（区分客户端网络失败兜底
+        // 「请稍后重试」——后端 php -S 单线程若中途卡死，网络 catch 会弹同款标题，
+        // 假阳性实证：server.log 中断后负向仍「通过」）
+        let alert = app.staticTexts.matching(
+            NSPredicate(format: "label CONTAINS '错误' AND NOT label CONTAINS '稍后重试'"))
+        if alert.firstMatch.waitForExistence(timeout: 30) {
+            app.buttons["确定"].tap()
+        } else {
+            let any = app.staticTexts["提示"]
             let homeTab = app.buttons["权重"]
             XCTAssertFalse(homeTab.exists, "错误密码不应登录成功")
-            XCTFail("预期错误弹窗未出现（服务端响应或弹窗机制异常）")
-        } else {
-            app.buttons["确定"].tap()
+            if any.exists {
+                XCTFail("弹窗文案是客户端兜底而非后端拒绝（后端可能已死）: \(any.label)")
+            } else {
+                print("=== APP ACCESSIBILITY TREE DUMP (no alert) ===")
+                print(app.debugDescription)
+                print("=== END DUMP ===")
+                XCTFail("预期错误弹窗未出现（服务端响应或弹窗机制异常）")
+            }
         }
     }
 }

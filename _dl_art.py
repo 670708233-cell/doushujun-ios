@@ -1,57 +1,20 @@
-# -*- coding: utf-8 -*-
-"""下载指定 artifact（两跳重定向）到 _ipa/ 目录。用法：python _dl_art.py <artifact_id> <out_name>"""
-import io
-import os
-import sys
-import urllib.request
-import urllib.error
-
-OWNER = "670708233-cell"
-REPO = "doushujun-ios"
-
-cred = io.open(r"d:\hubulider\dsj\doushujunfull\_cred_out.txt", encoding="utf-8").read()
-TOKEN = None
-for line in cred.splitlines():
-    line = line.strip()
-    if line.startswith("password="):
-        TOKEN = line[len("password="):].strip()
-        break
-
-ART_ID = sys.argv[1]
-OUT = sys.argv[2]
-API = f"https://api.github.com/repos/{OWNER}/{REPO}/actions/artifacts/{ART_ID}/zip"
-HDRS = {"Authorization": "Bearer " + TOKEN, "Accept": "application/vnd.github+json",
-        "User-Agent": "dsj-dl"}
-
-
+import json, io, os, sys, urllib.request, urllib.error, zipfile
+TOKEN = [l.split("=",1)[1].strip() for l in open(r"d:\hubulider\dsj\doushujunfull\_cred_out.txt", encoding="utf-8") if l.startswith("password=")][0]
+REPO = "670708233-cell/doushujun-ios"
+RUN, WANT = sys.argv[1], sys.argv[2]   # run_id, artifact_name
+H = {"Authorization": "Bearer "+TOKEN, "User-Agent": "dsj", "Accept": "application/vnd.github+json"}
 class NoRedirect(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        return None
-
-
-r = urllib.request.Request(API, headers=HDRS, method="GET")
+    def redirect_request(self, req, fp, code, msg, headers, newurl): return None
 opener = urllib.request.build_opener(NoRedirect)
+arts = json.loads(urllib.request.urlopen(urllib.request.Request(
+    f"https://api.github.com/repos/{REPO}/actions/runs/{RUN}/artifacts", headers=H), timeout=30).read())["artifacts"]
+a = [x for x in arts if x["name"] == WANT][0]
 try:
-    resp = opener.open(r, timeout=60)
-    location = resp.headers.get("Location")
-    if location:
-        r2 = urllib.request.Request(location, headers={"User-Agent": "dsj-dl"}, method="GET")
-        with urllib.request.urlopen(r2, timeout=300) as resp2:
-            data = resp2.read()
-    else:
-        data = resp.read()
+    opener.open(urllib.request.Request(f"https://api.github.com/repos/{REPO}/actions/artifacts/{a['id']}/zip", headers=H), timeout=60)
 except urllib.error.HTTPError as e:
-    if e.code in (301, 302, 303, 307):
-        location = e.headers.get("Location")
-        r2 = urllib.request.Request(location, headers={"User-Agent": "dsj-dl"}, method="GET")
-        with urllib.request.urlopen(r2, timeout=300) as resp2:
-            data = resp2.read()
-    else:
-        raise
-
-out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_ipa")
-os.makedirs(out_dir, exist_ok=True)
-out_path = os.path.join(out_dir, OUT)
-with open(out_path, "wb") as f:
-    f.write(data)
-print("saved:", out_path, len(data), "bytes")
+    data = urllib.request.urlopen(urllib.request.Request(e.headers["Location"], headers={"User-Agent": "dsj"}), timeout=120).read()
+z = zipfile.ZipFile(io.BytesIO(data))
+for n in z.namelist():
+    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.path.basename(n))
+    open(out, "wb").write(z.read(n))
+    print("saved", out, os.path.getsize(out))
