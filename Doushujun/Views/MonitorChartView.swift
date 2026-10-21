@@ -31,10 +31,12 @@ struct MonitorChartView: View {
                         // 作品信息
                         GlassCard(padding: 14) {                   // 信息卡
                             HStack(spacing: 12) {                  // 封面+文字横排
-                                NetImage(url: task.j["cover"].str, width: 46, height: 60)   // 封面图
+                                // 封面：后端 gettasklist 返回字段 content_image（原 cover 不存在实证）
+                                NetImage(url: task.j["content_image"].str, width: 46, height: 60)   // 封面图
                                     .clipShape(RoundedRectangle(cornerRadius: 8))
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text(task.j["video_title"].str ?? "未命名作品")          // 标题（两行截断）
+                                    // 标题：后端字段 content_title（原 video_title 不存在实证）
+                                    Text(task.j["content_title"].str ?? "未命名作品")          // 标题（两行截断）
                                         .font(.system(size: 14)).foregroundColor(T.textMain).lineLimit(2)
                                     let days = Fmt.daysLeft(task.j["expire_time"].str ?? task.j["end_time"].str ?? "")  // 剩余天数
                                     Text(days > 0 ? "监控中 · 剩余 \(days) 天" : "已到期停止采集")            // 状态文案
@@ -100,6 +102,20 @@ struct MonitorChartView: View {
                                 }
                             }
                         }
+
+                        // 每日数据明细表（对齐安卓 MonitorChartScreen「每日明细」：日期倒序最新在上）
+                        if !metrics.isEmpty {
+                            GlassCard {                            // 表格卡
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("每日数据明细").font(.system(size: 14, weight: .semibold)).foregroundColor(T.textMain)  // 区块标题
+                                    // 表头：日期+四指标列（列宽固定比例，与数据行对齐）
+                                    dailyRow(date: "日期", vals: ["播放", "点赞", "评论", "分享"], header: true)
+                                    ForEach(dailyRows.reversed(), id: \.0) { row in   // 倒序：最新日期在最上
+                                        dailyRow(date: row.0, vals: row.1, header: false)  // 单日数据行
+                                    }
+                                }
+                            }
+                        }
                     }
                     .padding(.horizontal, 16)      // 左右留白
                     .padding(.bottom, 30)          // 底部留白
@@ -137,6 +153,54 @@ struct MonitorChartView: View {
             }
         }
     }
+
+    /// 每日明细数据源：把四指标点列按「日」聚合 → [(日期"MM-dd", [四指标字符串])]
+    /// daily 粒度每指标每天仅一点，聚合取当日最后一点（服务端多次采集时兜底）
+    private var dailyRows: [(String, [String])] {
+        let f = DateFormatter()                          // 日期格式化（线程内局部实例）
+        f.dateFormat = "MM-dd"                           // 表格里只显示月-日
+        var byDay: [String: [Double]] = [:]              // 日期 → 四指标值（顺序同 metricDefs）
+        var order: [String] = []                         // 日期出现顺序（保持时间轴）
+        for (mi, m) in metricDefs.enumerated() {         // 遍历四个指标
+            for (d, v) in metrics[m.0] ?? [] {           // 该指标的每个数据点
+                let day = f.string(from: d)              // 时间戳 → "MM-dd"
+                if byDay[day] == nil {                   // 新日期：
+                    byDay[day] = [0, 0, 0, 0]            // 四指标清零初始化
+                    order.append(day)                    // 记录出现顺序
+                }
+                byDay[day]![mi] = v                      // 写入对应指标位（后写覆盖=当日最后一点）
+            }
+        }
+        return order.map { day in                        // 按时间轴顺序组装行数据
+            (day, byDay[day]!.map { $0.numFmtCn2 })      // (日期, [四指标格式化值])
+        }
+    }
+
+    /// 每日明细单行：日期列 + 四指标数值列（表头/数据行共用布局）
+    /// - Parameters:
+    ///   - date: 日期列文字（表头传"日期"）
+    ///   - vals: 四列数值/表头文字
+    ///   - header: 是否表头行（表头用次级色小字，数据行用主色）
+    private func dailyRow(date: String, vals: [String], header: Bool) -> some View {
+        let dateF = f_dateCol                            // 日期列宽
+        return HStack(spacing: 0) {                      // 五列横排
+            Text(date)                                   // 日期列
+                .font(.system(size: header ? 11 : 12, weight: header ? .regular : .medium))
+                .foregroundColor(header ? T.textSub : T.textMain)
+                .frame(width: dateF, alignment: .leading)
+            ForEach(Array(vals.enumerated()), id: \.offset) { i, v in   // 四指标列
+                Text(v)
+                    .font(.system(size: header ? 11 : 12, weight: header ? .regular : .medium))
+                    .foregroundColor(header ? T.textSub : metricDefs[i].2)  // 数值列用各指标本色（呼应折线图例）
+                    .frame(maxWidth: .infinity, alignment: .center)          // 等宽居中
+            }
+        }
+        .padding(.vertical, 4)                           // 行内上下留白
+        .background(header ? AnyShapeStyle(Color.white.opacity(0.04)) : AnyShapeStyle(Color.clear))  // 表头淡底分隔
+    }
+
+    /// 日期列固定宽度（"MM-dd" 五字符）
+    private var f_dateCol: CGFloat { 64 }
 }
 
 /// sheet(item:) 用 Identifiable 包装：任务 J 包一层 UUID

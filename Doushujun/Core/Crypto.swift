@@ -31,11 +31,13 @@ enum Crypto {
     }
 
     /// 旧版 MD5 签名三元组（tools/video/remove_watermark 专用协议）
-    /// signature = MD5("aweme_id=<id>&nonce=<n>&timestamp=<ms>" + secretKey)
+    /// signature = MD5("aweme_id=<id>&nonce=<n>&timestamp=<ms>" + 密钥)
+    /// ⚠密钥必须是后端 MiniProgram::verifySignature 的小程序密钥（与安卓 SignUtil 一致），
+    /// 不能用 web X-Signature 的 secretKey（两套体系各一个 key，混用=「签名验证失败」实证）
     static func legacySign(awemeId: String) -> (timestamp: String, nonce: String, signature: String) {
         let ts = String(Int64(Date().timeIntervalSince1970 * 1000))      // 当前毫秒时间戳
         let nonce = genNonce()                                           // 16 位随机数
-        let sig = md5Hex("aweme_id=\(awemeId)&nonce=\(nonce)&timestamp=\(ts)" + Network.secretKey)  // 固定序拼接+密钥后 MD5
+        let sig = md5Hex("aweme_id=\(awemeId)&nonce=\(nonce)&timestamp=\(ts)" + Network.legacyKey)  // 固定序拼接+小程序密钥后 MD5
         return (ts, nonce, sig)                                          // 三元组一并返回（请求需原样携带）
     }
 

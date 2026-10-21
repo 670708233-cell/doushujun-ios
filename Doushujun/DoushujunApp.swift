@@ -75,10 +75,10 @@ struct MainTabs: View {
     var body: some View {
         TabView(selection: $tab) {
             WeightView(onOpenHistory: { sheet = .weightHistory })          // 0 权重查询
-                .tabItem { Label("权重", systemImage: "scalemass.fill") }
+                .tabItem { Label("AI账号权重分析", systemImage: "scalemass.fill") }
                 .tag(0)
             WorkView(onOpenHistory: { sheet = .workHistory })              // 1 作品解析
-                .tabItem { Label("作品", systemImage: "doc.text.magnifyingglass") }
+                .tabItem { Label("AI作品优化分析", systemImage: "doc.text.magnifyingglass") }
                 .tag(1)
             MonitorView()                                                  // 2 数据监控
                 .tabItem { Label("作品数据监控走势", systemImage: "chart.line.uptrend.xyaxis") }

@@ -18,6 +18,7 @@ struct VipView: View {
     @State private var pointTiers: [(amount: Double, points: Double)] = []  // 点数档位（金额→点数）
     @State private var selectedTier: Double? = nil   // 选中的档位金额
     @State private var customAmount = ""             // 自定义充值金额输入
+    @State private var payType = "wxpay"             // 支付方式：wxpay 微信 / alipay 支付宝（默认微信，对齐安卓，会员/充值两面板共用）
     @State private var allowPointRecharge = false    // 站点是否开放点数充值（决定 Tab 显隐）
     @State private var loading = false               // 首屏加载中
     @State private var error = ""                    // 错误文案（兼 snackbar）
@@ -153,6 +154,17 @@ struct VipView: View {
         }
         .padding(.horizontal, 16)
 
+        // 支付方式选择（对齐安卓 VipScreen：微信/支付宝单选，默认微信）
+        GlassCard(padding: 12) {
+            HStack(spacing: 18) {
+                Text("支付方式").font(.system(size: 13)).foregroundColor(T.textSub)   // 行首标签
+                Spacer()
+                payOption("wxpay", label: "微信支付")                 // 微信单选
+                payOption("alipay", label: "支付宝")                  // 支付宝单选
+            }
+        }
+        .padding(.horizontal, 16)
+
         // 支付按钮
         PrimaryButton(title: "立即开通", loading: paying, enabled: selectedPkg != nil) {  // 未选套餐禁用
             if let pid = selectedPkg { createVipOrder(pkgId: pid) }
@@ -198,6 +210,17 @@ struct VipView: View {
         .onChange(of: customAmount) { v in
             if !v.isEmpty { selectedTier = nil }             // 输入自定义即取消档位
         }
+
+        // 支付方式选择（与会员面板共用 payType 状态）
+        GlassCard(padding: 12) {
+            HStack(spacing: 18) {
+                Text("支付方式").font(.system(size: 13)).foregroundColor(T.textSub)   // 行首标签
+                Spacer()
+                payOption("wxpay", label: "微信支付")                 // 微信单选
+                payOption("alipay", label: "支付宝")                  // 支付宝单选
+            }
+        }
+        .padding(.horizontal, 16)
 
         PrimaryButton(title: "立即充值", loading: paying) {
             createPointOrder()
@@ -249,7 +272,7 @@ struct VipView: View {
                 let d = try await Network.post("vip/create-order", body: [
                     "package_id": pkgId,
                     "user_email": SessionStore.email,        // 后端必校验（缺=「缺少必要参数」实证）
-                    "type": "alipay",                        // 支付渠道（参数名对齐安卓）
+                    "type": payType,                         // 支付渠道：wxpay/alipay（用户单选，透传七相支付 mapi）
                     "device_type": "pc",
                 ])
                 let url = d["pay_url"].str ?? d["recharge_url"].str ?? ""   // 收银台链接双字段兼容
@@ -292,7 +315,7 @@ struct VipView: View {
                 let d = try await Network.post("recharge/create", body: [
                     "amount": amount,
                     "points": points,
-                    "type": "point",
+                    "type": payType,                         // 支付渠道 wxpay/alipay（对齐安卓：type 即渠道，非订单类型）
                     "user_email": SessionStore.email,
                     "device_type": "pc",
                 ])
@@ -328,6 +351,22 @@ struct VipView: View {
                     }
                 }
             }
+        }
+    }
+
+    /// 支付方式单选项（wxpay/alipay 二选一）：文字胶囊，选中态主色高亮
+    /// （SF Symbol 无微信/支付宝品牌图标，纯文字对齐安卓 RadioButton+文字形态）
+    /// - Parameter id: 渠道标识（"wxpay" 微信 / "alipay" 支付宝），与后端 mapi 渠道参数一致
+    private func payOption(_ id: String, label: String) -> some View {
+        let sel = payType == id                            // 是否当前选中渠道
+        return Button {
+            payType = id                                   // 切换支付渠道（两面板共用同一状态）
+        } label: {
+            Text(label).font(.system(size: 13, weight: .medium))  // 渠道名
+                .foregroundColor(sel ? T.primary : T.textSub)  // 选中主色/未选灰
+                .padding(.horizontal, 14).padding(.vertical, 7)
+                .background(Capsule().fill(sel ? T.primary.opacity(0.14) : Color.white.opacity(0.05)))  // 选中淡色底/未选淡灰底
+                .overlay(Capsule().stroke(sel ? T.primary.opacity(0.4) : T.stroke, lineWidth: 1))       // 选中描边高亮
         }
     }
 }

@@ -114,16 +114,18 @@ struct MonitorView: View {
             GlassCard(padding: 14) {
                 VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 12) {
-                        NetImage(url: t["cover"].str, width: 52, height: 68)   // 竖版封面
+                        // 封面：后端 gettasklist 返回字段为 content_image（原 cover 字段不存在→封面空白实证）
+                        NetImage(url: t["content_image"].str, width: 52, height: 68)   // 竖版封面
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(t["video_title"].str ?? "未命名作品")
+                            // 标题：后端字段 content_title（原 video_title 不存在→「未命名作品」实证）
+                            Text(t["content_title"].str ?? "未命名作品")
                                 .font(.system(size: 14, weight: .medium)).foregroundColor(T.textMain).lineLimit(2)
                             HStack(spacing: 6) {
                                 Text(days > 0 ? "剩余 \(days) 天" : "已到期")   // 剩余/到期状态
                                     .font(.system(size: 11))
                                     .foregroundColor(days > 0 ? .green : T.danger)
-                                Text("· \(Fmt.mdhm(Fmt.time(t["create_time"].str ?? "") ?? Date()) )")  // 创建时间（月日时分）
+                                Text("· \(Fmt.mdhm(Fmt.time(t["created_at"].str ?? "") ?? Date()) )")  // 创建时间（后端字段 created_at）
                                     .font(.system(size: 11)).foregroundColor(T.textSub)
                             }
                         }
@@ -418,15 +420,30 @@ struct CreateTaskFlow: View {
         Task {
             defer { submitting = false }
             do {
-                let v = videoInfo                                // 预览详情（可能 nil）
-                let pt = v?["publish_time"].dbl ?? v?["create_time"].dbl ?? 0  // 毫秒/秒级兼容
+                let v = videoInfo                                // 预览详情（可能 nil；后端 douyin_video_detail 可能不含 publish_time）
+                // 发布时间三态解析（对齐安卓 parseTime：数字毫秒/秒 → 字符串日期 → 兜底当前时间；
+                // 兜底必填——后端 empty($publishTime) 直接拒单「发布时间不能为空」实证）
+                let pt: Int = {
+                    if let d = (v?["publish_time"].str ?? v?["create_time"].str).flatMap({ Double($0) }) {
+                        return d > 1e12 ? Int(d / 1000) : Int(d)          // 数字形态：毫秒转秒/秒原样
+                    }
+                    if let s = v?["publish_time"].str ?? v?["create_time"].str {  // 字符串日期形态：
+                        let f = DateFormatter()                           // "yyyy-MM-dd HH:mm:ss"（后端常规存式）
+                        f.dateFormat = "yyyy-MM-dd HH:mm:ss"
+                        if let t = f.date(from: s) { return Int(t.timeIntervalSince1970) }
+                        f.dateFormat = "yyyy-MM-dd"                       // 纯日期形态兜底
+                        if let t = f.date(from: s) { return Int(t.timeIntervalSince1970) }
+                    }
+                    return Int(Date().timeIntervalSince1970)              // 全部取不到：当前时间兜底（对齐安卓 now/1000）
+                }()
                 _ = try await Network.post("monitor/create-task", body: [
                     "user_email": SessionStore.email,
                     "aweme_id": videoId,                         // 后端参数名（原 video_id 404 实证）
-                    "content_title": v?["desc"].str ?? v?["title"].str ?? "未命名作品",
+                    "content_title": v?["desc"].str ?? v?["title"].str ?? "未命名作品",  // 标题（desc 为预览实证字段）
                     "content_url": v?["share_url"].str ?? "",
-                    "content_image": v?["aweme_cover"].str ?? v?["cover"].str ?? v?["cover_url"].str ?? "",
-                    "publish_time": pt > 1e12 ? Int(pt / 1000) : Int(pt),  // 毫秒转秒
+                    // 封面四层兜底：cover_info.default_cover 为预览实证结构，其余对齐安卓
+                    "content_image": v?["cover_info"]["default_cover"].str ?? v?["aweme_cover"].str ?? v?["cover"].str ?? v?["cover_url"].str ?? "",
+                    "publish_time": pt,                          // 秒级时间戳（上面三态解析）
                     "monitor_duration": duration,                // 后端参数名（原 duration_days）
                 ])
                 await MainActor.run { step = 3 }

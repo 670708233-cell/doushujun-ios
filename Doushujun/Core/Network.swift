@@ -30,7 +30,8 @@ final class Network {
     static let baseURL = URL(string: ProcessInfo.processInfo.environment["DSJ_BASE_URL"]
                              ?? "http://192.168.31.100:8000/api/")!  // 明文 HTTP：Info.plist 已允许 NSAllowsArbitraryLoads
     //static let baseURL = URL(string: "https://doushujun.me/api/")!      // 生产环境（发布时切回；带 / 结尾保证相对路径正确追加）
-    static let secretKey = "your_secret_key_here526fb87088aa9ac0bea25c0117f7e018"  // 签名密钥（与 web 端一致）
+    static let secretKey = "your_secret_key_here526fb87088aa9ac0bea25c0117f7e018"  // web X-Signature 签名密钥（与 web 端一致）
+    static let legacyKey = "d74230e9262ee220c7c130aec28c97b5"  // 旧版素材 MD5 签名密钥（后端 MiniProgram::verifySignature 的微信小程序密钥，与安卓 SignUtil 一致）
 
     /// 需要注入 X-Signature/X-Timestamp 的接口路径（与后端约定）
     static let signedPaths: Set<String> = [        // 后缀匹配：覆盖 v2 全族+VIP

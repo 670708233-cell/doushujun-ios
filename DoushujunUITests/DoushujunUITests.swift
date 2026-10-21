@@ -129,7 +129,7 @@ final class DoushujunUITests: XCTestCase {
         }
 
         // —— 硬断言：主页 tab 出现（登录成功；30s 内不出=登录链某环真挂了）——
-        let homeTab = app.buttons["权重"]
+        let homeTab = app.buttons["AI账号权重分析"]   // tab 名随 DoushujunApp 改名同步
         if !homeTab.waitForExistence(timeout: 30) {
             let alertMsg = app.staticTexts.matching(NSPredicate(format: "label CONTAINS '失败' OR label CONTAINS '错误' OR label CONTAINS '验证' OR label CONTAINS '提示'")).allElementsBoundByIndex.first?.label
             print("DIAG home-missing alert=<\(alertMsg ?? "无")>: \(diagBrief(app))")
@@ -178,7 +178,7 @@ final class DoushujunUITests: XCTestCase {
             app.buttons["确定"].tap()
         } else {
             let any = app.staticTexts["提示"]
-            let homeTab = app.buttons["权重"]
+            let homeTab = app.buttons["AI账号权重分析"]   // tab 名随 DoushujunApp 改名同步
             XCTAssertFalse(homeTab.exists, "错误密码不应登录成功")
             if any.exists {
                 XCTFail("弹窗文案是客户端兜底而非后端拒绝（后端可能已死）: \(any.label)")

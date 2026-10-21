@@ -544,10 +544,12 @@ struct WeightRowView: View {
                 Text(value).font(.system(size: 15, weight: .semibold)).foregroundColor(T.textMain)
             }
         } else if name == "综合评级", value.hasPrefix("/img/rating/") {
-            // 综合评级：截「级」前字母 → 本地 rating_X
-            let letter = value.components(separatedBy: "/").last?
-                .replacingOccurrences(of: "rating_", with: "")
-                .replacingOccurrences(of: ".png", with: "") ?? ""
+            // 综合评级：后端值如 "/img/rating/C级.png" → 取末段 "C级.png" → 去 ".png"/去「级」 → "c"
+            // → 本地 asset rating_a/b/c/d 显示徽章图（对齐安卓 rating_a drawable；原图缺失时回退文本）
+            let letter = (value.components(separatedBy: "/").last ?? "")     // "C级.png"
+                .replacingOccurrences(of: ".png", with: "")                  // → "C级"
+                .replacingOccurrences(of: "级", with: "")                    // → "C"
+                .lowercased()                                                // → "c"（asset 命名小写）
             if let img = UIImage(named: "rating_\(letter)") {
                 Image(uiImage: img).resizable().scaledToFit().frame(height: 30)
             } else {
