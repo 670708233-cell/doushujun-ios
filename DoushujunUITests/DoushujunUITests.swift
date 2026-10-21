@@ -84,11 +84,28 @@ final class DoushujunUITests: XCTestCase {
         waitExists(loginBtn, 5)
         loginBtn.tap()
 
-        // 诊断：读 sheet 请求探针（GEE=1 表示按钮 action 已触发、sheet 已请求）
+        // 探针驱动：GEE=1 表示按钮 action 已触发。iOS 17 无头模拟器上 SwiftUI Button 的
+        // element.tap() 偶发不派发 action（已知坑），coordinate.tap() 重试兜底
         let probe = app.descendants(matching: .any).matching(identifier: "gee_state").firstMatch
-        if probe.waitForExistence(timeout: 3) {
-            print("=== PROBE gee_state=\(probe.label) ===")
+        let geeOn = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "label == 'GEE=1'"), object: probe)
+        if XCTWaiter().wait(for: [geeOn], timeout: 4) != .completed {
+            let c = loginBtn.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            for i in 0..<3 {
+                c.tap()
+                if XCTWaiter().wait(for: [geeOn], timeout: 3) == .completed { break }
+                print("=== PROBE retry \(i) gee=\(probe.exists ? probe.label : "N/A") ===")
+            }
         }
+        // 健康检查：仍 GEE=0 时 tap 微信按钮，alert 能弹=tap 机制正常（问题在登录按钮本身）
+        if !(probe.exists && probe.label == "GEE=1") {
+            app.buttons["微信登录"].tap()
+            let tip = app.staticTexts["微信登录暂未开放"]
+            print("=== HEALTHCHECK wechat alert shown=\(tip.waitForExistence(timeout: 4)) ===")
+            if tip.exists { app.buttons["知道了"].tap() }
+        }
+        XCTAssertTrue(probe.exists && probe.label == "GEE=1",
+                      "登录按钮 tap 未触发（探针 GEE=\(probe.exists ? probe.label : "N/A")）")
 
         // 滑块轨道出现（探测极验的半秒占位会先出现，等它切到滑块）
         let track = app.descendants(matching: .any).matching(identifier: "slider_track").firstMatch
@@ -132,7 +149,19 @@ final class DoushujunUITests: XCTestCase {
         let codeField = app.textFields["图形验证码"]
         waitValue(codeField, answer, 5, "验证码未自动填入输入框")
 
-        app.buttons["登  录"].tap()
+        let loginBtn = app.buttons["登  录"]
+        loginBtn.tap()
+        // 探针驱动重试（同正向）
+        let probe = app.descendants(matching: .any).matching(identifier: "gee_state").firstMatch
+        let geeOn = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "label == 'GEE=1'"), object: probe)
+        if XCTWaiter().wait(for: [geeOn], timeout: 4) != .completed {
+            let c = loginBtn.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            for _ in 0..<3 {
+                c.tap()
+                if XCTWaiter().wait(for: [geeOn], timeout: 3) == .completed { break }
+            }
+        }
 
         // 滑块照常出现并拖满（验证链路正常）
         let track = app.descendants(matching: .any).matching(identifier: "slider_track").firstMatch
