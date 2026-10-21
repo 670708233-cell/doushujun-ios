@@ -35,8 +35,12 @@ final class SessionBus: ObservableObject {
     @Published var vipPackageName: String = ""               // 套餐名（如「月低请求版」，VIP 卡胶囊徽章）
     @Published var consumeToday: Int = 0                     // 今日消耗点数
     @Published var dailyLimit: Int = 0                       // 每日免费额度
-    @Published var usedToday: Int = 0                        // 今日已用次数
-    @Published var todayRemaining: Int = 0                   // 今日剩余次数（VIP 卡「剩 N 次」）
+    @Published var usedToday: Int = 0                        // 今日已用次数（作品类口径）
+    @Published var todayRemaining: Int = 0                   // 今日剩余次数（VIP 卡「剩 N 次」，作品类口径）
+    // 查询配额拆分（2026-10-21：作品类与权重类各自独立限额，后端 profile 拆分返回）
+    @Published var weightUsedToday: Int = 0                  // 权重查询今日已用
+    @Published var weightRemainingToday: Int = 0             // 权重查询今日剩余
+    @Published var hasWeightQuota: Bool = false              // 后端已返回权重拆分字段（驱动「我的」页权重行显示；老后端兼容隐藏）
 
     // 公告（announcement/current，超时静默）
     @Published var announcement: (title: String, content: String)? = nil  // 非 nil 显示公告栏
@@ -139,8 +143,17 @@ final class SessionBus: ObservableObject {
                 vipPackageName = data["vip_package_name"].str ?? ""  // 套餐名（「月低请求版」等）
                 consumeToday = data["consume_today"].int ?? consumeToday  // 今日消耗
                 dailyLimit = data["daily_limit"].int ?? dailyLimit   // 每日额度
-                usedToday = data["today_used"].int ?? usedToday      // 今日已用（★profile 字段名是 today_used）
-                todayRemaining = data["today_remaining"].int ?? todayRemaining  // 今日剩余
+                // 作品类配额（新字段 work_* 优先，回退老字段 today_used/today_remaining——两者后端口径均为作品类）
+                usedToday = data["work_used_today"].int ?? data["today_used"].int ?? usedToday          // 作品类今日已用
+                todayRemaining = data["work_remaining_today"].int ?? data["today_remaining"].int ?? todayRemaining  // 作品类今日剩余
+                // 权重类配额（后端拆分新增；老后端无此字段时保持隐藏权重行）
+                if let w = data["weight_used_today"].int {           // 权重今日已用有值：
+                    weightUsedToday = w                              // 更新总线
+                    hasWeightQuota = true                            // 标记后端已支持拆分（「我的」页显示权重行）
+                }
+                if let w = data["weight_remaining_today"].int {      // 权重剩余有值：
+                    weightRemainingToday = w                         // 更新总线
+                }
             }
         }
     }

@@ -199,8 +199,12 @@ struct MineView: View {
                 if bus.isVip {                                 // ---- 已开通会员：三行 ----
                     Text("VIP到期：\(String(bus.vipExpire.prefix(10)))（剩余\(remainDays(bus.vipExpire))天）")  // 完整到期日+剩余天数
                         .font(.system(size: 13, weight: .bold)).foregroundColor(T.warn)
-                    Text("今日查询：\(bus.usedToday)/\(bus.dailyLimit)次（剩\(bus.todayRemaining)次）")          // 今日配额
+                    Text("作品查询：\(bus.usedToday)/\(bus.dailyLimit)次（剩\(bus.todayRemaining)次）")          // 作品类配额（作品分析）
                         .font(.system(size: 12)).foregroundColor(T.textSub)
+                    if bus.hasWeightQuota {                                                                     // 权重类配额（后端拆分支持才显示，老后端兼容）
+                        Text("权重查询：\(bus.weightUsedToday)/\(bus.dailyLimit)次（剩\(bus.weightRemainingToday)次）")  // 与作品类各自独立限额
+                            .font(.system(size: 12)).foregroundColor(T.textSub)
+                    }
                     if !bus.vipPackageName.isEmpty {           // 套餐名胶囊（青色）
                         Text(bus.vipPackageName)
                             .font(.system(size: 10)).foregroundColor(T.primary)
