@@ -62,12 +62,17 @@ final class DoushujunUITests: XCTestCase {
         return captcha.label.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    /// 探针（gee_state）是否已变 GEE=1（每次新建 expectation——XCTWaiter 的 expectation 只能 wait 一次）
+    /// 探针（gee_state）是否已变 GEE=1。
+    /// 不用 NSPredicateExpectation：iOS 17 对 identifier 元素的谓词求值会吃缓存快照（假阴性，
+    /// 实际 GEE=1 却判 0，导致多余 tap 点在 sheet 背后把 sheet 关掉）。手动轮询每次强制 resolve。
     @discardableResult
     private func waitGeeOn(_ probe: XCUIElement, _ timeout: TimeInterval) -> Bool {
-        let exp = XCTNSPredicateExpectation(
-            predicate: NSPredicate(format: "label == 'GEE=1'"), object: probe)
-        return XCTWaiter().wait(for: [exp], timeout: timeout) == .completed
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if probe.exists && probe.label == "GEE=1" { return true }
+            usleep(300_000)
+        }
+        return probe.exists && probe.label == "GEE=1"
     }
 
     /// 正向链路：预填账号 + 自动验证码 + 拖满滑块 → 登录成功进主页
