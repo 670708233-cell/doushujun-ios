@@ -72,19 +72,6 @@ final class DoushujunUITests: XCTestCase {
         return false
     }
 
-    /// 探针（gee_state）是否已变 GEE=1。
-    /// 不用 NSPredicateExpectation：iOS 17 对 identifier 元素的谓词求值会吃缓存快照（假阴性，
-    /// 实际 GEE=1 却判 0，导致多余 tap 点在 sheet 背后把 sheet 关掉）。手动轮询每次强制 resolve。
-    @discardableResult
-    private func waitGeeOn(_ probe: XCUIElement, _ timeout: TimeInterval) -> Bool {
-        let deadline = Date().addingTimeInterval(timeout)
-        while Date() < deadline {
-            if probe.exists && probe.label == "GEE=1" { return true }
-            usleep(300_000)
-        }
-        return probe.exists && probe.label == "GEE=1"
-    }
-
     /// 正向链路：预填账号 + 自动验证码 + 拖满滑块 → 登录成功进主页
     func testLoginFullFlow() throws {
         let app = launch(user: "uitester", pass: "Uitest#2026")
@@ -108,9 +95,8 @@ final class DoushujunUITests: XCTestCase {
 
         // —— app 端自动链（UITEST_AUTO=1）：验证码自动填完 → 延时自动弹滑块 sheet →
         // autoSlide 合成真人轨迹 verify → doLogin。测试端全程不 tap（无头模拟器 Button tap
-        // 事件随机丢失实证）。sheet 生命周期仅 ~1s（autoSlide 完成即关），GEE 探针可能错过，
+        // 事件随机丢失实证）。sheet 生命周期仅 ~1s（autoSlide 完成即关），
         // 故不做中间断言，直接等登录最终结果 ——
-        let _ = app.descendants(matching: .any).matching(identifier: "gee_state").firstMatch
 
         // —— 断言登录成功：主页 tab 出现（失败时打印错误弹窗文案辅助排障）——
         let homeTab = app.buttons["权重"]
