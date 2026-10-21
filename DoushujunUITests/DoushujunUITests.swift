@@ -84,6 +84,12 @@ final class DoushujunUITests: XCTestCase {
         waitExists(loginBtn, 5)
         loginBtn.tap()
 
+        // 诊断：读 sheet 请求探针（GEE=1 表示按钮 action 已触发、sheet 已请求）
+        let probe = app.descendants(matching: .any).matching(identifier: "gee_state").firstMatch
+        if probe.waitForExistence(timeout: 3) {
+            print("=== PROBE gee_state=\(probe.label) ===")
+        }
+
         // 滑块轨道出现（探测极验的半秒占位会先出现，等它切到滑块）
         let track = app.descendants(matching: .any).matching(identifier: "slider_track").firstMatch
         if !track.waitForExistence(timeout: 20) {

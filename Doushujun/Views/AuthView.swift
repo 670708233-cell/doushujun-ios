@@ -178,6 +178,12 @@ private struct LoginPanel: View {
                 .frame(maxWidth: .infinity).frame(height: 46)
                 .background(RoundedRectangle(cornerRadius: 14).fill(Color(hex: "07C160")).opacity(0.85))  // 微信绿
             }
+            #if DEBUG
+            // UI 自动化探针：sheet 请求状态（测试断言用，视觉不可见）
+            Text(showGeeTest ? "GEE=1" : "GEE=0")
+                .font(.system(size: 1)).foregroundColor(.clear)
+                .accessibilityIdentifier("gee_state")
+            #endif
         }
         .sheet(isPresented: $showGeeTest) {
             CaptchaSheet { sliderToken in    // 滑块通过：拿 token 提交登录
@@ -187,12 +193,14 @@ private struct LoginPanel: View {
                 showGeeTest = false
             }
         }
-        .alert("微信登录暂未开放", isPresented: $showWechatTip) {
+        // iOS 同一视图链多 presentation 时后挂覆盖先挂（sheet 会被 alert 吞掉永不弹出），
+        // 两个 alert 拆挂 background 空节点错开层级
+        .background(Color.clear.alert("微信登录暂未开放", isPresented: $showWechatTip) {
             Button("知道了", role: .cancel) {}
         } message: {
             Text("需微信开放平台移动应用资质，当前请使用账号密码登录")
-        }
-        .errorAlert($error)                        // 登录错误统一弹窗
+        })
+        .background(Color.clear.errorAlert($error))   // 登录错误统一弹窗
     }
 
     /// 登录提交：校验 → 拼表单（可选带 slider_token）→ 存会话 → 总线同步 → 回调
