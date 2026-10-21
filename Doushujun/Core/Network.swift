@@ -28,8 +28,8 @@ final class Network {
     /// 本地联调环境（对齐安卓 RetrofitClient 当前配置，测极验滑块用；切回生产时改下行）
     /// UI 自动化测试：XCUITest 经 launchEnvironment 注入 DSJ_BASE_URL 覆盖默认值（连 runner 本机后端）
     static let baseURL = URL(string: ProcessInfo.processInfo.environment["DSJ_BASE_URL"]
-                             ?? "http://192.168.31.100:8000/api/")!  // 明文 HTTP：Info.plist 已允许 NSAllowsArbitraryLoads
-    //static let baseURL = URL(string: "https://doushujun.me/api/")!      // 生产环境（发布时切回；带 / 结尾保证相对路径正确追加）
+                             ?? "https://doushujun.me/api/")!  // 生产环境（带 / 结尾保证相对路径正确追加）
+    //static let baseURL = URL(string: "http://192.168.31.100:8000/api/")!  // 本地联调（极验滑块调试用；明文 HTTP 已由 Info.plist 放行）
     static let secretKey = "your_secret_key_here526fb87088aa9ac0bea25c0117f7e018"  // 签名密钥（与 web 端一致）
 
     /// 需要注入 X-Signature/X-Timestamp 的接口路径（与后端约定）
