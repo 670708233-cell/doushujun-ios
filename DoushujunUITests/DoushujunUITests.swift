@@ -89,14 +89,18 @@ final class DoushujunUITests: XCTestCase {
         XCTAssertTrue(runFullFlowOnce(), "热启动重试后正向链路仍未通过")
     }
 
-    /// 诊断摘要：拉码探针 + 树上关键元素清单（失败定位用）
+    /// 诊断摘要：app 状态 + 拉码探针 + 关键元素 + 全树 dump 头部（失败定位用）
     private func diagBrief(_ app: XCUIApplication) -> String {
-        var parts = ["probe=<\(app.otherElements["captcha_debug"].exists ? app.otherElements["captcha_debug"].label : "n/a")>"]
+        var parts = ["state=\(app.state.rawValue)",
+                     "probe=<\(app.otherElements["captcha_debug"].exists ? app.otherElements["captcha_debug"].label : "n/a")>"]
         for (desc, q) in [("user", app.textFields["用户名或邮箱"]),
                           ("code", app.textFields["图形验证码"]),
                           ("answer", app.otherElements["captcha_answer"])] {
             parts.append("\(desc):\(q.exists ? "label=\(q.label.prefix(12))" : "MISSING")")
         }
+        print("DIAG-TREE-BEGIN")
+        print(app.debugDescription)
+        print("DIAG-TREE-END")
         return parts.joined(separator: " ")
     }
 
