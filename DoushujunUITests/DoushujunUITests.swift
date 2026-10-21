@@ -85,11 +85,16 @@ final class DoushujunUITests: XCTestCase {
         loginBtn.tap()
 
         // 滑块轨道出现（探测极验的半秒占位会先出现，等它切到滑块）
-        let track = app.otherElements["slider_track"]
-        waitExists(track, 20, "滑块面板未出现——验证入口探测/降级链路异常")
+        let track = app.descendants(matching: .any).matching(identifier: "slider_track").firstMatch
+        if !track.waitForExistence(timeout: 20) {
+            print("=== APP ACCESSIBILITY TREE DUMP (slider missing) ===")
+            print(app.debugDescription)
+            print("=== END DUMP ===")
+            XCTFail("滑块面板未出现——验证入口探测/降级链路异常")
+        }
 
         // —— 模拟手指拖满滑块（上报层自带拟人噪声 + ratio 0.94 策略）——
-        let knob = app.otherElements["slider_knob"]
+        let knob = app.descendants(matching: .any).matching(identifier: "slider_knob").firstMatch
         waitExists(knob, 5)
         let start = knob.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
         let end = track.coordinate(withNormalizedOffset: CGVector(dx: 0.995, dy: 0.5))
@@ -124,9 +129,14 @@ final class DoushujunUITests: XCTestCase {
         app.buttons["登  录"].tap()
 
         // 滑块照常出现并拖满（验证链路正常）
-        let track = app.otherElements["slider_track"]
-        waitExists(track, 20)
-        let knob = app.otherElements["slider_knob"]
+        let track = app.descendants(matching: .any).matching(identifier: "slider_track").firstMatch
+        if !track.waitForExistence(timeout: 20) {
+            print("=== APP ACCESSIBILITY TREE DUMP (wrongpw slider missing) ===")
+            print(app.debugDescription)
+            print("=== END DUMP ===")
+            XCTFail("滑块面板未出现")
+        }
+        let knob = app.descendants(matching: .any).matching(identifier: "slider_knob").firstMatch
         let start = knob.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
         let end = track.coordinate(withNormalizedOffset: CGVector(dx: 0.995, dy: 0.5))
         start.press(forDuration: 0.15, thenDragTo: end, withVelocity: .default, thenHoldForDuration: 0.4)
