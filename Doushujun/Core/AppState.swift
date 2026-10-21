@@ -9,6 +9,15 @@ final class SessionBus: ObservableObject {
 
     /// 根视图状态：false=显示登录页，true=显示主页
     @Published var loggedIn: Bool = SessionStore.isLoggedIn  // 初值取本地持久化登录态
+
+    init() {
+        // UI 自动化测试隔离：正向用例登录成功留下的 token 会让下个用例跳过登录页，
+        // UITEST_RESET=1（launchEnvironment 注入）时启动即清登录态
+        if ProcessInfo.processInfo.environment["UITEST_RESET"] == "1" {
+            SessionStore.logout()
+        }
+        loggedIn = SessionStore.isLoggedIn
+    }
     /// 全局错误提示（顶部 Toast）
     @Published var toast: String?                            // 非 nil 显示 Toast
     /// 全屏 loading 文案（nil=隐藏）
