@@ -10,6 +10,8 @@ enum SessionStore {
     private static let kUser = "dsj_username"            // 用户名
     private static let kEmail = "dsj_email"              // 邮箱
     private static let kBalance = "dsj_balance"          // 余额（Double）
+    private static let kNick = "dsj_nickname"            // 昵称（「我的」页显示，可修改）
+    private static let kAvatar = "dsj_avatar"            // 头像 URL（上传后持久化，启动直显）
     private static let kWeightHistory = "dsj_weight_history"    // 权重查询历史键
     private static let kMaterialHistory = "dsj_material_history" // 素材历史键
     private static let kWorkHistory = "dsj_work_history"        // 作品历史键
@@ -20,6 +22,8 @@ enum SessionStore {
     static var username: String { d.string(forKey: kUser) ?? "" }    // 用户名（默认空串）
     static var email: String { d.string(forKey: kEmail) ?? "" }      // 邮箱（默认空串）
     static var balance: Double { d.double(forKey: kBalance) }        // 余额（默认 0）
+    static var nickname: String { d.string(forKey: kNick) ?? "" }    // 昵称（默认空串）
+    static var avatar: String { d.string(forKey: kAvatar) ?? "" }    // 头像 URL（默认空串）
 
     /// 是否已登录：token 非空即视为已登录
     static var isLoggedIn: Bool { !(d.string(forKey: kToken) ?? "").isEmpty }
@@ -38,10 +42,24 @@ enum SessionStore {
         d.set(v, forKey: kBalance)  // 覆盖余额
     }
 
-    /// 退出登录：仅清令牌（用户名/邮箱保留供登录页回显）
+    /// 持久化昵称（修改昵称成功/profile 回填时调用）
+    static func saveNickname(_ v: String) {
+        d.set(v, forKey: kNick)  // 覆盖昵称
+        d.synchronize()          // 立即落盘
+    }
+
+    /// 持久化头像 URL（上传成功/profile 回填时调用）
+    static func saveAvatar(_ v: String) {
+        d.set(v, forKey: kAvatar)  // 覆盖头像
+        d.synchronize()            // 立即落盘
+    }
+
+    /// 退出登录：清令牌与个人资料（昵称/头像），用户名/邮箱保留供登录页回显
     static func logout() {
-        d.removeObject(forKey: kToken)  // 删令牌
-        d.synchronize()                 // 立即落盘
+        d.removeObject(forKey: kToken)    // 删令牌
+        d.removeObject(forKey: kNick)     // 删昵称（防换号串显）
+        d.removeObject(forKey: kAvatar)   // 删头像（防换号串显）
+        d.synchronize()                   // 立即落盘
     }
 
     // MARK: - 查询历史（通用条目编解码）

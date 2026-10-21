@@ -63,6 +63,46 @@ final class Network {
         try await shared.request("GET", path, body: nil, query: query)    // GET 转发
     }
 
+    /// multipart 文件上传（对齐安卓 uploadAvatar：POST user/avatar，字段名 file）
+    /// - 成功判定/错误分类与 request 一致（401 踢登录、业务错抛 msg）
+    static func upload(_ path: String, fileData: Data, fileName: String, mimeType: String, fieldName: String = "file") async throws -> J {
+        let url = URL(string: path, relativeTo: Self.baseURL)!          // 相对路径拼 base
+        var req = URLRequest(url: url)                                  // 构建请求
+        req.httpMethod = "POST"                                         // 上传统一 POST
+        let boundary = "dsj.boundary.\(Int(Date().timeIntervalSince1970 * 1000))"  // 分隔符（时间戳防撞）
+        req.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")  // multipart 头
+        if let token = SessionStore.token {                             // 会话头（上传需登录）
+            req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        var body = Data()                                               // 请求体组装
+        body.append(Data("--\(boundary)\r\n".utf8))                     // 分隔起始
+        body.append(Data("Content-Disposition: form-data; name=\"\(fieldName)\"; filename=\"\(fileName)\"\r\n".utf8))  // 文件段头
+        body.append(Data("Content-Type: \(mimeType)\r\n\r\n".utf8))     // 文件 MIME
+        body.append(fileData)                                           // 文件二进制
+        body.append(Data("\r\n--\(boundary)--\r\n".utf8))               // 分隔结束
+        req.httpBody = body                                             // 挂体
+        let (d, r): (Data, URLResponse)                                 // 发送
+        do {
+            (d, r) = try await shared.session.data(for: req)            // 异步发送
+        } catch {
+            throw ApiError.network("网络连接失败，请检查网络")            // 传输层失败
+        }
+        let http = r as! HTTPURLResponse                                // HTTP 响应
+        if http.statusCode == 503 { throw ApiError.maintenance }        // 维护中
+        guard let root = try? J(data: d) else {                         // 响应非 JSON：
+            throw ApiError.network("服务返回异常(\(http.statusCode))")   // 网络错误
+        }
+        let code = root["code"].int ?? -999                             // 业务码
+        if code == 401 {                                                // 会话过期：
+            SessionBus.shared.forceLogout()                             // 全局踢登录
+            throw ApiError.sessionExpired                               // 抛过期
+        }
+        guard code == 200 || code == 1 else {                           // 业务失败：
+            throw ApiError.business(root["msg"].str ?? "上传失败，请重试")  // 后端文案
+        }
+        return root["data"]                                             // 成功返回 data 节点
+    }
+
     /// 核心请求实现：拼 URL → 注签名/会话头 → 发送 → 错误分类 → 取 data 节点
     private func request(_ method: String, _ path: String, body: [String: Any]?, query: [String: String]) async throws -> J {
         var url = URL(string: path, relativeTo: Self.baseURL)!  // 相对路径拼 base（base 带 / 尾保证追加语义）

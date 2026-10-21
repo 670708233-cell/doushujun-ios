@@ -26,12 +26,17 @@ final class SessionBus: ObservableObject {
     // 账号/余额/VIP（refreshAccount 刷新）
     @Published var username: String = SessionStore.username  // 用户名（初值取本地）
     @Published var email: String = SessionStore.email        // 邮箱
+    @Published var nickname: String = SessionStore.nickname  // 昵称（「我的」页显示，空回退用户名）
+    @Published var avatarUrl: String? = SessionStore.avatar.isEmpty ? nil : SessionStore.avatar  // 头像 URL（nil=默认图标）
     @Published var balance: Double = SessionStore.balance    // 余额
     @Published var vipLevel: String = "免费用户"              // VIP 等级名
+    @Published var isVip: Bool = false                       // 是否 VIP 会员（驱动「我的」VIP 卡三行/两行分支）
     @Published var vipExpire: String = ""                    // VIP 到期时间
+    @Published var vipPackageName: String = ""               // 套餐名（如「月低请求版」，VIP 卡胶囊徽章）
     @Published var consumeToday: Int = 0                     // 今日消耗点数
     @Published var dailyLimit: Int = 0                       // 每日免费额度
     @Published var usedToday: Int = 0                        // 今日已用次数
+    @Published var todayRemaining: Int = 0                   // 今日剩余次数（VIP 卡「剩 N 次」）
 
     // 公告（announcement/current，超时静默）
     @Published var announcement: (title: String, content: String)? = nil  // 非 nil 显示公告栏
@@ -109,22 +114,33 @@ final class SessionBus: ObservableObject {
         }
     }
 
-    /// 刷新账号状态（user/profile：余额+VIP+配额；失败静默）
+    /// 刷新账号状态（user/profile：资料+余额+VIP+配额；失败静默）
     func refreshAccount() {
         Task {  // 后台任务
             guard let data = try? await Network.get("user/profile") else { return }  // 失败静默
             await MainActor.run {  // 主线程批量更新
                 username = data["username"].str ?? username          // 用户名（缺省保留旧值）
                 email = data["email"].str ?? email                   // 邮箱
+                if let n = data["nickname"].str, !n.isEmpty {        // 昵称（后端保证非空，存量自动生成）
+                    nickname = n                                     // 更新总线
+                    SessionStore.saveNickname(n)                     // 落盘
+                }
+                if let a = data["avatar"].str {                      // 头像（后端已拼完整 URL，空串=无头像）
+                    avatarUrl = a.isEmpty ? nil : a                  // 更新总线
+                    SessionStore.saveAvatar(a)                       // 落盘（空串存空串=清除）
+                }
                 if let b = data["balance"].dbl {                     // 余额有值：
                     balance = b                                      // 更新总线
                     SessionStore.setBalance(b)                       // 落盘
                 }
                 vipLevel = data["vip_level_name"].str ?? (data["vip_level"].int.flatMap { $0 > 0 ? "VIP\($0)" : nil } ?? "免费用户")  // 等级名：后端名 > 数字拼 VIP > 免费用户
-                vipExpire = data["vip_expire_time"].str ?? ""        // 到期时间
+                isVip = data["is_vip"].bool ?? isVip                 // 是否 VIP（驱动 VIP 卡分支）
+                vipExpire = data["vip_expire_time"].str ?? ""        // 到期完整时间
+                vipPackageName = data["vip_package_name"].str ?? ""  // 套餐名（「月低请求版」等）
                 consumeToday = data["consume_today"].int ?? consumeToday  // 今日消耗
                 dailyLimit = data["daily_limit"].int ?? dailyLimit   // 每日额度
-                usedToday = data["used_today"].int ?? usedToday      // 今日已用
+                usedToday = data["today_used"].int ?? usedToday      // 今日已用（★profile 字段名是 today_used）
+                todayRemaining = data["today_remaining"].int ?? todayRemaining  // 今日剩余
             }
         }
     }
