@@ -323,6 +323,7 @@ struct WeightView: View {
                     history = SessionStore.history(SessionStore.weightHistoryKey)
                     bus.setBalance(d["new_balance"].dbl)
                     bus.setUsage(consume: d["consume_today"].int, used: nil, limit: nil)
+                    bus.refreshAccount()              // 补拉配额（weight_used_today 仅 profile 全量返回，顶部「今日已用」即时更新）
                 }
             } catch let e as ApiError {
                 await MainActor.run { self.error = e.errorDescription ?? "" }

@@ -562,6 +562,7 @@ struct WorkView: View {
                     SessionStore.pushHistory(SessionStore.workHistoryKey, id: wid, name: r0["desc"].str ?? wid)   // 记足迹
                     history = SessionStore.history(SessionStore.workHistoryKey)
                     bus.setBalance(d["new_balance"].dbl)  // 同步扣费后余额
+                    bus.refreshAccount()              // 补拉配额（work_used_today 仅 profile 全量返回，顶部「今日已用」即时更新）
                 }
             } catch let e as ApiError {
                 await MainActor.run { self.error = e.errorDescription ?? "" }
@@ -595,6 +596,7 @@ struct WorkView: View {
                     SessionStore.pushHistory(SessionStore.workHistoryKey, id: awemeId, name: r0["desc"].str ?? awemeId)   // 记足迹
                     history = SessionStore.history(SessionStore.workHistoryKey)
                     bus.setBalance(d["new_balance"].dbl)
+                    bus.refreshAccount()              // 直通查询同样计一次配额，顶部条同步刷新
                 }
                 doAiAnalyze()                             // 数据到手即自动启动 AI
             } catch {
