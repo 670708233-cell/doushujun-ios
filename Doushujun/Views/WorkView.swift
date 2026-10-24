@@ -18,6 +18,8 @@ struct WorkView: View {
     @State private var recentList: [J] = []
     @State private var snackbar = ""
     @State private var tip: (String, String)? = nil
+    @AppStorage("work_history_style") private var recStyle = "list"   // 查询记录视图样式（持久化，下次进入保持）
+    @State private var recQuery = ""                                  // 查询记录搜索词
 
     var body: some View {
         ZStack {
@@ -97,35 +99,63 @@ struct WorkView: View {
         }
     }
 
-    // MARK: - 最近分析（服务端前 3）
+    // MARK: - 查询记录（服务端前 10，四种视图样式 + 搜索，对齐安卓 WorkScreen.kt）
 
+    /// 查询记录区：标题行（条数徽章+云同步徽章）+ 样式切换 + 搜索框 + 记录视图
     @ViewBuilder
     private var recentSection: some View {
-        if !recentList.isEmpty {               // 服务端记录（卡片式）
-            SectionTitle(text: "最近分析")
-            ForEach(Array(recentList.prefix(3).enumerated()), id: \.offset) { _, r in
-                let cover = r["cover_info"]["default_cover"].str ?? r["aweme_cover"].str   // 封面双字段兼容
-                Button {
-                    if let id = r["aweme_id"].str {    // 点卡回填并查询
-                        input = id
-                        doQuery()
-                    }
-                } label: {
-                    GlassCard(padding: 12) {
-                        HStack(spacing: 12) {
-                            NetImage(url: cover, width: 56, height: 74)   // 竖版封面缩略
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text({ let d = r["desc"].str ?? ""; return d.isEmpty ? "未命名作品" : d }())   // 描述缺省兜底
-                                    .font(.system(size: 13, weight: .medium)).foregroundColor(T.textMain).lineLimit(2)
-                                Text("账号：\(r["owner_handle"].str ?? r["author_unique_id"].str ?? "-")")   // 作者双字段
-                                    .font(.system(size: 11)).foregroundColor(T.textSub).lineLimit(1)
-                                Text("查询时间：\(String((r["last_query_time"].str ?? "").prefix(16)))")   // 时间截 16 位
-                                    .font(.system(size: 11)).foregroundColor(T.textSub).lineLimit(1)
-                            }
-                            Spacer()
+        if !recentList.isEmpty {
+            // 标题行：渐变竖条 + 条数徽章（搜索时显示匹配数）+ 云同步徽章
+            HStack(spacing: 6) {
+                SectionTitle(text: "查询记录")
+                Text(recQuery.isEmpty ? "共 \(recentList.count) 条" : "匹配 \(filteredRecs.count)/\(recentList.count) 条")
+                    .font(.system(size: 10)).foregroundColor(T.primary)
+                    .padding(.horizontal, 8).padding(.vertical, 3)
+                    .background(Capsule().fill(T.primary.opacity(0.12)))
+                Spacer()
+                Text("☁ 与 Web 端同步")
+                    .font(.system(size: 10)).foregroundColor(T.primary)
+                    .padding(.horizontal, 8).padding(.vertical, 3)
+                    .background(Capsule().fill(T.primary.opacity(0.12)))
+            }
+            // 四种视图切换器：选中主题色胶囊，样式 @AppStorage 持久化
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach([("list", "列表"), ("card", "卡片列表"), ("grid", "仪表网格"), ("timeline", "时间线")], id: \.0) { pair in
+                        Button { recStyle = pair.0 } label: {
+                            Text(pair.1)
+                                .font(.system(size: 11, weight: recStyle == pair.0 ? .semibold : .regular))
+                                .foregroundColor(recStyle == pair.0 ? .white : T.textSub)
+                                .padding(.horizontal, 12).padding(.vertical, 5)
+                                .background(Capsule().fill(recStyle == pair.0 ? T.primary : T.primary.opacity(0.08)))
                         }
                     }
+                }
+            }
+            // 搜索框：描述 / 作品ID / 账号 / 时间
+            HStack(spacing: 6) {
+                Image(systemName: "magnifyingglass").font(.system(size: 13)).foregroundColor(T.textSub)
+                TextField("搜索记录：描述 / 作品ID / 账号 / 时间", text: $recQuery)
+                    .font(.system(size: 13)).foregroundColor(T.textMain).autocorrectionDisabled()
+                if !recQuery.isEmpty {
+                    Button { recQuery = "" } label: {
+                        Image(systemName: "xmark.circle.fill").font(.system(size: 14)).foregroundColor(T.textSub)
+                    }
+                }
+            }
+            .padding(.horizontal, 12).frame(height: 38)
+            .background(RoundedRectangle(cornerRadius: 10).fill(Color.white.opacity(0.05)))
+            .overlay(RoundedRectangle(cornerRadius: 10).stroke(T.stroke, lineWidth: 1))
+            // 记录视图
+            if filteredRecs.isEmpty {
+                Text("未找到匹配的记录").font(.system(size: 12)).foregroundColor(T.textSub)
+                    .frame(maxWidth: .infinity).padding(.vertical, 20)
+            } else {
+                switch recStyle {
+                case "card": recCards
+                case "grid": recGrid
+                case "timeline": recTimeline
+                default: recList
                 }
             }
         } else if !history.isEmpty {           // 本地 chips 回退
@@ -160,12 +190,171 @@ struct WorkView: View {
         }
     }
 
+    // MARK: - 查询记录视图（列表/卡片/网格/时间线）
+
+    /// 搜索过滤：描述/作品ID/作者昵称/作者账号/查询时间任一命中即保留
+    private var filteredRecs: [J] {
+        guard !recQuery.isEmpty else { return recentList }
+        let q = recQuery.lowercased()
+        return recentList.filter { r in
+            [r["desc"].str, r["aweme_id"].str, r["owner_nickname"].str, r["owner_handle"].str, r["last_query_time"].str]
+                .contains { ($0 ?? "").lowercased().contains(q) }
+        }
+    }
+
+    /// 列表（默认）：紧凑行卡（竖版封面缩略），一屏条数最多
+    private var recList: some View {
+        VStack(spacing: 8) {
+            ForEach(Array(filteredRecs.enumerated()), id: \.offset) { _, r in
+                recTap(r) {
+                    GlassCard(padding: 12) {
+                        HStack(spacing: 12) {
+                            NetImage(url: recCover(r), width: 56, height: 74)   // 竖版封面缩略
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(recDesc(r))
+                                    .font(.system(size: 13, weight: .medium)).foregroundColor(T.textMain).lineLimit(2)
+                                Text("账号：\(r["owner_handle"].str ?? r["author_unique_id"].str ?? "-")")   // 作者双字段
+                                    .font(.system(size: 11)).foregroundColor(T.textSub).lineLimit(1)
+                                Text("查询时间：\(recTime(r))")
+                                    .font(.system(size: 11)).foregroundColor(T.textSub).lineLimit(1)
+                            }
+                            Spacer()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// 卡片列表：全宽封面大卡，信息最完整
+    private var recCards: some View {
+        VStack(spacing: 8) {
+            ForEach(Array(filteredRecs.enumerated()), id: \.offset) { _, r in
+                recTap(r) {
+                    GlassCard(padding: 12) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            NetImage(url: recCover(r), height: 150)   // 全宽 16:9 封面
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 150)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                            Text(recDesc(r))
+                                .font(.system(size: 13, weight: .medium)).foregroundColor(T.textMain).lineLimit(3)
+                            Text("账号：\(r["owner_handle"].str ?? r["author_unique_id"].str ?? "-")")
+                                .font(.system(size: 11)).foregroundColor(T.textSub).lineLimit(1)
+                            Text("查询时间：\(recTime(r))")
+                                .font(.system(size: 11)).foregroundColor(T.textSub)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// 仪表网格：双列 1:1 封面，横向扫读对比
+    private var recGrid: some View {
+        LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible())], spacing: 8) {
+            ForEach(Array(filteredRecs.enumerated()), id: \.offset) { _, r in
+                recTap(r) {
+                    GlassCard(padding: 10) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            NetImage(url: recCover(r), height: 120)   // 1:1 封面（网格列宽自适应）
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 120)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                            Text(recDesc(r))
+                                .font(.system(size: 12, weight: .semibold)).foregroundColor(T.textMain).lineLimit(2)
+                            Text("查询时间：\(recTime(r))")
+                                .font(.system(size: 10)).foregroundColor(T.textSub).lineLimit(1)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// 时间线：左侧发光轴+主题色节点，右侧记录卡（回溯最直观）
+    private var recTimeline: some View {
+        VStack(spacing: 0) {
+            ForEach(Array(filteredRecs.enumerated()), id: \.offset) { i, r in
+                HStack(alignment: .top, spacing: 10) {
+                    VStack(spacing: 0) {
+                        Circle().fill(T.primary).frame(width: 9, height: 9)   // 发光节点
+                        if i < filteredRecs.count - 1 {
+                            Rectangle().fill(T.primary.opacity(0.25)).frame(width: 2).frame(maxHeight: .infinity)   // 轴线撑满到下一条
+                        }
+                    }
+                    recTap(r) {
+                        GlassCard(padding: 12) {
+                            HStack(spacing: 10) {
+                                NetImage(url: recCover(r), width: 56, height: 56)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(recDesc(r))
+                                        .font(.system(size: 13, weight: .semibold)).foregroundColor(T.textMain).lineLimit(1)
+                                    Text("账号：\(r["owner_handle"].str ?? r["author_unique_id"].str ?? "-")")
+                                        .font(.system(size: 11)).foregroundColor(T.textSub).lineLimit(1)
+                                    Text("查询时间：\(recTime(r))")
+                                        .font(.system(size: 11)).foregroundColor(T.textSub).lineLimit(1)
+                                }
+                                Spacer()
+                            }
+                        }
+                    }
+                }
+                .padding(.bottom, 8)
+            }
+        }
+    }
+
+    /// 记录卡统一点击行为：回填作品 ID 并发起查询
+    private func recTap<R: View>(_ r: J, @ViewBuilder label: () -> R) -> some View {
+        Button {
+            if let id = r["aweme_id"].str {
+                input = id
+                doQuery()
+            }
+        } label: { label() }
+    }
+
+    /// 封面双字段兼容
+    private func recCover(_ r: J) -> String? {
+        r["cover_info"]["default_cover"].str ?? r["aweme_cover"].str
+    }
+
+    /// 描述缺省兜底
+    private func recDesc(_ r: J) -> String {
+        let d = r["desc"].str ?? ""
+        return d.isEmpty ? "未命名作品" : d
+    }
+
+    /// 查询时间截 16 位可读化
+    private func recTime(_ r: J) -> String {
+        String((r["last_query_time"].str ?? "").prefix(16))
+    }
+
     // MARK: - 结果区
 
     /// 结果区：作品信息/作者信息/数据表现/雷达图/时间/带货/热搜词/状态/AI 入口/建议
     @ViewBuilder
     private var resultSection: some View {
         let r = result!
+
+        // 清空查询结果：回查询记录区（对齐安卓 WorkScreen.kt）
+        HStack {
+            Spacer()
+            Button {
+                result = nil
+                aiResultData = nil
+                snackbar = "已清空查询结果"
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "xmark.circle").font(.system(size: 12))
+                    Text("清空查询结果").font(.system(size: 12))
+                }
+                .foregroundColor(T.textSub)
+            }
+        }
 
         // 作品信息
         SectionTitle(text: "作品信息")
@@ -175,20 +364,24 @@ struct WorkView: View {
                     NetImage(url: r["cover_info"]["default_cover"].str ?? r["aweme_cover"].str, width: 86, height: 114)   // 大封面（双字段兼容）
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                     VStack(alignment: .leading, spacing: 6) {
-                        Text({ let d = r["desc"].str ?? ""; return d.isEmpty ? "无描述" : d }())   // 描述（3 行截断）
+                        Text({ let d = r["desc"].str ?? ""; return d.isEmpty ? "无描述" : d }())   // 描述（3 行截断，长按复制）
                             .font(.system(size: 13)).foregroundColor(T.textMain).lineLimit(3)
-                        Text("分类：\(r["video_category_desc"].str ?? "无")\n形式：\(r["orientation"].str ?? "未知")    时长：\(r["duration_formatted"].str ?? "未知")\(resolution(r))")   // 元信息+分辨率
+                            .copyable(r["desc"].str)
+                        Text("分类：\(r["video_category_desc"].str ?? "无")\n形式：\(r["orientation"].str ?? "未知")    时长：\(r["duration_formatted"].str ?? "未知")\(resolution(r))")   // 元信息+分辨率，长按复制
                             .font(.system(size: 11)).foregroundColor(T.textSub)
-                        if let tp = r["traffic_pool_desc"].str, !tp.isEmpty {   // 流量池（有值才显示）
+                            .copyable("分类：\(r["video_category_desc"].str ?? "无")\n形式：\(r["orientation"].str ?? "未知")    时长：\(r["duration_formatted"].str ?? "未知")\(resolution(r))")
+                        if let tp = r["traffic_pool_desc"].str, !tp.isEmpty {   // 流量池（有值才显示，长按复制）
                             Text("流量池：\(tp)").font(.system(size: 11)).foregroundColor(T.warn)
+                                .copyable("流量池：\(tp)")
                         }
                     }
                     Spacer(minLength: 0)
                 }
-                if let aiTitle = r["ai_title"].str, !aiTitle.isEmpty {   // AI 推荐标题（| 转行）
+                if let aiTitle = r["ai_title"].str, !aiTitle.isEmpty {   // AI 推荐标题（| 转行，长按复制）
                     Text("AI 推荐标题").font(.system(size: 11)).foregroundColor(T.textSub)
                     Text(aiTitle.replacingOccurrences(of: "|", with: "\n"))
                         .font(.system(size: 13)).foregroundColor(T.warn)
+                        .copyable(aiTitle.replacingOccurrences(of: "|", with: "\n"))
                 }
                 infoLine("作品ID", r["aweme_id"].str ?? "")
             }
@@ -204,8 +397,9 @@ struct WorkView: View {
         SectionTitle(text: "作者信息")
         GlassCard {
             VStack(alignment: .leading, spacing: 4) {
-                Text("\(aField("owner_nickname"))  @\(aField("owner_handle"))")   // 昵称 @handle
+                Text("\(aField("owner_nickname"))  @\(aField("owner_handle"))")   // 昵称 @handle，长按复制
                     .font(.system(size: 15, weight: .semibold)).foregroundColor(T.textMain)
+                    .copyable("\(aField("owner_nickname"))  @\(aField("owner_handle"))")
                 infoLine("用户签名", aField("signature"))
                 infoLine("粉丝数", aField("follower_count"))
                 infoLine("总获赞数", aField("total_favorited"))
@@ -224,26 +418,28 @@ struct WorkView: View {
         GlassCard {
             VStack(spacing: 2) {
                 ForEach(MetricOrder, id: \.key) { m in
-                    if let v = metricText(st, m.key) {   // 有值才渲染该行
+                    if let v = metricText(st, m.key) {   // 有值才渲染该行（长按复制）
                         HStack {
                             tipIcon("播放/推荐量" == m.label || metricName(m.key) != nil, m.label)   // 可释义行带问号
                             Text(m.label).font(.system(size: 13)).foregroundColor(T.textSub)
                             Spacer()
                             Text(v).font(.system(size: 13)).foregroundColor(T.textMain)
+                                .copyable(v)             // 长按复制数值
                         }
                         .padding(.vertical, 4)
                     }
                 }
-                if let er = r["engagement_rate_formatted"].str, !er.isEmpty {   // 互动率行
+                if let er = r["engagement_rate_formatted"].str, !er.isEmpty {   // 互动率行（长按复制）
                     HStack {
                         tipIcon(true, "互动率")
                         Text("互动率").font(.system(size: 13)).foregroundColor(T.textSub)
                         Spacer()
                         Text(er).font(.system(size: 13)).foregroundColor(T.primary)
+                            .copyable(er)
                     }
                     .padding(.vertical, 4)
                 }
-                let wr = r["weighted_engagement_rate_formatted"].str   // 加权互动率（格式化字段或数值拼 %）
+                let wr = r["weighted_engagement_rate_formatted"].str   // 加权互动率（格式化字段或数值拼 %，长按复制）
                     ?? r["weighted_engagement_rate"].dbl.map { String(format: "%.2f%%", $0) }
                 if let wr = wr, !wr.isEmpty {
                     HStack {
@@ -251,6 +447,7 @@ struct WorkView: View {
                         Text("加权互动率").font(.system(size: 13)).foregroundColor(T.textSub)
                         Spacer()
                         Text(wr).font(.system(size: 13)).foregroundColor(T.primary)
+                            .copyable(wr)
                     }
                     .padding(.vertical, 4)
                 }
@@ -380,7 +577,7 @@ struct WorkView: View {
 
     // MARK: - 小组件
 
-    /// 信息行：可释义问号 + 标签 + 右对齐值
+    /// 信息行：可释义问号 + 标签 + 右对齐值；长按弹「拷贝」菜单
     private func infoLine(_ label: String, _ value: String, color: Color = T.textMain) -> some View {
         HStack(alignment: .top) {
             tipIcon(WorkTips[label] != nil, label)   // 有释义才显示问号
@@ -389,6 +586,7 @@ struct WorkView: View {
             Text(value.isEmpty ? "-" : value)        // 空值显示占位
                 .font(.system(size: 13)).foregroundColor(color)
                 .multilineTextAlignment(.trailing)
+                .copyable(value)                     // 长按复制（对齐安卓数据行）
         }
         .padding(.vertical, 3)
     }
@@ -427,11 +625,11 @@ struct WorkView: View {
 
     // MARK: - 数据流
 
-    /// 拉服务端最近分析（前 3 条，失败静默）
+    /// 拉服务端查询记录（前 10 条，失败静默；对齐安卓查询记录区容量）
     private func loadRecent() {
         Task {
             if let d = try? await Network.post("v2/query/history", body: [
-                "user_email": SessionStore.email, "page": 1, "page_size": 3,
+                "user_email": SessionStore.email, "page": 1, "page_size": 10,
             ]) {
                 await MainActor.run { recentList = d["videos"].arr }
             }
@@ -711,3 +909,16 @@ let WorkTips: [String: String] = [
     "查询状态": "本次查询是否成功获取作品数据",
     "限流": "作品是否被平台限制推荐，限流后曝光量会骤降",
 ]
+
+extension View {
+    /// 长按弹出「拷贝」菜单（对齐安卓数据行长按复制）；空值不弹
+    func copyable(_ text: String?) -> some View {
+        contextMenu {
+            if let t = text, !t.isEmpty {
+                Button {
+                    UIPasteboard.general.string = t   // 写入系统剪贴板
+                } label: { Label("拷贝", systemImage: "doc.on.doc") }
+            }
+        }
+    }
+}

@@ -19,6 +19,10 @@ struct WeightHistoryView: View {
     @State private var error = ""                        // 首屏错误文案
     @State private var local: [SessionStore.HistoryEntry] = []  // 本地记录缓存
     @State private var detail: J? = nil                  // 当前查看的报告详情（nil=关闭）
+    @State private var snackbar = ""                     // 删除/跳转轻提示
+    @State private var rowTip: (String, String)? = nil   // 指标释义弹窗
+    @State private var deleting: J? = nil                // 待删除确认的记录（nil=关闭）
+    @ObservedObject private var bus = SessionBus.shared  // 全局总线（跳作品页直查）
 
     var body: some View {
         ZStack {
@@ -33,6 +37,16 @@ struct WeightHistoryView: View {
                 }
             }
             if let d = detail { detailSheet(d) }         // 报告详情浮层（覆盖全屏）
+            if let t = rowTip { tipDialog(t) }           // 指标释义弹窗
+        }
+        .snackbar($snackbar)
+        .confirmationDialog("确定删除这条分析记录？", isPresented: Binding(
+            get: { deleting != nil }, set: { if !$0 { deleting = nil } }), titleVisibility: .visible) {
+            Button("删除", role: .destructive) {          // 确认删除
+                if let d = deleting { doDelete(d) }
+                deleting = nil
+            }
+            Button("取消", role: .cancel) { deleting = nil }
         }
         .onAppear {
             if tab == 0 && list.isEmpty { load(reset: true) }  // 首次进入拉首页
@@ -84,11 +98,19 @@ struct WeightHistoryView: View {
                                 VStack(alignment: .leading, spacing: 3) {
                                     Text(str(r, "nickname") ?? "未知昵称").font(.system(size: 14, weight: .semibold)).foregroundColor(T.textMain)  // 昵称
                                     Text("权重分 \(str(r, "weight_score") ?? "-") · \(str(r, "weight_desc") ?? "")")  // 分数+描述一行
-                                        .font(.system(size: 12)).foregroundColor(T.textSub).lineLimit(1)
+                                        .font(.system(size: 12)).foregroundColor(T.warn).lineLimit(1)
+                                    Text("健康 \(str(r, "health_score") ?? "-") · 活跃 \(str(r, "activity_score") ?? "-") · 粉丝 \((str(r, "follower_count") ?? "0").numFmtCn)")  // 摘要行（对齐安卓卡）
+                                        .font(.system(size: 11)).foregroundColor(T.textSub).lineLimit(1)
                                     Text((str(r, "last_query_time") ?? "").replacingOccurrences(of: "T", with: " "))  // 查询时间可读化
                                         .font(.system(size: 11)).foregroundColor(T.textSub)
                                 }
                                 Spacer()
+                                Button {                      // 删除（对齐安卓卡右上角 trash）
+                                    deleting = r
+                                } label: {
+                                    Image(systemName: "trash").font(.system(size: 13)).foregroundColor(T.danger)
+                                }
+                                .padding(.trailing, 2)
                                 Image(systemName: "chevron.right").font(.system(size: 12)).foregroundColor(T.textSub)  // 可点暗示
                             }
                         }
@@ -171,6 +193,59 @@ struct WeightHistoryView: View {
         }
     }
 
+    // MARK: - 删除 / 释义 / 数据兼容
+
+    /// 删除 AI 报告记录：POST weight/delete（user_email + record_id，与安卓/Web 同参）
+    private func doDelete(_ d: J) {
+        guard let id = d["id"].int ?? d["record_id"].int else { return }
+        Task {
+            do {
+                _ = try await Network.post("v2/query/weight/delete", body: [
+                    "user_email": SessionStore.email, "record_id": id,
+                ])
+                await MainActor.run {
+                    list.removeAll { ($0["id"].int ?? -1) == id || ($0["record_id"].int ?? -2) == id }  // 本地移除
+                    total = max(0, total - 1)
+                    snackbar = "已删除该记录"
+                }
+            } catch {
+                await MainActor.run { snackbar = (error as? ApiError)?.errorDescription ?? "删除失败，请稍后重试" }
+            }
+        }
+    }
+
+    /// effective 兼容：weight_info.data.rowInfo != null ? weight_info.data : 原始（对齐 WeightView）
+    private func effective(_ d: J) -> J {
+        let inner = d["weight_info"]["data"]
+        if !inner["rowInfo"].arr.isEmpty || inner["rowInfo"].exists { return inner }
+        return d
+    }
+
+    /// 指标释义弹窗（遮罩可点关闭，样式对齐 WeightView.tipDialog）
+    private func tipDialog(_ t: (String, String)) -> some View {
+        ZStack {
+            Color.black.opacity(0.55).ignoresSafeArea().onTapGesture { rowTip = nil }
+            VStack(alignment: .leading, spacing: 12) {
+                Text(t.0).font(.system(size: 16, weight: .bold)).foregroundColor(T.textMain)
+                ScrollView(showsIndicators: false) {
+                    Text(t.1).font(.system(size: 13)).foregroundColor(T.textSub)
+                }
+                .frame(maxHeight: 200)
+                Button {
+                    rowTip = nil
+                } label: {
+                    Text("知道了").font(.system(size: 14, weight: .medium)).foregroundColor(T.primary)
+                        .frame(maxWidth: .infinity).frame(height: 42)
+                        .background(RoundedRectangle(cornerRadius: 10).fill(T.primary.opacity(0.12)))
+                }
+            }
+            .padding(18)
+            .background(RoundedRectangle(cornerRadius: 16).fill(T.card))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(T.stroke, lineWidth: 1))
+            .padding(.horizontal, 40)
+        }
+    }
+
     // MARK: - AI 报告详情（5 区块）
 
     /// 报告详情浮层：基本信息卡 + AI 五区块（空洞时缺省隐藏）
@@ -197,6 +272,33 @@ struct WeightHistoryView: View {
                                 InfoRow(label: "健康度", value: str(d, "health_desc") ?? "-", valueColor: .green)
                                 InfoRow(label: "粉丝数", value: (str(d, "follower_count") ?? "0").numFmtCn)  // 万/亿缩写
                                 InfoRow(label: "查询时间", value: (str(d, "last_query_time") ?? "").replacingOccurrences(of: "T", with: " "))
+                            }
+                        }
+                        // 权重指标行（row_info 还原，对齐安卓历史详情展开区）
+                        let rows = effective(d)["rowInfo"].arr
+                        if !rows.isEmpty {
+                            Text("权重指标").font(.system(size: 14, weight: .semibold)).foregroundColor(T.primary)
+                            GlassCard(padding: 12) {
+                                VStack(spacing: 2) {
+                                    let coverRows = rows.filter { $0["isShow"].bool && $0["rowValueType"].int == 1 && !$0["rowValueDetail"].arr.isEmpty }
+                                    ForEach(Array(rows.filter { $0["isShow"].bool && !($0["rowValueType"].int == 1 && !$0["rowValueDetail"].arr.isEmpty) }.enumerated()),
+                                            id: \.offset) { _, row in
+                                        WeightRowView(row: row, onTapTip: { rowTip = $0 }, onWork: { awemeId in
+                                            bus.pendingWorkId = awemeId   // 直通车：跳作品页直查
+                                            detail = nil
+                                            snackbar = "已切换到作品分析页"
+                                        })
+                                        Divider().overlay(Color.white.opacity(0.05))
+                                    }
+                                    ForEach(Array(coverRows.enumerated()), id: \.offset) { _, row in
+                                        CoverGridRow(row: row, onWork: { awemeId in
+                                            bus.pendingWorkId = awemeId
+                                            detail = nil
+                                            snackbar = "已切换到作品分析页"
+                                        })
+                                        .padding(.vertical, 6)
+                                    }
+                                }
                             }
                         }
                         // 5 区块
