@@ -88,6 +88,7 @@ struct WorkView: View {
         .onAppear {
             history = SessionStore.history(SessionStore.workHistoryKey)   // 刷新本地足迹
             loadRecent()                           // 拉服务端最近分析
+            bus.refreshAccount()                   // 进入页面即拉配额：打开界面立即显示今日已用/剩余
         }
         .onChange(of: bus.pendingWorkId) { id in
             // 直通车：历史/权重页封面 → 直查并自动 AI
@@ -760,7 +761,10 @@ struct WorkView: View {
                     SessionStore.pushHistory(SessionStore.workHistoryKey, id: wid, name: r0["desc"].str ?? wid)   // 记足迹
                     history = SessionStore.history(SessionStore.workHistoryKey)
                     bus.setBalance(d["new_balance"].dbl)  // 同步扣费后余额
-                    bus.refreshAccount()              // 补拉配额（work_used_today 仅 profile 全量返回，顶部「今日已用」即时更新）
+                    // 本地即时自增：不等 profile 回包，顶部「今日已用/剩 N 次」当场更新
+                    bus.usedToday += 1
+                    if bus.todayRemaining > 0 { bus.todayRemaining -= 1 }
+                    bus.refreshAccount()              // 补拉配额（服务器值校准本地）
                 }
             } catch let e as ApiError {
                 await MainActor.run { self.error = e.errorDescription ?? "" }
@@ -794,7 +798,10 @@ struct WorkView: View {
                     SessionStore.pushHistory(SessionStore.workHistoryKey, id: awemeId, name: r0["desc"].str ?? awemeId)   // 记足迹
                     history = SessionStore.history(SessionStore.workHistoryKey)
                     bus.setBalance(d["new_balance"].dbl)
-                    bus.refreshAccount()              // 直通查询同样计一次配额，顶部条同步刷新
+                    // 直通查询同样计一次配额，本地即时自增后由 profile 校准
+                    bus.usedToday += 1
+                    if bus.todayRemaining > 0 { bus.todayRemaining -= 1 }
+                    bus.refreshAccount()              // 补拉配额（服务器值校准本地）
                 }
                 doAiAnalyze()                             // 数据到手即自动启动 AI
             } catch {

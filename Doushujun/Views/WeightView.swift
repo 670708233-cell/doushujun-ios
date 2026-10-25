@@ -94,6 +94,7 @@ struct WeightView: View {
         .onAppear {
             loadRecent()
             history = SessionStore.history(SessionStore.weightHistoryKey)
+            bus.refreshAccount()   // 进入页面即拉配额：打开界面立即显示今日已用/剩余（不等到首次查询）
         }
         .onChange(of: bus.pendingWeightId) { id in
             // 历史 → 直查
@@ -328,6 +329,26 @@ struct WeightView: View {
         let eff = effective(result!)
         let rows = eff["rowInfo"].arr
 
+        // 清空查询结果：回查询记录区（对齐作品页 WorkView）
+        HStack {
+            Spacer()
+            Button {
+                withAnimation {
+                    result = nil
+                    aiResult = nil
+                    aiMsg = nil
+                    aiError = ""
+                }
+                snackbar = "已清空查询结果"
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "xmark.circle").font(.system(size: 12))
+                    Text("清空查询结果").font(.system(size: 12))
+                }
+                .foregroundColor(T.textSub)
+            }
+        }
+
         // 头像信息卡
         GlassCard {
             HStack(spacing: 12) {
@@ -488,7 +509,10 @@ struct WeightView: View {
                     history = SessionStore.history(SessionStore.weightHistoryKey)
                     bus.setBalance(d["new_balance"].dbl)
                     bus.setUsage(consume: d["consume_today"].int, used: nil, limit: nil)
-                    bus.refreshAccount()              // 补拉配额（weight_used_today 仅 profile 全量返回，顶部「今日已用」即时更新）
+                    // 本地即时自增：不等 profile 回包，顶部「今日已用/剩 N 次」当场更新
+                    bus.weightUsedToday += 1
+                    if bus.weightRemainingToday > 0 { bus.weightRemainingToday -= 1 }
+                    bus.refreshAccount()              // 补拉配额（weight_used_today 仅 profile 全量返回，服务器值校准本地）
                 }
             } catch let e as ApiError {
                 await MainActor.run { self.error = e.errorDescription ?? "" }
