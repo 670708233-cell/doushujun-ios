@@ -11,7 +11,7 @@ struct MonitorChartView: View {
     @State private var loading = false             // 加载中
     @State private var error = ""                  // 错误文案
     @State private var cumulative = true           // true=累计曲线 / false=单日增量
-    @State private var hidden: Set<String> = []    // 被隐藏的指标集合（最多隐 3 个）
+    @State private var metric = "play_count"       // 当前选中指标（单选单线，对齐安卓 MonitorChartScreen）
 
     /// 指标定义：data_type / 中文名 / 折线色
     private let metricDefs: [(String, String, Color)] = [
@@ -46,18 +46,18 @@ struct MonitorChartView: View {
                             }
                         }
 
-                        // 指标开关 + 累计切换
+                        // 指标切换（单选） + 累计切换
                         HStack(spacing: 8) {                       // 四胶囊+右侧切换
                             ForEach(metricDefs, id: \.0) { m in    // 遍历指标定义
-                                Button {                           // 点按切换显隐
-                                    if hidden.contains(m.0) { hidden.remove(m.0) } else if hidden.count < 3 { hidden.insert(m.0) }  // 最多同时隐 3 个（至少留 1 条线）
+                                Button {                           // 点按选中该指标（单线展示）
+                                    metric = m.0
                                 } label: {
                                     Text(m.1)                      // 指标名胶囊
                                         .font(.system(size: 12, weight: .medium))
-                                        .foregroundColor(hidden.contains(m.0) ? T.textSub : m.2)                       // 隐藏灰/显示本色
+                                        .foregroundColor(metric == m.0 ? m.2 : T.textSub)                  // 选中本色/未选灰
                                         .padding(.horizontal, 12).padding(.vertical, 7)
-                                        .background(Capsule().fill(hidden.contains(m.0) ? Color.white.opacity(0.05) : m.2.opacity(0.14)))  // 隐藏淡灰/显示淡色底
-                                        .overlay(Capsule().stroke(hidden.contains(m.0) ? T.stroke : m.2.opacity(0.4), lineWidth: 1))       // 描边同步
+                                        .background(Capsule().fill(metric == m.0 ? m.2.opacity(0.14) : Color.white.opacity(0.05)))  // 选中淡色底/未选淡灰
+                                        .overlay(Capsule().stroke(metric == m.0 ? m.2.opacity(0.4) : T.stroke, lineWidth: 1))      // 描边同步
                                 }
                             }
                             Spacer()                               // 右推
@@ -81,13 +81,13 @@ struct MonitorChartView: View {
                                     EmptyState(icon: "chart.xyaxis.line", text: error.isEmpty ? "数据采集中，稍后再来看看" : error)  // 空态/错误
                                         .padding(.vertical, 20)
                                 } else {                           // 有数据：
-                                    let series = metricDefs.compactMap { m -> LineChartView.Series? in  // 组装可见序列
-                                        guard let pts = metrics[m.0], !pts.isEmpty, !hidden.contains(m.0) else { return nil }  // 无点或被隐藏：跳过
+                                    let series = metricDefs.compactMap { m -> LineChartView.Series? in  // 组装序列（单选：仅当前指标）
+                                        guard m.0 == metric, let pts = metrics[m.0], !pts.isEmpty else { return nil }  // 未选中或无点：跳过
                                         return LineChartView.Series(label: m.1, color: m.2, points: pts)  // 序列（元组隐式适配命名字段）
                                     }
-                                    if series.isEmpty {            // 全被隐藏：
-                                        Text("请至少选择一个指标").font(.system(size: 13)).foregroundColor(T.textSub)
-                                            .frame(maxWidth: .infinity).padding(.vertical, 40)  // 提示
+                                    if series.isEmpty {            // 选中指标暂无数据：
+                                        EmptyState(icon: "chart.xyaxis.line", text: "该指标暂无数据，稍后再来看看")
+                                            .padding(.vertical, 20)
                                     } else {
                                         LineChartView(series: series)  // 折线图
                                     }
