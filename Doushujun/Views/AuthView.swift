@@ -249,6 +249,7 @@ private struct LoginPanel: View {
                 "password": pw,
                 "captcha_key": captchaKey,
                 "captcha_code": captchaCode.trimmingCharacters(in: .whitespaces),
+                "platform": "ios",   // 登录来源平台（后端记 last_login_platform，看板区分登录端）
             ]
             if !sliderToken.isEmpty { body["slider_token"] = sliderToken }   // 生产后端强校验，滑块必过才有值
             let d = try await Network.post("user/login", body: body)
@@ -383,6 +384,7 @@ private struct RegisterPanel: View {
                 "captcha_code": captchaCode.trimmingCharacters(in: .whitespaces),
                 "slider_token": sliderToken,       // 生产后端注册同样强校验
                 "invite_code": inviteCode.trimmingCharacters(in: .whitespaces),
+                "platform": "ios",                 // 注册来源（后端记 register_from，看板统计 iOS 端新增）
             ])
             onSuccess()                            // 注册即登录成功
         } catch {

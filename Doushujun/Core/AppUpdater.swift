@@ -1,4 +1,5 @@
 import SwiftUI  // UI 框架：View/UIApplication/Bundle
+import UIKit    // UIDevice：取 identifierForVendor 作设备标识（统计去重用）
 
 /// 启动更新检查（对齐安卓 AppUpdater：延迟 2.5s、force_update 不可关闭；iOS 展示提示+跳转链接）：
 /// App 启动后后台静默请求版本接口，发现新版本且携带更新日志时弹出更新窗；
@@ -19,8 +20,15 @@ final class AppUpdater: ObservableObject {
     func checkOnLaunch() {
         Task {  // 后台并发任务
             try? await Task.sleep(nanoseconds: 2_500_000_000)  // 睡 2.5s（纳秒），出错忽略
-            // 带 platform=ios：后端按平台读 ios_app_update_* 配置（不传=安卓键，老安卓包兼容）
-            guard let d = try? await Network.get("app/check-update", query: ["platform": "ios"]) else { return }  // 请求失败静默跳过
+            // 带 platform=ios：后端按平台读 ios_app_update_* 配置（不传=安卓键，老安卓包兼容）；
+            // device_id/app_version：后端顺带记录 iOS 端安装与启动统计（后台看板数据来源）
+            let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? ""  // 设备标识（同设备稳定，抹机才变）
+            let dispVer = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"  // 展示版本号
+            guard let d = try? await Network.get("app/check-update", query: [  // 请求失败静默跳过
+                "platform": "ios",
+                "device_id": deviceId,
+                "app_version": dispVer,
+            ]) else { return }
             // iOS 端无安卓 APK，仅当后端下发了 ios/通用提示时展示（无版本强比对的 URL 载体时忽略）
             guard let log = d["update_log"].str, !log.isEmpty else { return }  // 无更新日志：视为无更新
             let vc = d["version_code"].int ?? 0           // 远端版本号（数字比对基准）
