@@ -18,12 +18,13 @@ final class AppUpdater: ObservableObject {
 
     /// 启动时调用：延迟 2.5 秒后检查（避开启动高峰，不卡首屏）
     func checkOnLaunch() {
+        // 设备标识/版本号在 UI 同步上下文先取好（UIDevice/Bundle 是 MainActor 隔离，不能进 Task 再取）
+        let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? ""  // 设备标识（同设备稳定，抹机才变）
+        let dispVer = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"  // 展示版本号
         Task {  // 后台并发任务
             try? await Task.sleep(nanoseconds: 2_500_000_000)  // 睡 2.5s（纳秒），出错忽略
             // 带 platform=ios：后端按平台读 ios_app_update_* 配置（不传=安卓键，老安卓包兼容）；
             // device_id/app_version：后端顺带记录 iOS 端安装与启动统计（后台看板数据来源）
-            let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? ""  // 设备标识（同设备稳定，抹机才变）
-            let dispVer = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"  // 展示版本号
             guard let d = try? await Network.get("app/check-update", query: [  // 请求失败静默跳过
                 "platform": "ios",
                 "device_id": deviceId,
