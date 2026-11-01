@@ -97,9 +97,12 @@ struct CaptchaImage: View {
         Task { await pullAnswer() }
     }
 
-    /// 拉码重试循环：拿到明文答案即止；失败/无答案 1s 后再试，最多 5 次
+    /// 拉码：响应到手即收工（原版行为：一次拉成，验证码图不再连换）。
+    /// ★成功判定不能是「拿到明文答案」——生产后端（APP_DEBUG=false）永不回传答案字段，
+    ///   旧逻辑会因此判为未成功连拉 5 次、验证码图每秒一换（线上「验证码刷新 3 次」的根因）。
+    /// 仅传输失败才重试：最多 3 次、间隔 1s；仍失败显示「点击刷新」占位，由用户手点。
     private func pullAnswer() async {
-        for attempt in 0..<5 {
+        for attempt in 0..<3 {
             do {
                 let d = try await Network.get("captcha/generate")
                 let uri = d["captcha_image"].str ?? ""
@@ -114,13 +117,13 @@ struct CaptchaImage: View {
                     #if DEBUG
                     dbg = "n=\(attempt + 1) err= ans=\(ans.count) key=\(captchaKey.count)"
                     #endif
-                    // UI 自动化：UITEST_AUTO=1 时把明文自动填入输入框（CI 无键盘焦点，typeText 不可用）
+                    // UI 自动化：UITEST_AUTO=1 时把明文自动填入输入框（CI 无键盘焦点，typeText 不可用；仅 debug 后端有答案，不受本次改动影响）
                     if ProcessInfo.processInfo.environment["UITEST_AUTO"] == "1" && !ans.isEmpty {
                         code = ans
                         onAutoFill?()               // 通知面板触发滑块（tap 在无头模拟器不可靠）
                     }
                 }
-                if !ans.isEmpty { return }          // 拿到答案：成功收工
+                return                              // ★响应处理完即成功收工（生产一次拉成，不再循环）
             } catch let e {
                 await MainActor.run {
                     img = nil; captchaKey = ""      // 失败清空待重试
@@ -129,7 +132,7 @@ struct CaptchaImage: View {
                     #endif
                 }
             }
-            if attempt < 4 { try? await Task.sleep(nanoseconds: 1_000_000_000) }
+            if attempt < 2 { try? await Task.sleep(nanoseconds: 1_000_000_000) }
         }
     }
 }
@@ -285,9 +288,9 @@ private struct LoginPanel: View {
             }
             guard code == 200 || code == 1 else {
                 if let m = root["msg"].str { throw ApiError.business(m) }
-                // 无 msg 的异常响应：透出原始 code 形态便于定位（缺失 vs 字符串数字）
-                let codeRaw = root["code"].str ?? "字段缺失"
-                throw ApiError.business("登录失败(\(code)/原始:\(codeRaw))，请稍后重试")
+                // 无 msg 的异常响应：文案明确指向「服务端响应异常」（多为网络波动/瞬时故障），
+                // 不用「字段缺失」字样——用户会误以为是自己少填了表单字段
+                throw ApiError.business("登录失败(服务响应异常-\(code))，请稍后重试")
             }
             let d = root["data"]
             let token = d["token"].str ?? ""
