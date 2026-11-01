@@ -177,6 +177,7 @@ private struct LoginPanel: View {
     @State private var error = ""                  // 错误文案
     @State private var showGeeTest = false         // 滑块弹窗显隐（先验证后提交）
     @State private var showWechatTip = false       // 微信登录提示弹窗
+    @State private var multiInfo: J?               // 多端在线达上限（409）data：非 nil 弹确认框（need_confirm/force_token/在线设备）
     @ObservedObject private var bus = SessionBus.shared
 
     var body: some View {
@@ -225,21 +226,40 @@ private struct LoginPanel: View {
             }
         }
         // iOS 同一视图链多 presentation 时后挂覆盖先挂（sheet 会被 alert 吞掉永不弹出），
-        // 两个 alert 拆挂 background 空节点错开层级
+        // 多个 alert 拆挂 background 空节点错开层级
         .background(Color.clear.alert("微信登录暂未开放", isPresented: $showWechatTip) {
             Button("知道了", role: .cancel) {}
         } message: {
             Text("需微信开放平台移动应用资质，当前请使用账号密码登录")
         })
+        // 多端在线达上限确认（后端409）：继续登录=踢最早设备强登
+        .background(Color.clear.alert("登录设备数已达上限", isPresented: Binding(
+            get: { multiInfo != nil },           // 409 数据在即弹
+            set: { if !$0 { multiInfo = nil } }  // 关闭即清（取消/确认统一走按钮回调，此处兜底）
+        )) {
+            Button("继续登录") {                  // 确认强登：凭一次性 force_token 重试（后端跳过验证码）
+                let ft = multiInfo?["force_token"].str
+                multiInfo = nil
+                Task { await doLogin(sliderToken: nil, forceToken: ft) }
+            }
+            Button("取消", role: .cancel) {       // 放弃强登：清验证码回到正常登录状态
+                multiInfo = nil
+                captchaCode = ""
+                captchaKey = ""
+            }
+        } message: {
+            Text(multiInfoText)
+        })
         .background(Color.clear.errorAlert($error))   // 登录错误统一弹窗
     }
 
-    /// 登录提交：校验 → 拼表单（可选带 slider_token）→ 存会话 → 总线同步 → 回调
-    private func doLogin(sliderToken: String) async {
+    /// 登录提交：校验 → 拼表单（可选带 slider_token / force_token）→ 存会话 → 总线同步 → 回调
+    /// - forceToken：多端确认强登令牌（409 用户点「继续登录」后重试；后端凭它跳过验证码校验，60 秒内有效）
+    private func doLogin(sliderToken: String? = nil, forceToken: String? = nil) async {
         let un = username.trimmingCharacters(in: .whitespaces)
         let pw = password
         guard !un.isEmpty, !pw.isEmpty else { error = "请输入账号和密码"; return }               // 前置校验
-        if captchaKey.isEmpty && !captchaCode.isEmpty { error = "请输入图形验证码"; return }     // 无 key 却有输入=没拉到码
+        if forceToken == nil && captchaKey.isEmpty && !captchaCode.isEmpty { error = "请输入图形验证码"; return } // 无 key 却有输入=没拉到码
         loading = true
         error = ""
         defer { loading = false }
@@ -247,12 +267,26 @@ private struct LoginPanel: View {
             var body: [String: Any] = [
                 "username": un,
                 "password": pw,
-                "captcha_key": captchaKey,
-                "captcha_code": captchaCode.trimmingCharacters(in: .whitespaces),
-                "platform": "ios",   // 登录来源平台（后端记 last_login_platform，看板区分登录端）
+                "platform": "ios",   // 登录来源平台（后端多端在线统计/看板区分登录端）
             ]
-            if !sliderToken.isEmpty { body["slider_token"] = sliderToken }   // 生产后端强校验，滑块必过才有值
-            let d = try await Network.post("user/login", body: body)
+            if let ft = forceToken {
+                body["force_token"] = ft   // 确认强登：只带一次性令牌（60秒内有效）
+            } else {                        // 正常登录：带验证码三件套
+                body["captcha_key"] = captchaKey
+                body["captcha_code"] = captchaCode.trimmingCharacters(in: .whitespaces)
+                if let st = sliderToken, !st.isEmpty { body["slider_token"] = st }   // 生产后端强校验，滑块必过才有值
+            }
+            // postRaw：409 需读 data.need_confirm/force_token，常规 post 会把 409 抛成 business 丢失载荷
+            let root = try await Network.postRaw("user/login", body: body)
+            let code = root["code"].int ?? -999
+            if code == 409 && root["data"]["need_confirm"].bool {   // 多端在线达上限：存 data 驱动确认弹窗
+                multiInfo = root["data"]
+                return
+            }
+            guard code == 200 || code == 1 else {
+                throw ApiError.business(root["msg"].str ?? "登录失败，请稍后重试")
+            }
+            let d = root["data"]
             let token = d["token"].str ?? ""
             guard !token.isEmpty else { throw ApiError.business("登录失败，请稍后重试") }
             SessionStore.saveLogin(token: token,               // 持久化会话
@@ -267,6 +301,18 @@ private struct LoginPanel: View {
             captchaCode = ""                                   // 失败清验证码输入防重放
             captchaKey = ""                                    // 旧图形码已被消费，清 key 触发子组件自动换码
         }
+    }
+
+    /// 409 确认弹窗正文：在线设备列表 + 强登后果提示（对齐 web 端 showMultiLoginConfirm 文案）
+    private var multiInfoText: String {
+        guard let info = multiInfo else { return "" }
+        let nameMap = ["web": "网页端", "android": "安卓端", "ios": "iOS端", "exe": "exe端"]
+        let lines = info["online_devices"].arr.map { d -> String in
+            let p = d["platform"].str ?? "未知"
+            return "• \(nameMap[p] ?? p)（\(d["login_time"].str ?? "未知时间") 登录）"
+        }
+        let list = lines.isEmpty ? "" : "\n" + lines.joined(separator: "\n")
+        return "您的账号当前已在 \(info["online_count"].int ?? 0) 台设备在线（上限 \(info["limit"].int ?? 0) 台）：\(list)\n\n继续登录将使最早登录的设备退出登录，是否继续？"
     }
 }
 

@@ -58,6 +58,12 @@ final class Network {
         try await shared.request("POST", path, body: body, query: query)  // POST 转发
     }
 
+    /// 同 post，但业务失败不抛错：返回完整响应 root（含 code/msg/data）交调用方自判
+    /// - 用途：登录 409 多端确认（need_confirm/force_token 在 data 节点，常规 post 会把 409 抛成 business 丢失）
+    static func postRaw(_ path: String, body: [String: Any] = [:], query: [String: String] = [:]) async throws -> J {
+        try await shared.request("POST", path, body: body, query: query, raw: true)  // raw 通道转发
+    }
+
     /// GET 请求：仅 query 参数
     static func get(_ path: String, query: [String: String] = [:]) async throws -> J {
         try await shared.request("GET", path, body: nil, query: query)    // GET 转发
@@ -104,7 +110,8 @@ final class Network {
     }
 
     /// 核心请求实现：拼 URL → 注签名/会话头 → 发送 → 错误分类 → 取 data 节点
-    private func request(_ method: String, _ path: String, body: [String: Any]?, query: [String: String]) async throws -> J {
+    /// - raw=true：业务失败不抛错，返回完整 root（登录 409 多端确认读 need_confirm/force_token 用）
+    private func request(_ method: String, _ path: String, body: [String: Any]?, query: [String: String], raw: Bool = false) async throws -> J {
         var url = URL(string: path, relativeTo: Self.baseURL)!  // 相对路径拼 base（base 带 / 尾保证追加语义）
         if !query.isEmpty {                                     // 有 query 参数：
             var comps = URLComponents(url: url, resolvingAgainstBaseURL: true)!  // 组件化
@@ -156,6 +163,7 @@ final class Network {
         }
         let ok = code == 200 || code == 1                        // 成功码：200 或 1（VIP/支付族）
         if !ok {                                                 // 业务失败：
+            if raw { return root }                               // raw 通道：不抛错，完整响应交调用方自判（409 确认等）
             throw ApiError.business(root["msg"].str ?? root["message"].str ?? "请求失败，请稍后重试")  // 展示后端文案
         }
         return root["data"]                                      // 成功：返回 data 节点
