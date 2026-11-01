@@ -284,11 +284,11 @@ private struct LoginPanel: View {
                 return
             }
             guard code == 200 || code == 1 else {
-                throw ApiError.business(root["msg"].str ?? "登录失败，请稍后重试")
+                throw ApiError.business(root["msg"].str ?? "登录失败(\(code))，请稍后重试")
             }
             let d = root["data"]
             let token = d["token"].str ?? ""
-            guard !token.isEmpty else { throw ApiError.business("登录失败，请稍后重试") }
+            guard !token.isEmpty else { throw ApiError.business("登录响应异常（token缺失），请稍后重试") }
             SessionStore.saveLogin(token: token,               // 持久化会话
                                    username: d["username"].str,
                                    email: d["email"].str,
@@ -297,7 +297,13 @@ private struct LoginPanel: View {
             bus.refreshAccount()                               // 补拉账户（余额/用量/VIP）
             onSuccess()                                        // 根容器切主页
         } catch {
-            self.error = (error as? ApiError)?.errorDescription ?? "登录失败，请稍后重试"
+            let desc = (error as? ApiError)?.errorDescription ?? "登录失败：\(String(describing: error))"
+            // force_token 确认重试失败且后端报验证码错 = 确认令牌已过期（第二轮不带验证码，验证码校验必败）
+            if forceToken != nil && desc.contains("验证码") {
+                self.error = "确认已超时，请重新点击「登 录」并完成验证"
+            } else {
+                self.error = desc
+            }
             captchaCode = ""                                   // 失败清验证码输入防重放
             captchaKey = ""                                    // 旧图形码已被消费，清 key 触发子组件自动换码
         }
