@@ -1,0 +1,14 @@
+name: CI Probe (ubuntu)
+
+on:
+  push:
+    branches: [probe-check]
+  workflow_dispatch:
+
+jobs:
+  probe:
+    name: Probe ubuntu runner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo
+        run: echo "ubuntu runner alive at $(date -u)"
