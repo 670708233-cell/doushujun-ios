@@ -1,4 +1,4 @@
-name: CI Probe (ubuntu)
+name: CI Probe (macos)
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
 
 jobs:
   probe:
-    name: Probe ubuntu runner
-    runs-on: ubuntu-latest
+    name: Probe macos runner
+    runs-on: macos-latest
     steps:
       - name: Echo
-        run: echo "ubuntu runner alive at $(date -u)"
+        run: echo "macos runner alive at $(date -u)"
