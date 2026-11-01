@@ -284,7 +284,10 @@ private struct LoginPanel: View {
                 return
             }
             guard code == 200 || code == 1 else {
-                throw ApiError.business(root["msg"].str ?? "登录失败(\(code))，请稍后重试")
+                if let m = root["msg"].str { throw ApiError.business(m) }
+                // 无 msg 的异常响应：透出原始 code 形态便于定位（缺失 vs 字符串数字）
+                let codeRaw = root["code"].str ?? "字段缺失"
+                throw ApiError.business("登录失败(\(code)/原始:\(codeRaw))，请稍后重试")
             }
             let d = root["data"]
             let token = d["token"].str ?? ""
