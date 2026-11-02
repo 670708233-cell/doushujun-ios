@@ -287,8 +287,10 @@ private struct LoginPanel: View {
                 return
             }
             guard code == 200 || code == 1 else {
-                if let m = root["msg"].str { throw ApiError.business(m) }
-                // 无 msg 的异常响应：文案明确指向「服务端响应异常」（多为网络波动/瞬时故障），
+                // message 兼容：TP8 部署模式异常响应是 {code:"42S22", message:"..."}（code 为 SQLSTATE 字符串
+                // 会 .int 失败落到 -999；字段名是 message 不是 msg）——不兼容它，后端炸了用户只见神秘 -999
+                if let m = root["msg"].str ?? root["message"].str { throw ApiError.business(m) }
+                // 无 msg/message 的异常响应：文案明确指向「服务端响应异常」（多为网络波动/瞬时故障），
                 // 不用「字段缺失」字样——用户会误以为是自己少填了表单字段
                 throw ApiError.business("登录失败(服务响应异常-\(code))，请稍后重试")
             }
