@@ -931,16 +931,17 @@ struct GeeTestWebView: UIViewRepresentable {
     }
 
     private func load(_ wv: WKWebView) {
-        // 读 bundle 里的 geetest.html → 替换 captcha_id → 写沙盒 → loadFileURL
+        // 读 bundle 里的 geetest.html → 替换 captcha_id → loadHTMLString 注入
+        // ★baseURL 必须给 https://doushujun.me（对齐安卓 loadDataWithBaseURL 的已验证方案）：
+        // 旧版 loadFileURL 使 location.protocol='file:'，gt4.js 按 protocol+'//' 拼 JSONP
+        // 地址变成 file://gcaptcha4.geetest.com/... 必然加载失败 → onError → 永远降级自研滑块
         guard let url = Bundle.main.url(forResource: "geetest", withExtension: "html"),
               var html = try? String(contentsOf: url, encoding: .utf8) else {
             onError("验证组件缺失")
             return
         }
         html = html.replacingOccurrences(of: "__CAPTCHA_ID__", with: captchaId)
-        let tmp = FileManager.default.temporaryDirectory.appendingPathComponent("geetest_run.html")
-        try? html.write(to: tmp, atomically: true, encoding: .utf8)
-        wv.loadFileURL(tmp, allowingReadAccessTo: FileManager.default.temporaryDirectory)
+        wv.loadHTMLString(html, baseURL: URL(string: "https://doushujun.me"))
     }
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }

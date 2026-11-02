@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <!--
   极验 4.0 验证容器页（iOS WKWebView 版，改自安卓 assets/geetest.html）：
-  通过 loadFileURL 加载，captcha_id 由 App 读取本文件后替换占位符写入沙盒副本；
-  桥接走 WKScriptMessageHandler（window.webkit.messageHandlers.dsj.postMessage），
+  通过 loadHTMLString 加载并以 https://doushujun.me 为 baseURL（页面 origin=web 端同源，
+  ★勿改回 loadFileURL：file: 协议下 gt4.js 按 protocol+'//' 拼 JSONP 地址成 file://... 必失败）；
+  captcha_id 由 App 读本文件后替换占位符；桥接走 WKScriptMessageHandler
+  （window.webkit.messageHandlers.dsj.postMessage），
   消息体 = {event:"onCaptchaSuccess"|"onClose"|"onError", data:...}
 -->
 <html>
@@ -66,7 +68,8 @@
         {
           captchaId: captchaId,
           product: 'bind',
-          language: 'zh-cn'
+          language: 'zh-cn',
+          https: true   // ★强制 https 协议：防止任何 file:/http: 环境下 gt4 按 protocol+'//' 拼出不可用地址
         },
         function (captchaObj) {
           dbg('obj ok, bind events');
